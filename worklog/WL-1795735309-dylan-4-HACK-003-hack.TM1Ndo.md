@@ -6,7 +6,7 @@
 - Why: uak next requested full smoke; adapter Verify is green but shared adapter is absent
 - Failing: bash .uak/bin/q bash .uak/bin/smoke: exit 2 PRODUCT_UNVERIFIED: missing .uak/bin/smoke-project; secret scan passed 381 files
 - Commands: Verify 19 passed; smoke --affected exit0 PRODUCT_UNVERIFIED; full smoke exit2; git status --short clean
-- Next: Independent review of PR #3; shared product smoke setup requires its owner
+- Next: Integrated in main: 7f1b715714f2a918323f2d91ff42a7672cb531a0
 
 ## History
 - 1795735309 | CLAIMED | dylan-4 | claim; next: leer `docs/PEY.md`, escribir los tests con `httpx.MockTransport` y `uak red HACK-003`. | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795736583 | REVIEW | dylan-4 | done; PR https://github.com/DylanMCDS/Negosocios/pull/3; evidence: 6369315: uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py: 19 passed, exit 0; uak red: 4 assertion failures recorded before fix; smoke --affected: exit 0 PRODUCT_UNVERIFIED (product smoke not configured); diff check exit 0; advisor GO. All spike criteria implemented, real 1 MXN smoke human-only and not run. · red at 892d30a: E       AssertionError: assert False; reviewer: - | Harness: codex | Model: gpt-6.1-sol
 - 1795736635 | REVIEW | dylan-4 | checkpoint; next: Independent review of PR #3; shared product smoke setup requires its owner | Harness: codex | Model: gpt-6.1-sol
 - 1795736914 | REVIEW | dylan-3 | review; approve; SHA 636931560632eebb55cfb40037da53e781cfcf73; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol
+- 1795737171 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit 7f1b715714f2a918323f2d91ff42a7672cb531a0; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol
