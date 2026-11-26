@@ -6,9 +6,9 @@
 ## Event
 | Field | Value |
 |---|---|
-| Event / challenge | `<pendiente: nombre, reto, URL oficial>` · producto: Negosocios (ver IDEA.md, docs/CONTEXTO-CoDi.md) |
+| Event / challenge | Hackatón México 2026 (Pey · SpaceXAI · AI Builders MX), tema libre con CoDi + API de pey, https://hackatonmexico.com · **este sprint = prototipo**; cierre oficial de entregas 2026-12-12 23:59, postulación 2026-12-10 23:59 · producto: Negosocios (ver IDEA.md, docs/CONTEXTO-CoDi.md) |
 | Start | `2026-11-26 16:59 America/Mexico_City` |
-| Official deadline | `2026-11-29 23:59 America/Mexico_City` · platforms: `<pendiente>` |
+| Official deadline | `2026-11-29 23:59 America/Mexico_City` · platforms: portal pey.build (postulación + entrega) |
 | Freeze | `2026-11-29 17:59` (Freeze-Epoch 1795996740) · design lock Thu 17:59 · first claim by Thu 18:59 · plan-B video Sat 08:29 |
 | Clean rehearsal / plan B | `2026-11-29 21:59` |
 | Internal submission | `2026-11-29 22:59` |
@@ -19,16 +19,20 @@
 ## Official rubric (weights sum to 100)
 | ID | Criterion | Weight | Evidence in the demo |
 |---|---|---:|---|
-| C1 | `<criterion>` | `<%>` | `<step or artifact>` |
+| C1 | Uso de CoDi y del API de pey (real, claro para quien paga, QR/push/enlace) | 30 | Pasos 2–3: QR CoDi real y la pantalla reacciona al webhook |
+| C2 | Impacto y relevancia | 25 | Comerciante de tianguis: cobro + cierre del día |
+| C3 | Ejecución técnica (calidad, solidez, seguridad) | 15 | Webhook firmado, idempotencia, llaves sólo en servidor |
+| C4 | Experiencia y diseño (incluido el momento de pagar) | 15 | Pantallas bloqueadas en /uak-design-lock |
+| C5 | Originalidad frente a lo que ya existe en México | 15 | Cierre del día + descuento máximo con contribución mínima |
 
 ## Event rules
 | Topic | Confirmed rule | Source |
 |---|---|---|
-| AI use / prior code | `<...>` | `<URL>` |
-| Data and licenses | `<...>` | `<URL>` |
-| Pitch and video limits | `<duration and format for each>` | `<URL>` |
-| Repository requirements and disqualification rules | `<...>` | `<URL>` |
-| Sponsor requirements, if required by the official rules | `<... or none>` | `<URL>` |
+| AI use / prior code | IA permitida sin declararla. Código previo y de terceros permitido si se declara; la integración pey debe hacerse en el periodo (desde 2026-11-14) | https://hackatonmexico.com/reglas §9 |
+| Data and licenses | Respetar licencias; no guardar datos que pey marca como no almacenables; credenciales nunca en repo ni cliente | https://hackatonmexico.com/reglas §8.6, §9.4 |
+| Pitch and video limits | Video ≤ 3 min mostrando un cobro CoDi completo hasta la reacción al resultado; descripción ≤ 500 palabras; instrucciones de prueba ≤ 1000 palabras; deck opcional | https://hackatonmexico.com/reglas §10.1 |
+| Repository requirements and disqualification rules | Integración pey real y en producción (simulada = no cumple); Demo Pública accesible sin invitación; repo opcional; nombre sin pey/CoDi como marca; entrega incompleta = no entregada | https://hackatonmexico.com/reglas §6, §10 |
+| Sponsor requirements, if required by the official rules | Usar el API de pey para cobrar con CoDi (obligatorio). Bounties: se publican el 2026-11-30 | https://hackatonmexico.com/reglas §6, §15 |
 
 ## Plan B
 - A video of the whole flow at `<path>` (v1 at T−50%, final at T−2 h). Use it if `<network, mic, external API>` fails.
