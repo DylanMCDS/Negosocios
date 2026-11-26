@@ -15,4 +15,4 @@ Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
 Next: leer `docs/PEY.md`, escribir los tests con `httpx.MockTransport` y `uak red HACK-003`.
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 1
