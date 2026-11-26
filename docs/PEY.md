@@ -30,3 +30,12 @@ Un QR se puede pagar más de una vez hasta expirar → para una orden, usar `exp
 
 ## Regla de producto
 Una orden pasa a **pagada sólo** con un webhook verificado (o consulta al proveedor), nunca por lo que diga el cliente.
+
+## Adaptador Python (HACK-003)
+- `app.services.pey.PeyClient` es un Protocol síncrono: `create_qr(amount_mxn, concept, num_ref, expiration_s) -> QrResult(id, qr_string)`.
+- `HttpPeyClient(api_key, client=None)` recibe la llave desde la configuración del servidor. Un `httpx.Client` inyectado sigue siendo propiedad del consumidor. Timeout de 10 segundos, sin reintentos automáticos ni redirecciones; un timeout puede ocurrir después de crear el QR: revisar el portal antes de repetir.
+- `PeyBadRequest`, `PeyRateLimited`, `PeyServerError`, `PeyUnavailable` heredan de `PeyError` y exponen `status_code`, `error_type`, `request_id`. Errores de transporte o respuesta inválida también son `PeyError`; no se incluyen cuerpos ni credenciales en sus mensajes.
+- `FakePeyClient` registra los argumentos en `requests` y devuelve IDs deterministas `fake-qr-N`, con `qr_string` marcado `demo_data:true`; estos valores son sólo para pruebas, no QR CoDi pagables.
+- `app.services.pey_webhook.verify_webhook(raw_body, headers, secret)` devuelve el JSON autenticado o lanza `InvalidSignature` (alias de `WebhookVerificationError`). Verifica firma y vigencia del timestamp; **no** guarda eventos. La deduplicación persistente por `webhook-id` corresponde al consumidor HACK-007.
+- Tests offline: `uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py`.
+- Smoke **manual, sólo humano** con `PEY_API_KEY` ya exportada en su entorno: `uv run --no-project --with httpx python scripts/pey_smoke.py`. Crea **un QR real de 1 MXN**, vigente 360 s; stdout contiene sólo su `id`. No carga ni muestra `.env`. No correr en CI; este spike no acredita todavía un cobro real.
