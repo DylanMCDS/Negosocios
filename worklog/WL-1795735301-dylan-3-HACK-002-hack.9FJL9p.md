@@ -16,3 +16,4 @@
 - 1795736005 | BLOCKED | dylan-3 | Concurrent writer in HACK-002 worktree: schema tests and stubs appeared during read-only reconnaissance. Waiting for human to stop the other session before editing. | Harness: codex | Model: gpt-6.1-sol
 - 1795736024 | BLOCKED | dylan-3 | checkpoint; next: Human stops other HACK-002 session, then resume existing tests with uak red HACK-002 | Harness: codex | Model: gpt-6.1-sol
 - 1795736310 | BLOCKED | dylan-3 | heartbeat; lease until 1795739010 | Harness: codex | Model: gpt-6.1-sol
+- 1795736339 | CLAIMED | dylan-3 | Human confirmed sole writer; resume existing tests and red. | Harness: codex | Model: gpt-6.1-sol
