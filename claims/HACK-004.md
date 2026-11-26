@@ -9,8 +9,8 @@ Priority: P0
 Paths: app/services/finance.py, app/tests/test_finance.py
 Depends: None
 Verify: `uv run --no-project --with pytest pytest -q app/tests/test_finance.py`
-Lease-Until: 1795749771
-Updated: 1795735371
+Lease-Until: 1795750694
+Updated: 1795736294
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/1; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/1

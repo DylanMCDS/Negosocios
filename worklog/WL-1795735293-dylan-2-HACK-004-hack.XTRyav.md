@@ -13,3 +13,4 @@
 - 1795735342 | CLAIMED | dylan-2 | heartbeat; lease until 1795738042 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795735371 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/1; evidence: uv run --no-project --with pytest pytest -q app/tests/test_finance.py exit 0 (5 passed); 100/60/30 -> 10%; negative -> 'el precio actual ya incumple la meta'; closing counts only paid, pending separate, missing flags · red at 892d30a: FAILED app/tests/test_finance.py::test_max_discount_keeps_min_contribution - ...; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795735599 | REVIEW | dylan-1 | review; approve; SHA b871094c6da6d363bf57fed498d577c3a5969d6d; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795736294 | REVIEW | dylan-2 | heartbeat; lease until 1795750694 | Harness: claude-code | Model: claude-sonnet-5-5
