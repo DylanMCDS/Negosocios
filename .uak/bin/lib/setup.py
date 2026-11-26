@@ -1,0 +1,4763 @@
+#!/usr/bin/env python3
+"""Loopback-only visual installation and setup; Python 3.8 standard library.
+
+The existing installer owns installation and `uak start` owns readiness. This service never registers identities
+or changes a remote. Its one act of human authority is approving the plan (planning.py): the person types the
+project name, and only the reviewed plan files are committed and pushed (WHY.md, UI-004).
+"""
+import argparse
+import copy
+import hashlib
+import hmac
+import importlib.util
+import io
+import json
+import os
+import re
+import secrets
+import socketserver
+import shutil
+import signal
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
+import unicodedata
+import threading
+import time
+import webbrowser
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+HARNESS = ("claude", "codex", "cursor", "gemini")
+STACKS = ("none", "fastapi-react", "nextjs", "django", "go", "expo", "python-data", "ai-agent", "spring-boot")
+SETTINGS = {"Blackbox": ("on", "off"), "Pace": ("auto", "off")}
+# UAK-159, the "How your team will work" screen: the one rule the person may change there (a closed list of the engine's own
+# values, docs/CLI.md). Review-Mode, Review-Independence, Auto-Merge and Merge-Engine grant authority: they are read from
+# PROJECT.md on main and shown, never written by the browser (docs/SECURITY.md).
+RULES = {"Test-First": ("yes", "warn", "no")}
+SETTINGS.update(RULES)
+SHOWN = ("Review-Mode", "Review-Independence", "Auto-Merge")  # read for the rules screen, never written by the browser
+# Keys the browser may also add when an older PROJECT.md lacks them; their values are validated, never free text.
+ADDABLE = ("Live-URL",) + tuple(RULES)
+LIMIT = 65536
+
+
+def bash_binary():
+    # install.sh --wizard passes the Bash that runs it: Git for Windows may live anywhere (scoop, another drive),
+    # and a PATH lookup on Windows can find WSL's bash.exe instead.
+    # Only an absolute path to a program named bash; Git Bash reports its own path without ".exe".
+    launched = os.environ.get("UAK_SETUP_BASH", "")
+    for candidate in ((launched, launched + ".exe") if os.name == "nt" else (launched,)):
+        path = Path(candidate)
+        if candidate and path.is_absolute() and path.name.lower() in ("bash", "bash.exe") and path.is_file():
+            return str(path)
+    if os.name == "nt":
+        for base in (os.environ.get("ProgramFiles", "C:/Program Files"), os.environ.get("LOCALAPPDATA", "")):
+            for tail in ("Git/bin/bash.exe", "Programs/Git/bin/bash.exe"):
+                path = Path(base) / tail
+                if path.is_file():
+                    return str(path)
+        raise ValueError("Install Git for Windows, including Git Bash, then restart setup.")
+    binary = shutil.which("bash")
+    if not binary:
+        raise ValueError("Install Bash 3.2 or newer, then restart setup.")
+    return binary
+
+
+def safe_environment():
+    env = {k: v for k, v in os.environ.items() if not k.startswith("UAK_") and k not in (
+        "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR",
+        "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES")}
+    env.update(GIT_TERMINAL_PROMPT="0", GCM_INTERACTIVE="never", PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
+    # Windows Store aliases can precede the interpreter that launched the wizard.
+    env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env.get("PATH", "")
+    return env
+
+
+IDLE_SECONDS = 30 * 60   # UAK-153: a session with no action of the person for this long ends
+IDLE_EXIT_SECONDS = 15 * 60   # UAK-156: the server itself ends after this long with no request at all
+CLOSE_GRACE_SECONDS = 8       # UAK-156: after the page says it closed, a request within this time says it was a reload
+CODE_SECONDS = 120       # the one-time code of the launcher page is exchanged within this time, once
+RESTART = "bash install.sh --wizard"
+# Where a human authority act is recorded: the same file as a human's direct push (pre-push, pre-commit).
+ACT_LOG = "uak-direct-main.log"
+
+
+def agent_reason(*folders):
+    """Why this process has an agent identity (UAK-153), or "" for a human. The wizard performs a human's acts, and
+    it strips UAK_* from its children, so a hook that looks for the agent would not see one: it must not start."""
+    value = os.environ.get("UAK_AGENT", "")
+    if value:
+        return "UAK_AGENT=%s is set in this environment" % value[:40]
+    seen = set()
+    for folder in folders:
+        folder = str(folder or "")
+        if not folder or not os.path.isdir(folder):
+            continue
+
+        def git(*args):
+            try:
+                result = run_command(["git", "-C", folder] + list(args), cwd=folder, timeout=10)
+            except (OSError, subprocess.SubprocessError):
+                return ""
+            return (result.stdout or "").strip() if result.returncode == 0 else ""
+
+        top = git("rev-parse", "--show-toplevel")
+        for base in {folder, top} - {""}:
+            if base in seen:
+                continue
+            seen.add(base)
+            env_file = Path(base) / ".uak-env"
+            try:
+                text = env_file.read_text(encoding="utf-8", errors="replace") if env_file.is_file() else ""
+            except OSError:
+                text = ""
+            for line in text.splitlines():
+                key, _, named = line.strip().partition("=")
+                if key == "UAK_AGENT" and named.strip().strip("\"'"):
+                    return "%s names the agent %s" % (env_file, named.strip().strip("\"'")[:40])
+        if top:
+            named = git("config", "--get", "uak.agent")
+            if named:
+                return "uak.agent=%s is in the git config of %s" % (named[:40], top)
+            gitdir, common = git("rev-parse", "--absolute-git-dir"), git("rev-parse", "--git-common-dir")
+            if gitdir and common:
+                common = common if os.path.isabs(common) else os.path.join(top, common)
+                if os.path.realpath(gitdir) != os.path.realpath(common):
+                    return "%s is a linked worktree, which is where an agent works (an agent's worktree)" % top
+    return ""
+
+
+def refusal_text(reason):
+    return ("UAK SETUP refused: %s.\n"
+            "The wizard performs a human's acts (registering a reviewer, approving the plan, publishing the kit), so it "
+            "starts only for a human. In your own terminal, outside any agent session and outside an agent's worktree, "
+            "with UAK_AGENT unset, no .uak-env naming an agent and no uak.agent in the git config, run: %s"
+            % (reason, RESTART))
+
+
+def terminal_reason():
+    """Why this process has no person at a terminal, or "" (POSIX; none on Windows, where the barrier is the identity
+    refusal and the guard). A person's launch (`bash install.sh --wizard`, which execs setup.py) leaves stdin on their
+    terminal, whatever happens to the output (`| tee`, `> log`); an agent's tool runs a command with stdin on a pipe or
+    /dev/null. A process that allocates its own pty passes: this is a refusal, not a sandbox (SECURITY.md)."""
+    if os.name == "nt":
+        return ""
+    try:
+        return "" if sys.stdin is not None and sys.stdin.isatty() else "its input is not a terminal"
+    except (OSError, ValueError):
+        return "its input is not a terminal"
+
+
+PORT_FILE = "uak-wizard.port"
+
+
+def port_file(target):
+    """<git dir>/uak-wizard.port of the project a wizard starts on, or None when it is not a Git repository. The file
+    says "PID PORT" while the wizard runs; the guard reads it to know a wizard is live for this project."""
+    try:
+        result = run_command(["git", "-C", str(target), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             cwd=str(target), timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    folder = (result.stdout or "").strip()
+    return Path(folder) / PORT_FILE if result.returncode == 0 and folder and Path(folder).is_dir() else None
+
+
+def human_slug(name):
+    """The person's name for the kit, from the Git name of the checkout: its first word, lowercase ASCII, or ""."""
+    words = unicodedata.normalize("NFKD", name or "").encode("ascii", "ignore").decode("ascii").lower().split()
+    slug = re.sub(r"[^a-z0-9_-]", "", words[0]) if words else ""
+    return slug if re.fullmatch(r"[a-z][a-z0-9_-]{0,31}", slug) else ""
+
+
+def git_human(run, root):
+    try:
+        result = run(["git", "-C", str(root), "config", "user.name"], cwd=str(root), timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return human_slug(result.stdout) if result.returncode == 0 else ""
+
+
+def log_human_act(server, root, what, who, commit, detail=""):
+    """One line in uak-direct-main.log for an act of human authority that bypasses the merge gate, as a human's direct
+    push does (UAK-153): epoch, who, what, [detail,] commit. Written before the act, so an act that cannot be recorded
+    does not happen."""
+    try:
+        _, common = server.git_dirs(root)
+        if not common:
+            raise ValueError("no Git folder")
+        who = who if isinstance(who, str) and HUMAN_NAME.fullmatch(who) else "human"
+        line = "%d %s %s%s %s\n" % (int(time.time()), who, what, " " + detail if detail else "", commit)
+        with open(str(common / ACT_LOG), "a", encoding="utf-8") as handle:
+            handle.write(line)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        raise ValueError("Setup could not record this act in %s inside the project's Git folder, so it did not do it. "
+                         "Check that folder is writable, then try again." % ACT_LOG)
+
+
+def windows_job(proc):
+    """A Windows Job Object holding the process, or None (not Windows, or any call failed: the caller falls back to
+    taskkill). `taskkill /T` cannot walk a tree whose parent already exited, a job can (UI-010 review). Descendants
+    created after the assignment join the job by themselves; one spawned in the tiny window between Popen and the
+    assignment is not in it."""
+    if os.name != "nt":
+        return None
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class Basic(ctypes.Structure):
+            _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64), ("PerJobUserTimeLimit", ctypes.c_int64),
+                        ("LimitFlags", wintypes.DWORD), ("MinimumWorkingSetSize", ctypes.c_size_t),
+                        ("MaximumWorkingSetSize", ctypes.c_size_t), ("ActiveProcessLimit", wintypes.DWORD),
+                        ("Affinity", ctypes.c_size_t), ("PriorityClass", wintypes.DWORD),
+                        ("SchedulingClass", wintypes.DWORD)]
+
+        class Counters(ctypes.Structure):
+            _fields_ = [(name, ctypes.c_uint64) for name in (
+                "ReadOperationCount", "WriteOperationCount", "OtherOperationCount",
+                "ReadTransferCount", "WriteTransferCount", "OtherTransferCount")]
+
+        class Extended(ctypes.Structure):
+            _fields_ = [("BasicLimitInformation", Basic), ("IoInfo", Counters), ("ProcessMemoryLimit", ctypes.c_size_t),
+                        ("JobMemoryLimit", ctypes.c_size_t), ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                        ("PeakJobMemoryUsed", ctypes.c_size_t)]
+
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.CreateJobObjectW.restype = wintypes.HANDLE
+        kernel.CreateJobObjectW.argtypes = [wintypes.LPVOID, wintypes.LPCWSTR]
+        kernel.SetInformationJobObject.argtypes = [wintypes.HANDLE, ctypes.c_int, wintypes.LPVOID, wintypes.DWORD]
+        kernel.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+        kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+        job = kernel.CreateJobObjectW(None, None)
+        if not job:
+            return None
+        info = Extended()
+        info.BasicLimitInformation.LimitFlags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        if not kernel.SetInformationJobObject(job, 9, ctypes.byref(info), ctypes.sizeof(info)) or \
+                not kernel.AssignProcessToJobObject(job, int(proc._handle)):
+            kernel.CloseHandle(job)
+            return None
+        return job
+    except Exception:
+        return None
+
+
+def windows_job_end(job, kill):
+    """Terminate (when `kill`) and close the job; closing it also kills anything left (KILL_ON_JOB_CLOSE)."""
+    import ctypes
+    from ctypes import wintypes
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.TerminateJobObject.argtypes = [wintypes.HANDLE, wintypes.UINT]
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    if kill:
+        kernel.TerminateJobObject(job, 1)
+    kernel.CloseHandle(job)
+
+
+# UAK-156: every child of the wizard (git, `uak`, install.sh, the planner) runs in a group of its own that the server
+# records in <git dir>/uak-wizard.children and kills on every way out; on Linux a child also dies with a server that is
+# killed (parent-death signal), and the next start kills what a killed server left, from that record.
+CHILDREN = {}
+CHILD_LOCK = threading.Lock()
+CHILD_FILE = [None]
+CHILD_RECORD = "uak-wizard.children"
+KEY_FILE = "uak-wizard.key"
+
+
+def process_stamp(pid):
+    """Something that changes when the number is reused: the start time of the process, or "" when it is not there or
+    cannot be read."""
+    return read_stamp(pid) or ""
+
+
+def process_exists(pid):
+    """Is there a process with this number (a zombie counts)? POSIX: signal 0. Windows: OpenProcess (os.kill there would
+    end the process)."""
+    if os.name == "nt":
+        return windows_stamp(pid) is not None
+    try:
+        os.kill(pid, 0)
+    except PermissionError:
+        return True
+    except (OSError, OverflowError, ValueError):
+        return False
+    return True
+
+
+def read_stamp(pid):
+    """UAK-196: the start time of PID, read ONE way per system, the same when it is recorded and when it is compared
+    (a record of another wizard of this project is read by the same code): Linux the start field of /proc/PID/stat
+    (clock ticks since boot); macOS the kernel's p_starttime by sysctl (microseconds); Windows the creation time of
+    GetProcessTimes; other systems `ps -o lstart=` in the C locale and UTC. None when no process has the number, ""
+    when one has it and its start time cannot be read (then nothing is signalled: see process_state)."""
+    if not isinstance(pid, int) or pid <= 0:
+        return None
+    if os.name == "nt":
+        return windows_stamp(pid)
+    if os.path.isdir("/proc/self"):
+        try:
+            with open("/proc/%d/stat" % pid, encoding="utf-8") as handle:
+                return handle.read().rsplit(")", 1)[1].split()[19]
+        except (OSError, IndexError, ValueError):
+            return "" if process_exists(pid) else None
+    if sys.platform == "darwin":
+        return darwin_stamp(pid)
+    try:
+        env = dict(os.environ, LC_ALL="C", TZ="UTC0")
+        done = subprocess.run(["ps", "-o", "lstart=", "-p", str(pid)], capture_output=True, text=True, timeout=10, env=env)
+        found = " ".join(done.stdout.split()) if done.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        found = ""
+    return found or ("" if process_exists(pid) else None)
+
+
+def darwin_stamp(pid):
+    """macOS: sysctl kern.proc.pid.PID; the struct kinfo_proc starts with p_starttime (a timeval) and holds p_pid at
+    byte 40. The pid is checked, so a layout this code does not know reads as "cannot be read", never as a match."""
+    try:
+        import ctypes
+        import struct
+        libc = ctypes.CDLL(None, use_errno=True)
+        mib = (ctypes.c_int * 4)(1, 14, 1, pid)  # CTL_KERN, KERN_PROC, KERN_PROC_PID
+        buf = ctypes.create_string_buffer(1024)
+        size = ctypes.c_size_t(1024)
+        if libc.sysctl(mib, 4, buf, ctypes.byref(size), None, ctypes.c_size_t(0)) != 0:
+            return "" if process_exists(pid) else None
+        if size.value == 0:
+            return None  # no process has the number
+        raw = buf.raw[:size.value]
+        seconds, micros = struct.unpack_from("=qi", raw, 0)
+        if size.value < 44 or struct.unpack_from("=i", raw, 40)[0] != pid or seconds <= 0:
+            return ""
+        return "%d%06d" % (seconds, micros)
+    except Exception:  # noqa: BLE001 - no ctypes or no sysctl: unreadable, so nothing is signalled
+        return "" if process_exists(pid) else None
+
+
+def windows_stamp(pid):
+    """Windows: the creation time of PID (100 ns since 1601) by OpenProcess and GetProcessTimes; None when no process has
+    the number (ERROR_INVALID_PARAMETER), "" when it cannot be opened or read."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.OpenProcess.restype = wintypes.HANDLE
+        kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel.GetProcessTimes.argtypes = [wintypes.HANDLE] + [ctypes.POINTER(wintypes.FILETIME)] * 4
+        kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+        handle = kernel.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+        if not handle:
+            return None if ctypes.get_last_error() == 87 else ""
+        try:
+            times = [wintypes.FILETIME() for _ in range(4)]
+            if not kernel.GetProcessTimes(handle, *[ctypes.byref(t) for t in times]):
+                return ""
+            value = (times[0].dwHighDateTime << 32) | times[0].dwLowDateTime
+            return "%d" % value if value else ""
+        finally:
+            kernel.CloseHandle(handle)
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def process_state(pid, stamp):
+    """UAK-196: is PID still the process recorded with STAMP? "same" (its start time is the recorded one), "other" (the
+    number now belongs to another process), "gone" (no process has the number) or "unknown" (its start time cannot be
+    read, or none was recorded). Only "same" may be signalled; "gone" may only have its group ended (a group or session
+    keeps its number reserved, so the group is still the one this server started)."""
+    now = read_stamp(pid)
+    if now is None:
+        return "gone"
+    if not now or not stamp:
+        return "unknown"
+    return "same" if now == stamp else "other"
+
+
+LEFT_WHY = {"other": "its number now belongs to another program, so setup did not touch it",
+            "unknown": "setup could not read its start time, so it cannot tell it is the process it started and left it alone"}
+
+
+def report_left(pid, state):
+    """A recorded process that setup did not signal is said on the terminal, never left in silence."""
+    try:
+        print("UAK SETUP did not end process %d: %s. If it is still running and it is yours, end it yourself." % (
+            pid, LEFT_WHY.get(state, state)), flush=True)
+    except (OSError, ValueError):
+        pass
+
+
+def write_children():
+    path = CHILD_FILE[0]
+    if not path:
+        return
+    try:
+        with CHILD_LOCK:
+            lines = ["%d %s\n" % (pid, stamp) for pid, stamp in CHILDREN.items()]
+            if lines:
+                Path(path).write_text("".join(lines), encoding="utf-8")
+            elif Path(path).exists():
+                Path(path).unlink()
+    except OSError:
+        pass
+
+
+def track_child(pid, stamp=None):
+    """Record PID with its start time, always (UAK-196: a kill compares it, with or without a record file)."""
+    stamp = process_stamp(pid) if stamp is None else stamp
+    with CHILD_LOCK:
+        CHILDREN[pid] = stamp
+    write_children()
+
+
+def forget_child(pid):
+    with CHILD_LOCK:
+        CHILDREN.pop(pid, None)
+    write_children()
+
+
+def pid_alive(pid):
+    """A process that is there and not a zombie."""
+    try:
+        os.kill(pid, 0)
+    except (OSError, OverflowError):
+        return False
+    try:
+        with open("/proc/%d/stat" % pid, encoding="utf-8") as handle:
+            return handle.read().rsplit(")", 1)[1].split()[0] != "Z"
+    except (OSError, IndexError):
+        return True
+
+
+def descendants(pid):
+    """Every process below PID by parent links (UAK-192: a child that calls setsid leaves the group, not the tree):
+    /proc on Linux, else `ps -A -o pid=,ppid=`. Collected before anything is killed."""
+    parents = {}
+    if os.path.isdir("/proc/self"):
+        for name in os.listdir("/proc"):
+            if name.isdigit():
+                try:
+                    with open("/proc/%s/stat" % name, encoding="utf-8") as handle:
+                        parents[int(name)] = int(handle.read().rsplit(")", 1)[1].split()[1])
+                except (OSError, IndexError, ValueError):
+                    pass
+    else:
+        try:
+            out = subprocess.run(["ps", "-A", "-o", "pid=,ppid="], capture_output=True, text=True, timeout=10).stdout
+        except (OSError, subprocess.SubprocessError):
+            out = ""
+        for line in out.splitlines():
+            parts = line.split()
+            if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+                parents[int(parts[0])] = int(parts[1])
+    found, queue = [], [pid]
+    while queue:
+        head = queue.pop()
+        for child, parent in parents.items():
+            if parent == head and child not in found and child != os.getpid():
+                found.append(child)
+                queue.append(child)
+    return found
+
+
+def kill_pids(targets, wait=1.0):
+    """TERM every PID of TARGETS ({pid: start time}, checked by the caller), wait a bounded time, then KILL only what is
+    still the same process (UAK-196: a number freed and given to another program during the wait is not killed).
+    Never this process."""
+    targets = dict((p, s) for p, s in targets.items() if p > 1 and p != os.getpid())
+    for pid in targets:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except (OSError, OverflowError):
+            pass
+    end = time.monotonic() + wait
+    while time.monotonic() < end and any(pid_alive(p) for p in targets):
+        time.sleep(0.05)
+    for pid, stamp in targets.items():
+        if pid_alive(pid) and stamp and read_stamp(pid) == stamp:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except (OSError, OverflowError):
+                pass
+
+
+def stamped(pids):
+    """{pid: start time} of the PIDs whose start time can be read now (one that ended meanwhile drops out)."""
+    found = {}
+    for pid in pids:
+        stamp = read_stamp(pid)
+        if stamp:
+            found[pid] = stamp
+    return found
+
+
+def end_dead_group(pid):
+    """The leader PID is gone: end what is left of its group. Its number stays reserved while the group exists, so the
+    group is the one this server started; with no group this signals nothing."""
+    if os.name == "nt":
+        return
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except (OSError, OverflowError):
+        pass
+
+
+def kill_recorded(pid, tree=False):
+    """End PID's group (with TREE, its descendants too) only while PID is the process this server recorded (UAK-196):
+    the same start time, or gone with its group left. A number no longer in the record, or another process's now, is
+    never signalled."""
+    with CHILD_LOCK:
+        stamp = CHILDREN.get(pid)
+    if stamp is None:
+        return
+    state = process_state(pid, stamp)
+    if state == "same":
+        kill_group(pid, tree=tree)
+    elif state == "gone":
+        end_dead_group(pid)
+    else:
+        report_left(pid, state)
+
+
+def kill_group(pid, tree=False):
+    """End PID's process group (Windows: its tree). With TREE (UAK-192) also every descendant by parent links, leaving the
+    group or not: TERM, a bounded wait, then KILL. The caller has checked that PID is the process it recorded."""
+    if os.name != "nt" and tree:
+        kill_pids(stamped([pid] + descendants(pid)))
+        try:
+            os.killpg(pid, signal.SIGKILL)
+        except OSError:
+            pass
+        return
+    if os.name == "nt":
+        try:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(pid)], capture_output=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            pass
+        return
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except OSError:
+        pass
+
+
+def stop_children():
+    """Every child still running, with its descendants (the way out of the server, whatever the cause). UAK-196: each
+    recorded number is compared with its recorded start time first; one that differs or cannot be read is not
+    signalled, and is said on the terminal."""
+    with CHILD_LOCK:
+        recorded = list(CHILDREN.items())
+    for pid, stamp in recorded:
+        state = process_state(pid, stamp)
+        if state == "same":
+            kill_group(pid, tree=True)
+        elif state == "gone":
+            end_dead_group(pid)
+        else:
+            report_left(pid, state)
+        forget_child(pid)
+
+
+class TreeWatch:
+    """UAK-192: what a button's process starts, remembered while it runs (every descendant, with its start time), so a
+    grandchild that calls setsid and outlives its parent is still ended, and is in the child record meanwhile."""
+
+    def __init__(self, pid, pipes=()):
+        self.pid, self.seen, self.done = pid, {}, threading.Event()
+        self.stamp = process_stamp(pid)  # UAK-196: what is below the number counts only while it is still the run's
+        self.every = 0.25 if os.path.isdir("/proc/self") else 1.0
+        self.started = time.monotonic()
+        self.pipes = set()
+        for handle in pipes:  # Linux: what holds the pipe of the run is part of the run, whoever started it
+            try:
+                self.pipes.add(os.readlink("/proc/self/fd/%d" % handle.fileno()))
+            except (OSError, ValueError, AttributeError):
+                pass
+        self.thread = threading.Thread(target=self.poll, daemon=True)
+        self.thread.start()
+
+    def mine(self):
+        """The run's own process is still the one started (a zombie counts): what is below it is the run's."""
+        return process_state(self.pid, self.stamp) == "same"
+
+    def look(self):
+        if not self.mine():
+            return
+        for pid in descendants(self.pid):
+            if pid not in self.seen:
+                stamp = process_stamp(pid)
+                self.seen[pid] = stamp
+                track_child(pid, stamp)
+
+    def holders(self):
+        found = []
+        if self.pipes:
+            for name in os.listdir("/proc"):
+                if name.isdigit() and int(name) != os.getpid():
+                    try:
+                        for fd in os.listdir("/proc/%s/fd" % name):
+                            if os.readlink("/proc/%s/fd/%s" % (name, fd)) in self.pipes:
+                                found.append(int(name))
+                                break
+                    except OSError:
+                        pass
+        return found
+
+    def poll(self):
+        while not self.done.wait(0.02 if self.pipes and time.monotonic() - self.started < 1.0 else self.every):
+            self.look()
+
+    def kill(self):
+        """End the tree that is left, and forget it."""
+        self.done.set()
+        if threading.current_thread() is not self.thread:
+            self.thread.join(3)
+        self.look()
+        left = {}
+        for pid, stamp in list(self.seen.items()):
+            state = process_state(pid, stamp)  # UAK-196: a number given to another program meanwhile is left alone
+            if state == "same":
+                left[pid] = stamp
+            elif state == "unknown":
+                report_left(pid, state)
+        below = descendants(self.pid) if self.mine() else []
+        for pid, stamp in stamped(below + self.holders()).items():
+            left.setdefault(pid, stamp)
+        kill_pids(left)
+        for pid in list(self.seen):
+            forget_child(pid)
+
+
+PAGE_ID = re.compile(r"[a-z0-9]{8,32}")  # the shape the page generates
+MAX_PAGES = 64
+RECORD_LINE = re.compile(r"([0-9]{1,9}) ([0-9A-Za-z][0-9 A-Za-z:]*)", re.ASCII)
+
+
+def protected_groups():
+    """The numbers a record must never make us signal: this process, its group, its parent and the parent's group (the
+    person's terminal job)."""
+    mine = {os.getpid(), os.getppid()}
+    for getter in (os.getpgrp, lambda: os.getpgid(0), lambda: os.getpgid(os.getppid())):
+        try:
+            mine.add(getter())
+        except (OSError, AttributeError):
+            pass
+    return mine
+
+
+def reap_children(path):
+    """Kill the groups a server that no longer exists left, then drop the record. Each line is "PID START": plain ASCII
+    digits, a PID above 1 that is none of ours, and a start time. A line that does not parse is skipped and signals
+    nothing; a leader that is alive with another start time is not touched; a dead leader whose group still has members
+    is the case the record is for (on Linux the members must be in a session of that number). Windows closes its jobs
+    with the server: nothing to read there."""
+    try:
+        lines = Path(path).read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError):
+        lines = None
+    killed = 0
+    if lines is not None and os.name != "nt":
+        keep_away = protected_groups()
+        for line in lines:
+            found = RECORD_LINE.fullmatch(line.strip())
+            if not found:
+                continue
+            pid, stamp = int(found.group(1)), found.group(2)
+            if pid <= 1 or pid in keep_away:
+                continue
+            state = process_state(pid, stamp)
+            if state == "other":
+                continue  # the number belongs to another process now
+            if state == "unknown":
+                report_left(pid, state)  # UAK-196: a start time that cannot be read signals nothing
+                continue
+            if state == "gone" and sys.platform.startswith("linux") and not group_members(pid):
+                continue
+            try:
+                os.killpg(pid, 0)  # the leader may be gone (it died with the server) while its children are not
+            except (OSError, OverflowError):
+                continue
+            kill_group(pid)
+            killed += 1
+    try:
+        Path(path).unlink()
+    except OSError:
+        pass
+    return killed
+
+
+def group_members(pid):
+    """Linux: the processes in group PID that started their own session (what the wizard's children do)."""
+    found = []
+    try:
+        names = os.listdir("/proc")
+    except OSError:
+        return found
+    for name in names:
+        if not name.isdigit():
+            continue
+        try:
+            with open("/proc/%s/stat" % name, encoding="utf-8") as handle:
+                fields = handle.read().rsplit(")", 1)[1].split()
+            if int(fields[2]) == pid and int(fields[3]) == pid:
+                found.append(int(name))
+        except (OSError, IndexError, ValueError):
+            continue
+    return found
+
+
+LIBC = []
+
+
+def load_libc():
+    """libc, loaded in the parent before any child starts (a preexec_fn must not import or load anything)."""
+    if not LIBC:
+        try:
+            import ctypes
+            LIBC.append(ctypes.CDLL(None, use_errno=True))
+        except Exception:  # noqa: BLE001 - no libc here: the record and the next start do the cleaning
+            LIBC.append(None)
+    return LIBC[0]
+
+
+def die_with_parent():
+    """preexec_fn (Linux): SIGKILL for this child when the thread that started it ends, i.e. when the server is killed."""
+    try:
+        LIBC[0].prctl(1, 9)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def run_command(command, cwd=None, timeout=120, group=False, env=None, on_line=None, input=None, binary=False, on_start=None, **kwargs):
+    """`env` adds a few named variables to the sanitized environment (UI-006: UAK_HUMAN for one human act).
+    `on_line` (UI-010) receives each line of standard output while the process runs. UAK-156: whatever `group` says, the
+    child has a process group of its own that is recorded and killed when it ends, times out or the server ends."""
+    environment = safe_environment()
+    environment.update(env or {})
+    extra = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" else {"start_new_session": True}
+    if sys.platform.startswith("linux") and load_libc():
+        extra["preexec_fn"] = die_with_parent
+    text = {} if binary else {"text": True, "encoding": "utf-8", "errors": "replace"}
+    proc = subprocess.Popen(command, cwd=cwd, env=environment, stdin=subprocess.PIPE if input is not None else subprocess.DEVNULL,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, **text, **extra)
+    track_child(proc.pid)
+    if on_start:  # UAK-192: the page's Stop button needs the group to end
+        try:
+            on_start(proc.pid)
+        except Exception:
+            pass
+    job = windows_job(proc)
+    watch = TreeWatch(proc.pid, (proc.stdout, proc.stderr)) if on_start and os.name != "nt" else None
+    holder = [job]  # the job is closed once, by whichever of stop_group or the final cleanup gets there first
+    readers, lines, errors = [], [], []
+    if on_line:  # both pipes are drained by threads, so a chatty stderr never blocks the tool
+        def read_out():
+            for line in proc.stdout:
+                lines.append(line)
+                try:
+                    on_line(line)
+                except Exception:
+                    pass
+        readers = [threading.Thread(target=read_out, daemon=True),
+                   threading.Thread(target=lambda: errors.extend(proc.stderr), daemon=True)]
+        for thread in readers:
+            thread.start()
+
+    def stop_group():
+        if os.name == "nt":
+            if holder[0]:
+                windows_job_end(holder[0], True)
+                holder[0] = None
+            else:
+                kill_recorded(proc.pid)
+        elif watch:
+            kill_recorded(proc.pid, tree=proc.poll() is None)
+            watch.kill()
+        else:
+            kill_recorded(proc.pid)
+
+    def finish(wait=None):
+        if not readers:
+            return proc.communicate(input, timeout=wait)
+        proc.wait(timeout=wait)
+        # One grace period for both readers, not 10 s each (UI-015: Windows QA measured 20 s).
+        deadline = time.monotonic() + (2 if watch else 10)
+        for thread in readers:
+            thread.join(max(0, deadline - time.monotonic()))
+        if any(thread.is_alive() for thread in readers):
+            # A descendant still holds the pipe after the tool exited: stop the group, never leave it running (UI-010 review).
+            stop_group()
+            for thread in readers:
+                thread.join(10)
+        return "".join(lines), "".join(errors)
+
+    try:
+        try:
+            out, err = finish(timeout)
+        except subprocess.TimeoutExpired:
+            stop_group()
+            out, err = finish()
+            if not group:
+                raise subprocess.TimeoutExpired(command, timeout, output=out, stderr=err)
+            return subprocess.CompletedProcess(command, 124, out, err + "\nThe run took too long and was stopped.")
+        return subprocess.CompletedProcess(command, proc.returncode, out, err)
+    finally:
+        if os.name == "nt":
+            if holder[0]:  # the job holds a descendant that outlived its tool; closing it ends it
+                windows_job_end(holder[0], True)
+        elif watch:
+            kill_recorded(proc.pid)
+            watch.kill()
+        else:
+            kill_recorded(proc.pid)  # a descendant that outlived its tool does not outlive the call
+        forget_child(proc.pid)
+
+
+def redact(text):
+    text = re.sub(r"(https?://)[^\s/@]+:[^\s/@]+@", r"\1[redacted]@", str(text))
+    text = re.sub(r"\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{12,})", "[redacted]", text)
+    text = re.sub(r"(?i)((?:token|password|secret|api[_-]?key)\s*[=:]\s*)\S+", r"\1[redacted]", text)
+    text = re.sub(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b", "[redacted]", text)
+    text = re.sub(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/=-]{8,}", r"\1[redacted]", text)
+    return text[-18000:]
+
+
+class FieldError(ValueError):
+    """A refusal about one form field: the page shows it under that field and moves the focus there (UI-021)."""
+
+    def __init__(self, message, field):
+        super().__init__(message)
+        self.field = field
+
+
+def project_root(target):
+    if not isinstance(target, str) or not target.strip() or len(target) > 4096 or "\x00" in target:
+        raise FieldError("Enter the full path to an existing Git repository.", "target")
+    given = Path(target.strip()).expanduser()
+    # UI-021 (QA round D): "my-app" said "does not exist" (it was looked up next to setup). A path from the root of a
+    # drive (/c/Users/… in Git Bash) is still a full path.
+    if not given.is_absolute() and not target.strip().startswith(("/", "\\")):
+        raise FieldError("Use the full path of the folder, not a relative one: for example /Users/you/my-app or "
+                         "C:\\Projects\\my-app.", "target")
+    path = given.resolve()
+    if not path.is_dir():
+        raise FieldError("This folder does not exist. Choose an existing project folder.", "target")
+    result = run_command(["git", "-C", str(path), "rev-parse", "--show-toplevel"], timeout=10)
+    if result.returncode or Path(result.stdout.strip()).resolve() != path:
+        raise FieldError("Choose the root of a Git repository. Create the repository first if needed.", "target")
+    if (path / ".uak").is_symlink():
+        raise FieldError("The kit folder must be local to this project, not a symbolic link.", "target")
+    return path
+
+
+def install_command(installer, target, options):
+    if not isinstance(options, dict) or set(options) - {"mode", "harness", "stack", "blackbox", "solo"}:
+        raise ValueError("Unknown installation option.")
+    mode = options.get("mode")
+    harness = options.get("harness", ["claude", "codex"])
+    stack = options.get("stack", "none")
+    if mode not in ("sprint", "marathon"):
+        raise ValueError("Choose Hackathon or Product before installing.")
+    if not isinstance(harness, list) or not harness or any(h not in HARNESS for h in harness) or len(set(harness)) != len(harness):
+        raise ValueError("Choose at least one supported coding tool.")
+    if stack not in STACKS or any(not isinstance(options.get(k, False), bool) for k in ("blackbox", "solo")):
+        raise ValueError("Invalid stack or installation preference.")
+    cmd = [bash_binary(), str(Path(installer).resolve()), "--mode", mode, "--harness", ",".join(harness), "--stack", stack]
+    if options.get("blackbox", True) is False:
+        cmd.append("--no-blackbox")
+    if options.get("solo", False):
+        cmd.append("--solo")
+    return cmd + [str(target)]
+
+
+DASH = []
+
+
+def dashboard_module():
+    """dash.py, imported once for the whole life of the server; its git calls go through the wizard's own runner."""
+    if not DASH:
+        spec = importlib.util.spec_from_file_location("uak_dashboard", Path(__file__).with_name("dash.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        module.RUNNER = run_command
+        DASH.append(module)
+    return DASH[0]
+
+
+def valid_setting(key, value):
+    if key == "Live-URL":
+        # The deploy link: only what the dashboard would render as a link (https, a host, no credentials).
+        return isinstance(value, str) and dashboard_module().live_url(value) == value
+    return value in SETTINGS[key]
+
+
+def save_settings(target, settings):
+    if not isinstance(settings, dict) or not settings or set(settings) - set(SETTINGS) - set(ADDABLE):
+        raise ValueError("Only the diagnostics, usage pacing, the test rule and the deploy link can be changed here.")
+    if any(not valid_setting(key, value) for key, value in settings.items()):
+        raise ValueError("Invalid project preference.")
+    path = Path(target) / ".uak/PROJECT.md"
+    if path.is_symlink() or path.parent.is_symlink():
+        raise ValueError("Project configuration must be a regular local file.")
+    text = path.read_bytes().decode("utf-8")
+    # Read/write only the executable config block, leaving prose and all other fields intact.
+    matches = list(re.finditer(r"(?ms)^```text\r?\n(.*?)^```", text))
+    if len(matches) != 1:
+        raise ValueError("Expected one executable configuration block in .uak/PROJECT.md.")
+    block = matches[0]
+    content = block.group(1)
+    for key, value in settings.items():
+        found = len(re.findall(r"(?m)^[-* ]*" + re.escape(key) + r":", text))
+        if found == 0 and key in ADDABLE:
+            # A PROJECT.md from before this key: add it as the block's last line, in the block's line ending.
+            newline = "\r\n" if "\r\n" in content else "\n"
+            content = content + key + ": " + value + newline
+            continue
+        if found != 1:
+            raise ValueError("Ambiguous %s setting. Keep a single setting in the executable configuration block." % key)
+        pattern = r"(?m)^" + re.escape(key) + r": [^\r\n]*"
+        if len(re.findall(pattern, content)) != 1:
+            raise ValueError("Expected exactly one %s setting. Restore the project configuration first." % key)
+        content = re.sub(pattern, lambda match: key + ": " + value, content)
+    updated = text[:block.start(1)] + content + text[block.end(1):]
+    fd, name = tempfile.mkstemp(prefix=".uak-setup-", dir=str(path.parent))
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(updated.encode("utf-8"))
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(name, path.stat().st_mode)
+        if path.read_bytes().decode("utf-8") != text:
+            raise ValueError("Project configuration changed while saving. Reload and try again.")
+        os.replace(name, path)
+    finally:
+        if os.path.exists(name):
+            os.unlink(name)
+    return True
+
+
+def read_config(target, keys=None):
+    """The page's four settings, or the raw values of `keys` (UI-019 reads Freeze-Epoch) through the same reader."""
+    path = Path(target) / ".uak/PROJECT.md"
+    if not path.is_file():
+        return {}
+    # Use the engine's reader, including its Markdown and first-match semantics.
+    settings = keys is None
+    keys = ("Mode", "Blackbox", "Pace", "Live-URL") + tuple(RULES) + SHOWN if settings else tuple(keys)
+    script = '. "$1"; file=$2; for key in %s; do uak_cfg "$file" "$key"; done' % " ".join(keys)
+    result = run_command([bash_binary(), "-c", script, "uak-setup-config",
+                          str(Path(__file__).with_name("config.sh")), str(path)], timeout=10)
+    if result.returncode:
+        raise ValueError("Could not read the project configuration. Check technical details in the terminal.")
+    values = dict(zip(keys, result.stdout.splitlines()))
+    if not settings:
+        return values
+    # Only a link the dashboard would render is shown back; "-" or anything invalid reads as no link.
+    values["Live-URL"] = dashboard_module().live_url(values.get("Live-URL")) or ""
+    return values
+
+
+def install_unfinished(target):
+    """install.sh writes .uak/INSTALLING first and removes it last (UAK-171): present means it stopped halfway."""
+    return (Path(target) / ".uak/INSTALLING").exists()
+
+
+GH_LOGIN = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\Z")
+
+
+def signing_identity(run, root):
+    """Who will sign this project's commits and pull requests (UI-007): the project's Git name and email, and the GitHub
+    login of `gh`. Only those parsed values leave this function; gh's output (it prints token details) never does."""
+    def value(*args):
+        try:
+            result = run(["git", "-C", str(root), "config"] + list(args), cwd=str(root), timeout=10)
+        except (OSError, subprocess.SubprocessError):
+            return ""
+        return (result.stdout or "").strip()[:200] if result.returncode == 0 else ""
+
+    # `gh config get user` reads gh's own hosts file: no network (auth status validates the token online and made
+    # inspecting a project wait), and nothing but the login. Anything that is not one login is ignored.
+    login = ""
+    try:
+        shown = run(["gh", "config", "get", "user", "-h", "github.com"], cwd=str(root), timeout=10)
+        text = (shown.stdout or "").strip()
+        login = text if shown.returncode == 0 and GH_LOGIN.fullmatch(text) else ""
+    except (OSError, subprocess.SubprocessError):
+        login = ""
+    return {"git_name": value("user.name"), "git_email": value("user.email"), "gh_login": login}
+
+
+def kit_present(target):
+    return not install_unfinished(target) and \
+        all((Path(target) / path).is_file() for path in (".uak/PROJECT.md", ".uak/bin/uak", ".uak/VERSION"))
+
+
+# UAK-160: `uak start` says what each check is as a code with its values on a line of its own ("CODE {json}", only when
+# UAK_START_CODES=1). The page writes its own sentence for the code; the engine's prose stays in `text` for the technical
+# details. What comes from the engine is bounded and typed here, never trusted: a code is a short lowercase name, a value
+# is a short string, and anything else is dropped (the page then says the check has no description).
+CODE_NAME = re.compile(r"[a-z][a-z0-9_]{0,47}\Z")
+CODE_VALUE_MAX, CODE_VALUES_MAX, CODE_HINTS_MAX = 600, 12, 24
+
+
+def coded(item):
+    """{"code", "values"} from one engine item, or None when it is not a well-formed code."""
+    if not isinstance(item, dict):
+        return None
+    name, values = item.get("code"), item.get("values")
+    if not isinstance(name, str) or not CODE_NAME.match(name) or not isinstance(values, dict):
+        return None
+    clean = {}
+    for key, value in list(values.items())[:CODE_VALUES_MAX]:
+        if isinstance(key, str) and CODE_NAME.match(key) and isinstance(value, str):
+            clean[key] = value[:CODE_VALUE_MAX]
+    return {"code": name, "values": clean}
+
+
+def code_line(line):
+    if not line.startswith("CODE {"):
+        return None
+    try:
+        data = json.loads(line[5:])
+    except (ValueError, RecursionError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def attach_code(check, data):
+    """Put one CODE line on the check it follows: its own code and values, then the codes of the lines under it. Every
+    field is checked for its type before it is used; a wrong one is dropped and the rest of the line still counts."""
+    state = data.get("state")
+    head = coded(data.get("check"))
+    if isinstance(state, str) and state in ("ok", "todo", "note") and head:
+        check.update(head)
+    given = data.get("hints")
+    items = given[:CODE_HINTS_MAX] if isinstance(given, list) else []
+    hints = [coded(h) for h in items]
+    if any(hints):
+        texts = check.get("text", "").split("\n")[1:]
+        check["hints"] = [dict(h or {}, text=texts[i] if len(texts) == len(hints) else "") for i, h in enumerate(hints)]
+
+
+def readiness(output, code):
+    lines = redact(output).splitlines()
+    checks = []
+    ready_code = None
+    for line in lines:
+        match = re.match(r"^(OK|TODO|NOTE)\s+(.*)$", line)
+        data = code_line(line)
+        if data is not None:
+            if isinstance(data.get("state"), str) and data["state"] == "ready":
+                ready_code = coded(data.get("check"))
+            elif checks:
+                attach_code(checks[-1], data)
+        elif match:
+            checks.append({"state": match.group(1).lower(), "text": match.group(2)})
+        elif line.startswith("         ") and checks:
+            checks[-1]["text"] += "\n" + line.strip()
+    ready_lines = [line[len("START READY · "):].strip() for line in lines if line.startswith("START READY · ")]
+    ready = code == 0 and bool(ready_lines)
+    # Only the exact claim command is ever offered to copy; anything else on the READY line (the engine's note,
+    # "cd <worktree> and open your agent there…") is prose shown as text.
+    claim = CLAIM_COMMAND.match(ready_lines[-1]) if ready else None
+    result = {"ready": ready, "checks": checks, "next_command": claim.group(0) if claim else "",
+              "next_note": ready_lines[-1] if ready and not claim else ""}
+    result["next_code"] = ready_code if ready and ready_code else None
+    return result
+
+
+BUSY = ("installing", "checking", "planning", "approving", "publishing", "registering")
+# Whole-string matches over ASCII only: `$` lets a trailing newline through and \d takes non-ASCII digits (review of
+# 57ef048: "ana\n" could add a line to the Published-By commit message).
+HUMAN_NAME = re.compile(r"[a-z][a-z0-9_-]{0,31}\Z")
+
+
+def zone_database():
+    """True when this computer can tell a real time zone from a made-up one (Python's zoneinfo or the system files)."""
+    try:
+        import zoneinfo
+        if zoneinfo.available_timezones():
+            return True
+    except ImportError:  # Python 3.8: the system's zone files only
+        pass
+    return any(os.path.isfile(os.path.join(folder, "Etc", "UTC")) for folder in ZONE_DIRS)
+
+
+def real_zone(zone):
+    """An IANA time zone this computer knows; without a zone database, one in an IANA area."""
+    if zone not in ("UTC", "GMT") and not (TIME_ZONE.fullmatch(zone) and zone.split("/")[0] in ZONE_AREAS):
+        return False
+    try:
+        import zoneinfo
+        if zoneinfo.available_timezones():
+            zoneinfo.ZoneInfo(zone)
+            return True
+    except ImportError:
+        pass
+    except (ValueError, OSError, LookupError):  # ZoneInfoNotFoundError is a KeyError
+        return False
+    folders = [folder for folder in ZONE_DIRS if os.path.isfile(os.path.join(folder, "Etc", "UTC"))]
+    return not folders or any(os.path.isfile(os.path.join(folder, *zone.split("/"))) for folder in folders)
+
+
+def dated(shown, start, end, last=False):
+    """The engine's "Tue 11:55" (a weekday and a time in the event's zone) with its date inside the event: the first
+    such day from the start, or the last one up to the end (UI-021: "stops Wed 06:24; take the first task by Tue 11:55"
+    read in reverse). "" when it is not that shape."""
+    import datetime
+    match = re.fullmatch(r"(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (\d\d):(\d\d)", shown.strip())
+    if not match:
+        return ""
+    begin, finish = (datetime.datetime.strptime(t, "%Y-%m-%d %H:%M") for t in (start, end))
+    days = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    day = finish.date() if last else begin.date()
+    for _ in range(8):
+        moment = datetime.datetime(day.year, day.month, day.day, int(match.group(2)), int(match.group(3)))
+        if days[moment.weekday()] == match.group(1) and (moment <= finish if last else moment >= begin):
+            return "%s %s" % (match.group(1), moment.strftime("%Y-%m-%d %H:%M"))
+        day += datetime.timedelta(days=-1 if last else 1)
+    return ""
+
+
+def signed_line(field, name):
+    """The human line of a commit setup makes (Approved-By, Published-By): one wording, the page's name (UI-012)."""
+    return "%s: %s (from the setup page; committed as the local Git identity, unverified)" % (field, name)
+
+
+SCHEDULE_TIME = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}\Z")
+TIME_ZONE = re.compile(r"(UTC|[A-Za-z]+(/[A-Za-z0-9_+-]+){1,2})\Z")
+# The IANA areas: without a zone database (Python on Windows has none unless tzdata is installed) a zone must at least
+# start with one of them (UI-021, QA round D: "Mars/Base" was accepted and a Freeze-Epoch computed).
+ZONE_AREAS = ("Africa", "America", "Antarctica", "Arctic", "Asia", "Atlantic", "Australia", "Europe", "Indian",
+              "Pacific", "Etc")
+ZONE_DIRS = ("/usr/share/zoneinfo", "/usr/lib/zoneinfo", "/usr/share/lib/zoneinfo")
+# `uak start`'s READY line when a task is free: the command, then the engine's note after spaces.
+# The first prompts of the two agents the team step starts (UI-006). Constants with no shell metacharacters, and they
+# start with a word: Git Bash rewrites an argument that starts with / into a Windows path.
+IMPL_PROMPT = "Run /uak-start for %s. Work only in this worktree."
+REVIEW_PROMPT = ("You are the reviewer %s. Run bash .uak/bin/uak next; when it names a task to review, run $uak-review "
+                 "with that task ID. Never write code for a task.")
+# A task wt accepts (wt: [A-Z][A-Z0-9]*-[0-9]{3,}); the READY line's claim is offered to agents only when it is one.
+TEAM_TASK = re.compile(r"[A-Z][A-Z0-9]*-[0-9]{3,}\Z")
+CLAIM_COMMAND = re.compile(r"^bash \.uak/bin/wt new ([A-Z][A-Z0-9]*-[0-9]+)(?=\s|$)")
+# UI-009 (absorbs UI-014): any available tool takes either role; a role is only an identity (UAK_AGENT).
+TOOL_LABEL = {"claude": "Claude Code", "codex": "Codex"}
+IMPL_PROMPT_CODEX = "Run $uak-start for %s. Work only in this worktree."
+REVIEW_PROMPT_CLAUDE = REVIEW_PROMPT.replace("$uak-review", "/uak-review")
+# Codex: the ONE place its sandbox flags live. workspace-write, because Codex ignores --add-dir in a read-only sandbox;
+# --add-dir GITDIR, because the sandbox keeps .git read-only and the engine writes refs (rounds 1 and 3: "Operation not
+# permitted"); network_access, because workspace-write has no network and uak next fetches claims ("Could not resolve
+# host: github.com"). Verified on macOS with codex-cli 0.167.1 (`codex exec`, WHY.md UI-009); not yet in Windows Git Bash.
+# No approval or sandbox bypass is ever added.
+CODEX_FLAGS = "--sandbox workspace-write --add-dir %s -c sandbox_workspace_write.network_access=true"
+# The engine's own TODO when every task is taken (bin/start): the team is working, the team step stays (UI-009).
+WAITING_TODO = "a claimable task: uak next offers none"
+# Network Git from a request: its own timeout, the whole process tree stops (UI-011). Tool probes: 20 s each.
+NET_TIMEOUT = 30
+PROBE_TIMEOUT = 20
+REMOTE_TTL = 15
+TOOLS_TTL = 60
+SETUP_BASE, SETUP_CLAIMS = "refs/uak/setup-base", "refs/uak/setup-claims"
+REF_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,99}\Z")
+CLAIM_FILE = re.compile(r"[A-Za-z0-9_.-]+\.md\Z")
+SAFE_PATH = re.compile(r"[A-Za-z0-9._][A-Za-z0-9._/-]{0,199}\Z")
+LIVE_STATES = ("CLAIMED", "BLOCKED", "REVIEW")
+# UI-019: a re-picked project keeps its last check this long (seconds); later the page checks again by itself.
+CHECK_KEEP = 600
+# UI-024 (B-10): a hanging remote made the check take 75 s while every view answered 409. The check stops after 45 s
+# (its whole tree), and a stalled HTTP transfer ends after 10 s below 1 kB/s. GIT_SSH_COMMAND is never set: it would
+# override the person's core.sshCommand.
+CHECK_TIMEOUT = 45
+CHECK_ENV = {"GIT_HTTP_LOW_SPEED_LIMIT": "1000", "GIT_HTTP_LOW_SPEED_TIME": "10"}
+CHECK_TIMEOUT_ERROR = ("The check stopped: %s did not answer within %d s. Your last result is still shown. Check your "
+                       "connection, then press Check again.")
+CHECKING_NOTE = "Checking your project… the commands come back when it ends."
+BUSY_NOTE = "An operation is running… the commands come back when it ends."
+CHECKING_WARNING = "Setup is checking your project. Showing the last known state until it ends."
+# UI-024 (D-3.2, A-F11): no launch command before the reviewer can review the agents' work.
+LOCK_REASON = "Register %s first (step 1): agents start only once a reviewer can review their work."
+# UI-024 (A-F6): Claude Code's own record of the folders it trusts; read-only, only booleans leave claude_trust().
+CLAUDE_CONFIG_MAX = 32 * 1024 * 1024
+TEAM_SIZE = re.compile(r"^- Team size: (\d{1,2}) ", re.M)
+# UI-024 (D-7.1): a planning run that broke a rule did not finish well, and the page says how to undo it.
+PLAN_PROBLEM = "The planner changed things only you may change."
+UNDO_COMMAND_TEXT = "Undo it with this command, then press Create the plan again:"
+UNDO_BY_HAND_TEXT = "Undo these changes by hand, then press Create the plan again."
+
+
+class Busy(Exception):
+    """A worker runs: the request answers 409 (or the last view) instead of touching the network or the engine."""
+
+
+class Need(ValueError):
+    """A team-step refusal that names what the page should ask for first: "human" (the name) or "check" (UI-019)."""
+
+    def __init__(self, message, need):
+        super().__init__(message)
+        self.need = need
+
+
+class WayOut(ValueError):
+    """A refusal that carries one safe way forward for the page (unrelated remote history, UI-011)."""
+
+    def __init__(self, message, way_out):
+        super().__init__(message)
+        self.way_out = way_out
+
+
+# UAK-160: the page's own sentences ride beside the engine's by code. A check the engine coded says what it is, so the
+# decisions below read the code; a check with no code (an older kit's `uak start`) keeps its text patterns.
+COMMAND_ENV = {"UAK_START_CODES": "1"}
+
+
+def team_phase(state):
+    """"ready" after a READY check; "waiting" when the check's only TODO is that no task is free (the team is working);
+    "" otherwise. Derived from the last check, never stored."""
+    if state.get("ready"):
+        return "ready"
+    todos = [c for c in state.get("checks") or [] if c.get("state") == "todo"]
+    if state.get("installed") and len(todos) == 1 and (
+            todos[0].get("code") == "no_claimable_task" or
+            (not todos[0].get("code") and
+             re.sub(r"^\d+\.\s*", "", todos[0].get("text", "").split("\n")[0]).strip() == WAITING_TODO)):
+        return "waiting"
+    return ""
+
+
+def completed_steps(state):
+    """The guided checklist: what the last readiness check passed, as plain text (first line, no number)."""
+    return [re.sub(r"^\d+\.\s*", "", c.get("text", "").split("\n")[0])
+            for c in state.get("checks") or [] if c.get("state") == "ok"]
+
+
+def completed_items(state):
+    """The same list by code: [{"code", "values", "text"}] (UAK-160), so the page writes each line itself."""
+    return [{"code": c.get("code", ""), "values": c.get("values", {}),
+             "text": re.sub(r"^\d+\.\s*", "", c.get("text", "").split("\n")[0])}
+            for c in state.get("checks") or [] if c.get("state") == "ok"]
+
+
+# The screen that does what a coded check asks for (UAK-160): by the code, never by the engine's wording.
+ACTION_BY_CODE = {"push_kit": "publish", "push_changes": "publish", "plan_none": "plan", "plan_none_main": "plan",
+                  "approve_plan": "plan", "plan_lint": "plan"}
+
+
+def guidance(state, dashboard=None, now=None):
+    """The one next action. Readiness comes only from `uak start` (the same gate Configuration shows), so the
+    dashboard never offers to start work that the gate still blocks; an active freeze overrides everything.
+    `commands` (copyable) is only ever the exact claim command; the gate's fix lines are `steps`, shown as text,
+    because they are prose that can carry project values (branch names, remote URLs)."""
+    now = time.time() if now is None else now
+    dashboard = dashboard or {}
+
+    def step(kind, title, detail, commands=(), steps=(), check=None):
+        found = {"kind": kind, "title": title, "detail": detail, "commands": list(commands), "steps": list(steps)}
+        if check and check.get("code"):  # the page writes the title and the lines under it from their codes
+            found.update(code=check["code"], values=check.get("values", {}),
+                         items=[{"code": h.get("code", ""), "values": h.get("values", {}), "text": h.get("text", "")}
+                                for h in check.get("hints") or []])
+        return found
+
+    if state.get("phase") in BUSY:
+        return step("busy", "Working in the background", "Keep this window and the terminal open.")
+    if state.get("phase") == "error" and state.get("error"):
+        return step("error", "Something needs your attention", state["error"])
+    # UI-023 (B-07): a merge in the human queue is the first thing a person does; the reason is a plain sentence
+    # with no path (the engine's own words stay in the Advanced view's conversation).
+    human = dashboard["needs_human"] if "needs_human" in dashboard else state.get("needs_human") or []
+    if human and state.get("installed"):
+        return step("human", "%s needs a person to finish its merge" % human[0]["task"], plain_reason(human[0]["reason"]))
+    if frozen_since(state, dashboard, now):
+        return step("frozen", "Project changes are frozen",
+                    "The change window has closed. Review the project with the responsible human before starting new work.")
+    if not state.get("installed"):
+        return step("install", "Install the kit in this project", "Choose your workflow and coding tools in Configuration.")
+    if team_phase(state) == "waiting":
+        todo = next(c for c in state.get("checks") or [] if c.get("state") == "todo")
+        found = step("waiting", "Your team is working", "No task is free to start right now.",
+                     steps=[l for l in todo.get("text", "").split("\n")[1:] if l], check=todo)
+        found.pop("code", None)  # the screen's own title and detail: only the lines under it come from the engine
+        return found
+    if state.get("ready"):
+        claim = CLAIM_COMMAND.match(state.get("next_command") or "")
+        tasks = {t.get("id"): "WAITING" if t.get("waiting_on") else t.get("state") for t in dashboard.get("tasks") or []}
+        if claim and tasks.get(claim.group(1), "AVAILABLE") != "AVAILABLE":
+            return step("check", "Check what's next",
+                        "The task suggested by the last check is no longer available.")
+        if claim:
+            return step("ready", "Start the next task",
+                        "Your project passed the readiness checks. Run this in your coding tool's terminal.",
+                        [claim.group(0)])
+        return step("ready", "Your project is ready", state.get("next_note") or
+                    "Your project passed the readiness checks.")
+    for check in state.get("checks") or []:
+        if check.get("state") == "todo":
+            lines = check.get("text", "").split("\n")
+            title = re.sub(r"^\d+\.\s*", "", lines[0])
+            g = step("todo", title, "This is the first thing the readiness check needs.",
+                     steps=[l for l in lines[1:] if l], check=check)
+            # The page does what it can itself; anything else becomes a terminal box with the exact cd (UI-005).
+            # Why (simulation, Nov 2026): the next action lived only in Technical details and looked like loading.
+            # A preflight groups several doctor failures: each goes where it is fixed, the page or a terminal.
+            page_lines = {"schedule": r"Freeze-Epoch", "publish": r"push rejected in dry-run"}
+            rest = []
+            for line in g["steps"]:
+                kind = next((k for k, pattern in page_lines.items() if re.search(pattern, line)), None)
+                if kind and "action" not in g:
+                    g["action"] = kind
+                elif not kind:
+                    rest.append(line)
+            if "action" not in g:
+                if check.get("code") in ACTION_BY_CODE:
+                    g["action"], rest = ACTION_BY_CODE[check["code"]], []
+                elif not check.get("code") and re.search(r"push the kit to |push your changes to", title):
+                    g["action"], rest = "publish", []
+                elif not check.get("code") and re.search(r"^(a plan|approve the plan|fix the plan)", title):
+                    g["action"], rest = "plan", []
+            if rest:
+                g["terminal"] = {"cd": "cd '%s'" % str(state.get("target", "")).replace("'", "'\\''"), "steps": rest}
+                # The same lines by code, in the same order (UAK-160): the page writes each from its code.
+                by_text = {i["text"]: i for i in g.get("items") or [] if i.get("text")}
+                g["terminal"]["items"] = [by_text.get(line, {}) for line in rest]
+            return g
+    return step("check", "Check what your project needs",
+                "The readiness check lists what is missing before agents can start, in order.")
+
+
+FROZEN_NOTE = "The change window has closed. Review the project with the responsible human before starting new work."
+
+
+def frozen_since(state, dashboard=None, now=None):
+    """The freeze epoch when it has passed, else 0. Claims' config, the last dashboard read, or the project's own
+    PROJECT.md (UI-023, B-06: a project past its freeze read "Your team is working" until the dashboard was opened)."""
+    now = time.time() if now is None else now
+    freeze = (dashboard or {}).get("freeze") or state.get("freeze") or (state.get("resume") or {}).get("freeze") or 0
+    return freeze if 0 < freeze <= now else 0
+
+
+DEPENDENCY = re.compile(r"[A-Z][A-Z0-9]*-\d+")
+# An absolute path (POSIX or a Windows drive) in an engine reason, and the gate's "(log: …)" note.
+ABSOLUTE_PATH = re.compile(r"(?<![\w.:/\\])(?:[A-Za-z]:[\\/]|/)[^\s;,()]+")
+LOG_NOTE = re.compile(r"\s*\(log: [^)]*\)")
+
+
+def without_paths(text):
+    """UI-023 (B-07): a reason shown on the page names files, never where they are on someone's disk."""
+    text = LOG_NOTE.sub("", str(text or ""))
+    return ABSOLUTE_PATH.sub(lambda m: re.split(r"[\\/]", m.group(0).rstrip("/\\"))[-1] or "…", text).strip()
+
+
+# Why the merge gate handed a task to a person, as one plain sentence each (Spanish pairs in workspace.js).
+HUMAN_REASONS = (
+    (r"PRODUCT_UNVERIFIED|[Ss]moke", "The product check (smoke) failed or does not exist yet, so the merge stopped."),
+    (r"FREEZE", "The project is frozen: a person must allow this task before it merges."),
+    (r"Review-Independence|same human",
+     "The reviewer and the author belong to the same person: another person's agent must review."),
+    (r"[Aa]pprov", "The merge needs a current approval from a reviewer."),
+    (r"[Cc]onflict|[Vv]erify|[Cc]andidate|tree hash|not on ",
+     "Checking the merged result failed: the task needs a look before it can merge."),
+)
+
+
+def plain_reason(reason):
+    for pattern, sentence in HUMAN_REASONS:
+        if re.search(pattern, reason or ""):
+            return sentence
+    return "The merge stopped and needs a person. The Advanced view's conversation has the details."
+
+
+def truthful(data):
+    """UI-023 (A-F9, B-07, B-13): what the page shows as available can really be claimed, an approved review is
+    marked, and only the human queue counts as work for a person; reasons carry no absolute path."""
+    tasks = data.get("tasks") or []
+    states = {t.get("id"): t.get("state") for t in tasks}
+    for t in tasks:
+        deps = re.sub(r"\([^)]*\)", "", t.get("depends") or "")
+        t["waiting_on"] = [d for d in dict.fromkeys(DEPENDENCY.findall(deps))
+                           if d != t.get("id") and states.get(d) != "INTEGRATED"] if t.get("state") == "AVAILABLE" else []
+    progress = data.setdefault("progress", {})
+    progress["waiting"] = sum(1 for t in tasks if t["waiting_on"])
+    progress["available"] = sum(1 for t in tasks if t.get("state") == "AVAILABLE" and not t["waiting_on"])
+    verdicts = {}
+    for review in sorted(data.get("reviews") or [], key=lambda r: r.get("at") or 0):
+        verdicts[review.get("task")] = review.get("verdict")
+    offered = {o.get("task") for o in data.get("offers") or []}
+    for t in tasks:
+        t["approved"] = t.get("state") == "REVIEW" and verdicts.get(t.get("id")) == "approve" and t.get("id") not in offered
+    for q in data.get("queue") or []:
+        q["reason"] = without_paths(q.get("reason"))
+    data["needs_human"] = [{"task": q.get("task", ""), "reason": q["reason"]} for q in data.get("queue") or []
+                           if q.get("state") == "HUMAN"]
+    return data
+
+
+def dashboard_key(server, root):
+    """What the dashboard of ROOT depends on, read with one `git ls-remote` and two stats; None when the remote does
+    not answer (then the full read runs and says so)."""
+    try:
+        remote, base = remote_and_base()
+        done = server.identity_run(["git", "-C", str(root), "ls-remote", "--heads", remote, "claims", base],
+                                   cwd=str(root), timeout=NET_TIMEOUT)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+    tips = (done.stdout or "").strip()
+    if done.returncode != 0 or not tips:
+        return None
+    files = []
+    for name in (".uak/PROJECT.md", ".uak/TASKS.md"):
+        try:
+            seen = os.stat(os.path.join(str(root), name))
+            files.append((seen.st_mtime_ns, seen.st_size))
+        except OSError:
+            files.append(None)
+    return (tips, tuple(files))
+
+
+def last_claims(server, root, module):
+    """UI-023 (B-08): the remote does not answer: the newest local copy of claims this clone has (the dashboard's,
+    setup's or Git's tracking ref), built like a live read and marked stale; None when there is none."""
+    remote, base = remote_and_base()
+    newest = None
+    for ref in (DASH_CLAIMS, SETUP_CLAIMS, "refs/remotes/%s/claims" % remote):
+        shown = server.planning.git(server.identity_run, root, "log", "-1", "--format=%ct", ref, "--", timeout=10)
+        at = (shown.stdout or "").strip() if shown.returncode == 0 else ""
+        if at.isdigit() and (not newest or int(at) > newest[1]):
+            newest = (ref, int(at))
+    if not newest:
+        return None
+    backlog = None
+    for ref in ("refs/uak/dash-base", SETUP_BASE, "refs/remotes/%s/%s" % (remote, base)):
+        shown = server.planning.git(server.identity_run, root, "show", ref + ":.uak/TASKS.md", timeout=10)
+        if shown.returncode == 0:
+            backlog = shown.stdout
+            break
+    if backlog is None:
+        backlog = module.read(Path(root) / ".uak/TASKS.md")
+    folder = Path(tempfile.mkdtemp(prefix="uak-last-claims-"))
+    try:
+        with tarfile.open(fileobj=io.BytesIO(module.git("archive", newest[0], cwd=str(root)))) as archive:
+            for member in archive.getmembers():
+                # Plain files and directories only, inside the folder (the same rule as dash.py's live read).
+                if member.name.startswith("/") or ".." in Path(member.name).parts or not (member.isfile() or member.isdir()):
+                    continue
+                if hasattr(tarfile, "data_filter"):
+                    archive.extract(member, str(folder), filter="data")
+                else:
+                    archive.extract(member, str(folder))
+        data = module.build(folder, backlog, Path(root).name)
+    finally:
+        shutil.rmtree(str(folder), ignore_errors=True)
+    data.update(source="cache", connection="unreachable", stale=True, claims_at=newest[1], refresh=20,
+                warning="Coordination could not refresh. Showing the last known state of the team.",
+                live_url=module.project_live_url(module.read(Path(root) / ".uak/PROJECT.md")))
+    return data
+
+
+def planning_module():
+    spec = importlib.util.spec_from_file_location("uak_planning", Path(__file__).with_name("planning.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+# ---- UAK-192: a button where the page showed a command to copy --------------------------------------------------------
+# The page sends the NAME of an action and its validated fields (POST /api/run); the server builds the command from this
+# fixed table and the project's state, arguments as a list, no shell. `run`: runs in the server, one at a time, in the
+# child record (it ends with the wizard). `terminal`: opens a window of the person's system (the coding tool is
+# interactive), which belongs to the person and stays when the wizard closes. `form`: a form that already existed.
+# `copy`: stays a copy box, with the reason (SECURITY.md lists the same table).
+RUN_ACTIONS = {
+    "start-agent": {"kind": "terminal", "fields": ("role",), "what": "Start this agent"},
+    "deploy-help": {"kind": "run", "fields": (), "what": "Deploy help"},
+    "smoke": {"kind": "run", "fields": (), "what": "Smoke test"},
+    "skill-add": {"kind": "run", "fields": ("name",), "what": "Add the skill"},
+    "readiness": {"kind": "run", "fields": (), "what": "Readiness check"},
+    "open-rules": {"kind": "run", "fields": (), "what": "Open PROJECT.md"},
+    "live-link": {"kind": "form", "fields": ("url",), "what": "Save the link", "route": "/api/settings"},
+    "design-round": {"kind": "copy", "reason": "an agent runs it: it asks a coding tool to draw the screens, which needs the tool's own terminal"},
+    "design-gallery": {"kind": "copy", "reason": "it serves a page until you stop it with Ctrl+C, which a button cannot offer"},
+    "branch-switch": {"kind": "copy", "reason": "it changes what is checked out in your folder: you should see the Git command you run"},
+    "publish-way-out": {"kind": "copy", "reason": "it is a Git command that fixes your history or your remote: setup shows it, you run it"},
+    "plan-trust": {"kind": "copy", "reason": "it makes a coding tool trust a folder, which only you may grant"},
+    "plan-undo": {"kind": "copy", "reason": "it undoes changes to files the planner made: you should see which"},
+    "claim-task": {"kind": "copy", "reason": "it only claims a task; Start this agent claims it and opens the agent"},
+    "terminal-cd": {"kind": "copy", "reason": "a cd only means something in the terminal you type it in"},
+    "wizard-restart": {"kind": "copy", "reason": "it starts the wizard itself, which is not running to press a button"},
+}
+# The copy boxes of the page (a static box by the id of its Copy button; a drawn one by the name copyRow() is given).
+COPY_BOXES = {
+    "copy-terminal-command": "wizard-restart", "copy-closed": "wizard-restart", "copy-branch-warning": "branch-switch",
+    "copy-setup-branch-warning": "branch-switch", "copy-terminal-cd": "terminal-cd",
+    "copy-publish-way-out": "publish-way-out", "copy-publish-way-out-push": "publish-way-out",
+    "copy-plan-trust": "plan-trust", "copy-plan-undo": "plan-undo", "copy-team-implement": "start-agent",
+    "copy-team-resume": "start-agent", "copy-team-review": "start-agent", "copy-next-command": "claim-task",
+    "copy-advanced-next": "claim-task",
+}
+SKILL_NAME = re.compile(r"[a-z0-9][a-z0-9-]{0,63}\Z")
+REFUSED_LOG = "uak-wizard.refused"
+LAUNCH_RECORD = "uak-wizard.launchers"
+LAUNCHERS = [None]
+LAUNCH_KEY = [secrets.token_urlsafe(24)]  # this process's own until main() sets the server's (kept in uak-wizard.key)
+REFUSED_KEEP = 200  # UAK-196: uak-wizard.refused keeps its last 200 lines
+ACTION_NAME = re.compile(r"[a-z][a-z0-9-]{0,39}\Z")
+RUN_ROLES = ("implement", "review")
+RUN_TIMEOUT = 120
+RUN_TAIL = 14           # lines of output kept under "Technical details"
+AGENT_AGAIN_SECONDS = 15  # a second click on the same agent within this time is the first click again
+TERMINAL_WAIT = 1.5     # a terminal that exits with an error within this time did not open
+LINUX_TERMINALS = (("x-terminal-emulator", "-e"), ("gnome-terminal", "--"), ("konsole", "-e"), ("xterm", "-e"))
+WINDOWS_SAFE = re.compile(r"[A-Za-z0-9 _.:/\\()+,=@~-]+\Z")
+TERMINAL_TAIL = " Copy the command and run it in a terminal of your own."
+NO_TERMINAL = {
+    "remote": "Setup could not open a terminal window: this is a remote session, so a window would open on another computer." + TERMINAL_TAIL,
+    "display": "Setup could not open a terminal window: this computer has no screen to show one." + TERMINAL_TAIL,
+    "none": "Setup could not open a terminal window: no terminal program was found on this computer." + TERMINAL_TAIL,
+    "failed": "Setup could not open a terminal window: the terminal program stopped before it opened one." + TERMINAL_TAIL,
+    "path": "Setup could not open a terminal window: a folder name has a character Windows cannot pass to it." + TERMINAL_TAIL,
+}
+RUN_ADVICE = {
+    "deploy-help": "Check that the project folder is still there, then press the button again.",
+    "smoke": "Read the technical details. If setup could not tell how your app starts, run the copied command in a terminal with --command and your app's start command.",
+    "skill-add": "Check the skill's name against the kit's skills, then try again.",
+    "readiness": "Read the technical details, fix what they name, then check again.",
+    "open-rules": "Open .uak/PROJECT.md yourself with any editor.",
+}
+STOPPED_NOTE = "Stopped. Nothing is left running."
+RUN_REFUSAL = "Setup runs only the actions of its own list. Use the buttons of the page."
+
+
+def system_name():
+    return {"darwin": "Darwin", "win32": "Windows"}.get(sys.platform, "Linux")
+
+
+def applescript_text(text):
+    return text.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def launcher_text(command):
+    """The script the terminal runs: it removes itself, runs SERVER's command, and waits for Enter so a failure is read."""
+    return ("#!/usr/bin/env bash\n"
+            'rm -f -- "$0" 2>/dev/null; rmdir -- "$(dirname -- "$0")" 2>/dev/null\n'
+            + command + "\nstatus=$?\necho\n"
+            'echo "The agent ended (exit $status). Press Enter to close this window."\n'
+            "read -r _ || true\n")
+
+
+def write_launcher(command):
+    folder = Path(tempfile.mkdtemp(prefix="uak-agent-"))
+    remember_launcher(folder)
+    path = folder / "start.sh"
+    path.write_text(launcher_text(command), encoding="utf-8", newline="\n")
+    os.chmod(str(path), 0o700)
+    return path
+
+
+def launcher_proof(key, folder, device, inode):
+    """UAK-196: what proves a launcher folder is this wizard's: an HMAC, under the wizard's key, of the folder's path,
+    device and inode as they were when the wizard made it. The key lives in the server's memory and in uak-wizard.key
+    (0600, which the guard refuses to read while the wizard is live), so a line written by hand proves nothing."""
+    text = "%s\0%d\0%d" % (folder, int(device), int(inode))
+    return hmac.new(str(key).encode("utf-8"), text.encode("utf-8", "surrogateescape"), hashlib.sha256).hexdigest()
+
+
+def append_private(path, text):
+    """Append TEXT to PATH (created 0600), never through a link: O_NOFOLLOW where the system has it, and a link is
+    refused before opening where it does not. An OSError is the caller's."""
+    if os.path.islink(str(path)):
+        raise OSError("a link stands at %s" % path)
+    flags = os.O_WRONLY | os.O_CREAT | os.O_APPEND | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
+    descriptor = os.open(str(path), flags, 0o600)
+    with os.fdopen(descriptor, "ab") as handle:
+        handle.write(text.encode("utf-8", "surrogateescape"))
+
+
+def append_bounded(path, line, keep=None):
+    """UAK-196: append LINE to PATH (never through a link) and keep only its last KEEP lines (REFUSED_KEEP): a page that
+    sends refused requests for ever cannot fill the disk. Only the tail is read; the shortened file replaces the old
+    one in one rename."""
+    keep = REFUSED_KEEP if keep is None else keep
+    try:
+        with open(str(path), "rb") as handle:
+            handle.seek(-1, os.SEEK_END)
+            if handle.read(1) != b"\n":
+                line = "\n" + line  # a record that does not end its last line: ours starts on a line of its own
+    except OSError:
+        pass  # no record yet, or an empty one
+    append_private(path, line)
+    window = keep * 256
+    size = os.path.getsize(str(path))
+    with open(str(path), "rb") as handle:
+        handle.seek(max(0, size - window))
+        tail = handle.read()
+    lines = tail.splitlines(True)
+    if size > window and lines:
+        lines = lines[1:]  # the first line of the window may be cut
+    if size <= window and len(lines) <= keep:
+        return
+    descriptor, temporary = tempfile.mkstemp(prefix=Path(path).name + ".", dir=str(Path(path).parent))
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(b"".join(lines[-keep:]))
+        os.replace(temporary, str(path))
+    except OSError:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
+
+
+def remember_launcher(folder):
+    """The folders this wizard made are recorded (in the git directory) with what proves they are its own (UAK-196: the
+    folder's device and inode, signed with the wizard's key), so a launcher that no terminal ever ran is removed when
+    the wizard closes or the next one starts, and nothing else is."""
+    record = LAUNCHERS[0]
+    if record:
+        try:
+            info = os.lstat(str(folder))
+            append_private(record, "%s %d %d %s\n" % (launcher_proof(LAUNCH_KEY[0], folder, info.st_dev, info.st_ino),
+                                                     info.st_dev, info.st_ino, folder))
+        except OSError:
+            pass
+
+
+def sweep_launchers(record, key=None):
+    """Remove the launcher folders RECORD names that this wizard made, then the record. A line counts only when its
+    proof is the HMAC under KEY (the key of the wizard that wrote the record: this one's on close, the previous one's
+    from uak-wizard.key on the next start) of the path, device and inode, and the folder there still has that device
+    and inode, is a real folder (not a link) named uak-agent-* directly in the temp directory, and holds at most
+    start.sh. A hand-written line, a line of another wizard and a garbled line remove nothing."""
+    key = LAUNCH_KEY[0] if key is None else key
+    lines = []
+    if key and not os.path.islink(str(record)):
+        try:
+            lines = Path(record).read_text(encoding="utf-8", errors="surrogateescape").splitlines()[:4096]
+        except OSError:
+            lines = []
+    base = Path(tempfile.gettempdir()).resolve()
+    for line in lines:
+        parts = line.split(" ", 3)
+        if len(parts) != 4 or not (parts[1].isdigit() and parts[2].isdigit()):
+            continue
+        proof, device, inode, path = parts
+        try:
+            if not hmac.compare_digest(proof, launcher_proof(key, path, device, inode)):
+                continue  # not a line this wizard wrote
+            folder = Path(path)
+            info = os.lstat(path)
+            if (stat.S_ISDIR(info.st_mode) and info.st_dev == int(device) and info.st_ino == int(inode)
+                    and folder.name.startswith("uak-agent-") and folder.resolve().parent == base
+                    and set(os.listdir(path)) <= {"start.sh"}):
+                shutil.rmtree(path, ignore_errors=True)
+        except (OSError, ValueError, TypeError):
+            pass
+    try:
+        Path(record).unlink()
+    except OSError:
+        pass
+
+
+def terminal_argv(system, script, cwd, env=None, which=shutil.which, bash="bash"):
+    """The command that opens a terminal window running SCRIPT, for one system: (argv, "") or (None, a NO_TERMINAL key).
+    The script path is the only text the terminal is given, and it is quoted for the system; what the agent runs
+    (the project's path included) lives inside the script, single-quoted by shell_quote."""
+    env = os.environ if env is None else env
+    script = str(script)
+    if system == "Darwin":
+        if env.get("SSH_CONNECTION") or env.get("SSH_TTY"):
+            return None, "remote"
+        line = "bash " + shell_quote(script)
+        return ["osascript", "-e", 'tell application "Terminal" to activate',
+                "-e", 'tell application "Terminal" to do script "%s"' % applescript_text(line)], ""
+    if system == "Windows":
+        if not (WINDOWS_SAFE.match(script) and WINDOWS_SAFE.match(str(cwd)) and WINDOWS_SAFE.match(str(bash))):
+            return None, "path"
+        found = which("wt")
+        if found:
+            return [found, "new-tab", "--startingDirectory", str(cwd), str(bash), "--login", script], ""
+        return [which("cmd") or "cmd.exe", "/c", "start", "", str(bash), "--login", script], ""
+    if env.get("SSH_CONNECTION") or env.get("SSH_TTY"):
+        return None, "remote"
+    if not (env.get("DISPLAY") or env.get("WAYLAND_DISPLAY")):
+        return None, "display"
+    for name, flag in LINUX_TERMINALS:
+        found = which(name)
+        if found:
+            return [found, flag, str(bash), script], ""
+    return None, "none"
+
+
+def open_terminal(command, cwd, system=None, env=None, wait=TERMINAL_WAIT):
+    """Open a terminal window of this system in CWD running COMMAND (Bash text from the server). (True, "") when a window
+    is up, else (False, one sentence saying why). The window is the person's: it is not in the child record and it stays
+    when the wizard ends. Never reports a window it could not open."""
+    system = system or system_name()
+    environment = safe_environment()
+    script = None
+    try:
+        bash = bash_binary()
+        script = write_launcher(command)
+        argv, why = terminal_argv(system, script.as_posix() if system == "Windows" else script, Path(cwd).as_posix() if system == "Windows" else cwd,
+                                  environment if env is None else env, bash=bash)
+        if argv is None:
+            raise RuntimeError(why)
+        extra = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" else {"start_new_session": True}
+        proc = subprocess.Popen(argv, cwd=str(cwd), env=environment, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL, **extra)
+        threading.Thread(target=proc.wait, daemon=True).start()  # reaped; the window itself is not ours to end
+        try:
+            code = proc.wait(timeout=wait)
+        except subprocess.TimeoutExpired:
+            return True, ""  # still running: a terminal that stays in front is a window that is up
+        if code != 0:
+            raise RuntimeError("failed")
+        return True, ""
+    except RuntimeError as exc:
+        reason = str(exc)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        reason = "failed"
+    if script is not None and script.parent.is_dir():
+        shutil.rmtree(str(script.parent), ignore_errors=True)
+    return False, NO_TERMINAL.get(reason, NO_TERMINAL["failed"])
+
+
+def editor_argv(system, path, which=shutil.which):
+    """The command that opens one file in the system's editor: an argument list; ValueError says what to do instead."""
+    path = str(path)
+    if system == "Darwin":
+        return [which("open") or "open", "-t", path]
+    if system == "Windows":
+        if not WINDOWS_SAFE.match(path):
+            raise ValueError("A folder name has a character Windows cannot pass to an editor. Open .uak/PROJECT.md yourself.")
+        return [which("cmd") or "cmd.exe", "/c", "start", "", path]
+    found = which("xdg-open")
+    if not found:
+        raise ValueError("This computer has no program to open files from here (xdg-open). Open .uak/PROJECT.md yourself.")
+    return [found, path]
+
+
+def tail_lines(text, keep=RUN_TAIL):
+    lines = [re.sub(r"[\x00-\x08\x0b-\x1f\x7f]", "", line)[:300] for line in redact(text).splitlines() if line.strip()]
+    return lines[-keep:]
+
+
+class SetupServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def server_bind(self):
+        # HTTPServer.server_bind calls socket.getfqdn(), a reverse DNS lookup that took 36 to 43 s on macOS CI runners
+        # (every setup test paid it once, UAK-152); the name is never used. Same fix as design_round.py's capture server.
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = "127.0.0.1", self.server_address[1]
+
+    def __init__(self, target, installer, run):
+        self.planning = planning_module()
+        self.plan = None
+        self.token = secrets.token_urlsafe(32)
+        # UAK-153: the browser is opened on a one-time code, never on the token. The server exchanges the code once.
+        self.clock, self.notify, self.ended, self.launcher = time.monotonic, lambda text: print(text, flush=True), False, None
+        self.code, self.code_at, self.code_used, self.last_active = "", 0.0, True, self.clock()
+        self.last_request, self.closing_at, self.key = self.clock(), 0.0, secrets.token_urlsafe(24)
+        self.close_asked = False  # UAK-159: the person pressed "Close the wizard"
+        self.pages, self.reopened = {}, []  # open pages: id -> (last seen, reopens when first seen); reopen times
+        self.dash_tips = {}
+        self.runs, self.agents, self.run_seq = {}, {}, 0  # UAK-192: the last run of each action; agents started here
+        self.nonce = secrets.token_urlsafe(24)
+        self.installer = Path(installer).resolve()
+        self.run = run or run_command
+        # Reading who signs (git config, gh's hosts file) is local and read-only: it never goes through the operation
+        # runner, whose callers count and pace their own commands.
+        self.identity_run = run_command
+        self.lock = threading.Lock()
+        self.new_code()
+        # The slow lane (UI-011): every POST and every GET that may reach the network, the engine or a coding tool holds
+        # it; /api/status never does. Order: slow, then lock; never the reverse.
+        self.slow = threading.Lock()
+        self.remote_cache, self.tools_cache, self.team_cache, self.plan_known = {}, {}, {}, {}
+        # UI-024: the last trust read of Claude Code's config (size 1, keyed by its mtime and size) and the last good
+        # dashboard of each project, shown (stale) while a check runs instead of a 409 (B-10).
+        self.trust_cache, self.dash_cache = {}, {}
+        self.worker = None
+        self.plan_started, self.plan_last = 0, ""
+        self.target = ""
+        self.failed_target = ""
+        # UI-019: the last finished check of each project (kept 10 minutes, so re-picking a project keeps it).
+        self.checks_kept = {}
+        self.state = {"phase": "welcome", "target": str(target), "ready": False, "checks": [], "details": "",
+                      "installed": False, "human": "", "human_source": "", "resume": {}, "inspect": 0,
+                      "checked": False}
+        super().__init__(("127.0.0.1", 0), SetupHandler)
+
+    def config(self):
+        return read_config(self.target)
+
+    @property
+    def dash(self):
+        return dashboard_module()
+
+    def server_close(self):
+        super().server_close()
+        for _, parts in list(self.dash_tips.values()):
+            shutil.rmtree(parts.get("dir", ""), ignore_errors=True)
+        self.dash_tips.clear()
+
+    # ---- UAK-192: the actions a button runs ------------------------------------------------------------------
+    def run_view(self):
+        """What /api/status says about the buttons: the last run of each action and the agents started from here."""
+        now = time.monotonic()
+        with self.lock:
+            runs = {name: {"id": job["id"], "state": job["state"], "seconds": int((job["ended"] or now) - job["started"]),
+                           "tail": list(job["tail"]), "advice": job["advice"]} for name, job in self.runs.items()}
+            agents = {role: dict(found) for role, found in self.agents.items()}
+        return runs, agents
+
+    def start_run(self, action, argv, cwd, env, timeout):
+        """Start ACTION in the server, one at a time: the same action running is returned as it is (a second click does
+        not start it twice); another action running refuses."""
+        with self.lock:
+            for name, job in self.runs.items():
+                if job["state"] == "running":
+                    if name == action:
+                        return job, True
+                    raise Busy("Another action is still running. Wait for it, or stop it first.")
+            self.run_seq += 1
+            job = {"id": self.run_seq, "action": action, "state": "running", "started": time.monotonic(), "ended": 0.0,
+                   "tail": [], "pid": None, "stop": False, "advice": ""}
+            self.runs[action] = job
+        threading.Thread(target=self.run_work, args=(job, argv, cwd, env, timeout), daemon=True).start()
+        return job, False
+
+    def run_work(self, job, argv, cwd, env, timeout):
+        def line(text):
+            with self.lock:
+                job["tail"] = (job["tail"] + tail_lines(text))[-RUN_TAIL:]
+
+        def started(pid):
+            with self.lock:
+                job["pid"] = pid
+                stopped = job["stop"]
+            if stopped:
+                kill_recorded(pid)
+
+        code, output = 1, ""
+        try:
+            done = self.run(argv, cwd=cwd, timeout=timeout, group=True, env=env, on_line=line, on_start=started)
+            code, output = done.returncode, (done.stdout or "") + "\n" + (done.stderr or "")
+        except Exception as exc:  # noqa: BLE001 - the page needs a result, whatever happened
+            output = "The action could not start: %s" % redact(exc)
+        with self.lock:
+            job["pid"] = None
+            job["tail"] = tail_lines(output) or job["tail"]
+            job["state"] = "stopped" if job["stop"] else "done" if code == 0 else "failed"
+            if job["state"] == "failed":
+                job["advice"] = RUN_ADVICE.get(job["action"], "")
+            job["ended"] = time.monotonic()
+
+    def stop_run(self):
+        """The Stop button: end the running action's process group. False when nothing runs."""
+        with self.lock:
+            job = next((j for j in self.runs.values() if j["state"] == "running"), None)
+            if not job:
+                return False
+            job["stop"] = True
+            pid = job["pid"]
+        if pid:
+            kill_recorded(pid, tree=True)
+        return True
+
+    def refuse_run(self, token):
+        """A request the page can never send (an action outside the table, an extra field, a value that is not text, a
+        copy-only action): one line in uak-wizard.refused of the git directory, never its text. It is not in
+        uak-direct-main.log: the hook reads the last line of that file and takes any recent line whose third field is
+        not `push` for a direct commit to main."""
+        try:
+            with self.lock:
+                target = self.target
+            if target:
+                _, common = self.git_dirs(project_root(target))
+                if common:
+                    detail = token if isinstance(token, str) and ACTION_NAME.fullmatch(token) else "command-line"
+                    append_bounded(common / REFUSED_LOG, "%d refused-run %s\n" % (int(time.time()), detail))
+        except (OSError, ValueError, subprocess.SubprocessError):
+            pass  # the refusal stands even when the record cannot be written
+
+    def remember_page(self, page, born=None):
+        """Keep PAGE (caller holds the lock): at most MAX_PAGES, the one silent the longest goes first."""
+        now = self.clock()
+        seen = self.pages.get(page)
+        if seen is None and len(self.pages) >= MAX_PAGES:
+            del self.pages[min(self.pages, key=lambda p: self.pages[p][0])]
+        self.pages[page] = (now, born if born is not None else (seen[1] if seen else None))
+
+    def seen_request(self, page=""):
+        """A request that passed every check: the server is in use, and a page that said it closed has come back. A
+        request that names its page keeps it (a request that did not pass is never counted, so invented ids cost nothing)."""
+        with self.lock:
+            self.last_request, self.closing_at = self.clock(), 0.0
+            if page:
+                self.remember_page(page)
+
+    def session_began(self, page, code):
+        """The page that exchanged CODE: when the code was minted by a second start, that reopen created this page."""
+        with self.lock:
+            born = next((i for i, (_, minted) in enumerate(self.reopened) if minted == code), None)
+            if page:
+                self.remember_page(page, born)
+
+    def reopens_for(self, page):
+        """How many second starts opened a page other than this one, and when the latest of them was."""
+        with self.lock:
+            born = (self.pages.get(page) or (0, None))[1]
+            others = [at for i, (at, _) in enumerate(self.reopened) if i != born]
+            return len(others), (time.strftime("%H:%M", time.localtime(others[-1])) if others else "")
+
+    def page_closed(self, page=""):
+        """A page says it closed. The grace starts only when no page is left (an idle second tab sends nothing)."""
+        with self.lock:
+            if page:
+                self.pages.pop(page, None)
+            else:
+                self.pages.clear()  # a request that names no page speaks for all of them
+            if not self.pages:
+                self.closing_at = self.clock()
+
+    def working(self):
+        worker = self.worker
+        return bool(worker and worker.is_alive()) or bool(CHILDREN)
+
+    def end_reason(self):
+        """Why the server should end now, or "": 15 minutes with no request, or every page said it closed and none came
+        back, and no action running. The message says how to open it again."""
+        if self.working():
+            return ""
+        if self.close_asked:
+            return "the wizard was closed from its page"
+        now = self.clock()
+        with self.lock:
+            for page in [p for p, seen in self.pages.items() if now - seen[0] > IDLE_EXIT_SECONDS]:
+                del self.pages[page]  # silent for longer than the limit: that tab is not counted
+            closing = self.closing_at
+        if closing and now - closing >= CLOSE_GRACE_SECONDS:
+            return "the page was closed"
+        if now - self.last_request > IDLE_EXIT_SECONDS:
+            return "it had no request for %s" % duration(IDLE_EXIT_SECONDS)
+        return ""
+
+    def close_now(self):
+        """"Close the wizard": the server ends at once (the watcher stops it within a second), unless an action is
+        still running (its process would be left behind): then nothing ends and the page says why."""
+        if self.working():
+            raise Busy("An action is still running. Close the wizard when it finishes.")
+        with self.lock:
+            self.close_asked = True
+
+    def reopening(self):
+        """A second start asked for a new page: say so here, write it in the register, and only then mint the code."""
+        if self.ended:
+            raise Busy("The session of this setup ended. Press Ctrl+C where it runs and start it again: bash install.sh --wizard")
+        at = time.time()
+        try:
+            root = project_root(self.state.get("target") or "")
+        except (OSError, ValueError, subprocess.SubprocessError):
+            raise ValueError("Setup could not record the new page, so it did not open one.")
+        log_human_act(self, root, "reopen", "human", "-", "second-start")
+        launcher = self.make_launcher()
+        with self.lock:
+            self.reopened.append((at, self.code))
+        self.notify("UAK SETUP: a second start asked for a new page at %s. If that was not you, press Ctrl-C here."
+                    % time.strftime("%H:%M", time.localtime(at)))
+        return launcher
+
+    def new_code(self):
+        """A fresh one-time code (the person asks for a new page); the session ends only by idling."""
+        with self.lock:
+            self.code, self.code_at, self.code_used = secrets.token_urlsafe(18), self.clock(), False
+            return self.code
+
+    def exchange(self, code):
+        """The session token for a valid, unused, fresh code; the code is spent either way it is presented right."""
+        with self.lock:
+            fresh = (self.code and not self.code_used and not self.ended and isinstance(code, str)
+                     and self.clock() - self.code_at <= CODE_SECONDS
+                     and hmac.compare_digest(code.encode("utf-8"), self.code.encode("utf-8")))
+            if fresh:
+                self.code_used = True
+                self.last_active = self.clock()
+            return self.token if fresh else None
+
+    def git_dirs(self, root):
+        return git_dirs(self, root, self.identity_run)
+
+    def make_launcher(self):
+        """A page that opens setup on the one-time code. The browser is given this file, so the code is in no process's
+        arguments and in no line of the terminal; the folder and the file are private to the person."""
+        self.forget_launcher()
+        folder = Path(tempfile.mkdtemp(prefix="uak-setup-"))
+        try:
+            os.chmod(str(folder), 0o700)
+        except OSError:
+            pass
+        url = "http://127.0.0.1:%d/#code=%s" % (self.server_port, self.new_code())
+        page = folder / "open.html"
+        descriptor = os.open(str(page), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            handle.write('<!doctype html><meta charset="utf-8"><title>UAK setup</title>'
+                         '<meta http-equiv="refresh" content="0;url=%s"><p>Opening setup. If nothing happens, '
+                         '<a href="%s">continue</a>.</p>\n' % (url, url))
+        self.launcher = page
+        return page
+
+    def forget_launcher(self):
+        page = getattr(self, "launcher", None)
+        self.launcher = None
+        if page:
+            shutil.rmtree(str(page.parent), ignore_errors=True)
+
+    def touch(self):
+        self.last_active = self.clock()
+
+    def expire_if_idle(self):
+        """End the session after IDLE_SECONDS without an action, and say in the terminal how to open a new one."""
+        with self.lock:
+            if self.ended or self.clock() - self.last_active <= IDLE_SECONDS:
+                return self.ended
+            self.ended = True
+        self.notify("UAK SETUP: the session ended after 30 minutes without activity. Press Ctrl+C here, then open a new "
+                    "one from your terminal: %s" % RESTART)
+        return True
+
+    def engine(self):
+        """The engine shipped with this setup (kit/.uak or an installed .uak), refused when the project's differs."""
+        if self.target and install_unfinished(self.target):
+            raise ValueError("The last install or update did not finish. Choose Repair or update kit to complete it.")
+        if not self.target or not kit_present(self.target) or self.failed_target == self.target:
+            raise ValueError("Install the kit before planning or checking readiness.")
+        project_root(self.target)
+        package = Path(__file__).resolve().parents[2]
+        installed_version = (Path(self.target) / ".uak/VERSION").read_text(encoding="utf-8").strip()
+        source_version = (package / "VERSION").read_text(encoding="utf-8").strip()
+        if installed_version != source_version:
+            raise ValueError("The installed kit version differs from this setup. Use Repair or update first so the correct engine checks readiness.")
+        return package / "bin/uak"
+
+    def forget(self, root=None):
+        """Drop what setup remembers about a project's remote, tools and team view (caller holds the lock)."""
+        root = str(root or self.target)
+        for cache in (self.remote_cache, self.team_cache):
+            for key in [k for k in cache if k[0] == root]:
+                del cache[key]
+        old = self.dash_tips.pop(os.path.normcase(root), None)
+        if old:
+            shutil.rmtree(old[1].get("dir", ""), ignore_errors=True)
+
+    def open_target(self):
+        """On start (main(), never make_server): an installed project on the command line opens where it is, from
+        local Git only (UI-019: a restart landed on Welcome). Anything else keeps the welcome screen. Never raises."""
+        try:
+            root = project_root(self.state.get("target") or "")
+            if not kit_present(root) or install_unfinished(root):
+                return
+            identity = signing_identity(self.identity_run, root)
+            resume, saved = project_progress(self, root, "")
+            branch = branch_state(self, root)
+            with self.lock:
+                self.target = str(root)
+                self.state["branch"] = branch
+                self.state.update(target=str(root), installed=resume["installed"], can_repair=(root / ".uak").exists(),
+                                  phase="setup", identity=identity, git_human=git_human(self.identity_run, root), human=saved, human_source="project" if saved else "",
+                                  resume=resume, inspect=self.state.get("inspect", 0) + 1, checked=False, ready=False,
+                                  checks=[], next_command="", next_note="", freeze=0, needs_human=[], details="", error="",
+                                  versions=kit_versions(self, root), detected=detect_project(self, root), design=design_state(root), home=str(Path.home()))
+                self.plan_known.setdefault(str(root), ([], bool(resume["kit_on_main"]), "", ""))
+        except (OSError, ValueError, subprocess.SubprocessError):
+            return
+
+    def refresh_progress(self):
+        """Recompute the restore facts of the current project (after a worker, a schedule, an idea or a name)."""
+        with self.lock:
+            target, human = self.target, self.state.get("human") or ""
+        if not target:
+            return
+        resume, _ = project_progress(self, Path(target), human)
+        branch = branch_state(self, Path(target))
+        with self.lock:
+            if self.target == target:
+                self.state["resume"] = resume
+                self.state["branch"] = branch
+                self.state["design"] = design_state(target)
+
+    def keep_check(self, at=None):
+        """Remember the current project's finished check (caller holds the lock)."""
+        state = self.state
+        if not self.target or not state.get("checked") or state.get("error") or state.get("phase") not in ("setup", "ready"):
+            return
+        key = os.path.normcase(self.target)
+        old = self.checks_kept.get(key) or {}
+        self.checks_kept[key] = {"ready": state.get("ready", False), "checks": list(state.get("checks") or []),
+                                 "next_command": state.get("next_command", ""), "next_note": state.get("next_note", ""),
+                                 "details": state.get("details", ""), "phase": state["phase"],
+                                 "freeze": state.get("freeze", 0), "installed": state.get("installed", False),
+                                 "at": at if at is not None else old.get("at", time.monotonic())}
+
+    def kept_check(self, root, installed):
+        """The kept check of ROOT when it is recent, for the same installation and not a failed one; else None."""
+        kept = self.checks_kept.get(os.path.normcase(str(root)))
+        if not kept or time.monotonic() - kept["at"] > CHECK_KEEP or kept["installed"] != installed or not installed \
+                or self.failed_target == str(root):
+            return None
+        return kept
+
+    def start_worker(self, work):
+        """Start the one background operation. It waits for the slow lane to drain first, so no request-side network
+        section overlaps the engine; the thread is assigned and started under one lock (amendment 3)."""
+        def drained():
+            with self.slow:
+                pass
+            try:
+                work()
+            finally:
+                try:
+                    self.refresh_progress()  # UI-019: what the operation changed, for the page's restored steps
+                except Exception:  # noqa: BLE001 - the restore facts are a hint; the operation's result stands
+                    pass
+
+        with self.lock:
+            self.worker = threading.Thread(target=drained, daemon=True)
+            self.worker.start()
+
+    def apply_readiness(self, result):
+        self.forget()
+        output = redact(result.stdout + "\n" + result.stderr)
+        self.state.update(readiness(output, result.returncode))
+        self.state.update(phase="ready" if self.state["ready"] else "setup", details=output, checked=True,
+                          checks_stale=False)
+        if not self.state["checks"] and not self.state["ready"]:
+            self.state["error"] = "The readiness check could not complete. Check connection and technical details, then retry."
+        self.keep_check(at=time.monotonic())
+
+    def plan_run(self, harness, command, note):
+        """The planning run, then the server's own check of what changed and its own lint."""
+        planning, root, uak = self.planning, Path(self.target), self.engine()
+        with self.lock:
+            self.plan = None
+            self.state.update(phase="planning", error="", details="", outcome="", problem="")
+            self.plan_started, self.plan_last = time.time(), ""
+
+        def seen(line):  # the last readable line of the tool's output, for the page (UI-010)
+            shown = planning.progress_line(line)
+            if shown:
+                with self.lock:
+                    self.plan_last = shown
+
+        def work():
+            try:
+                note_path = planning.regular_file(root, planning.NOTE_FILE)
+                if note:
+                    planning.write_atomic(note_path, ("# Changes the human asked for\n\n" + note + "\n").encode("utf-8"))
+                before = planning.snapshot(self.run, root)
+                result = self.run(command, cwd=str(root), timeout=planning.PLAN_TIMEOUT, group=True, on_line=seen)
+                after = planning.snapshot(self.run, root)
+                if note_path.is_file() and not note_path.is_symlink():
+                    note_path.unlink()
+                found = planning.violations(before, after)
+                tasks = planning.regular_file(root, ".uak/TASKS.md")
+                missing = not tasks.is_file()
+                text = tasks.read_text(encoding="utf-8", errors="replace") if tasks.is_file() else ""
+                # No plan file: nothing to check, so no lint verdict (a green "passes" there was shown in round r3).
+                checked = {"ok": False, "lines": []} if missing else planning.lint(self.run, root, uak, bash_binary())
+                plan = {"harness": harness, "violations": found, "lint": checked, "cards": planning.cards(text),
+                        "digest": planning.digest(root), "head": after["head"], "exit": result.returncode,
+                        "failed": missing}
+                if found:
+                    # UI-024 (D-7.1): one instruction to undo what the planner did, with its command when Git can.
+                    plan["undo"] = undo_instruction(self.run, root, before, after, found)
+                output = (result.stdout or "") + "\n" + (result.stderr or "")
+                # An untrusted folder (UI-008): the tool ran, wrote no plan, and said why; name that cause.
+                untrusted = not tasks.is_file() and planning.UNTRUSTED in output
+                with self.lock:
+                    self.plan = plan
+                    failed = result.returncode != 0 or missing
+                    # The trust line names the specific cause of a missing plan; any other missing plan says so plainly.
+                    self.state.update(phase="error" if failed else "planned", details=redact(output),
+                                      error=planning.UNTRUSTED_ERROR if untrusted else
+                                      planning.MISSING_PLAN_ERROR if missing and result.returncode == 0 else
+                                      "The coding tool stopped with an error. Check Technical details, then try again." if failed else "")
+                    # A written plan after a rule break is not "done": the page reads "Finished with problems".
+                    self.state.update(outcome="problems" if found else "", problem=PLAN_PROBLEM if found else "")
+                    self.plan_started = 0
+            except Exception as exc:
+                with self.lock:
+                    self.plan_started = 0
+                    self.state.update(phase="error", error="Planning stopped. Correct the issue and retry.", details=redact(exc))
+
+        self.start_worker(work)
+
+    def approve_run(self, root, approved, approved_by, base_head, remote, base):
+        """Commit exactly the reviewed plan files with Backlog-Approved: yes, check the commit, push, re-check."""
+        planning, uak = self.planning, self.engine()
+        with self.lock:
+            self.state.update(phase="approving", error="", details="")
+            who = self.state.get("human") or ""
+
+        def git(*args, timeout=60):
+            return planning.git_out(self.run, root, *args, timeout=timeout)
+
+        def work():
+            pushed = False
+            try:
+                with self.lock:
+                    if planning.digest(root) != approved:
+                        raise ValueError("The plan files changed while approving. Nothing was committed; review the plan again.")
+                    planning.approve_config(root)
+                    blobs = {name: git("hash-object", "--path=" + name, "--", name).strip() for name in planning.PLAN_FILES}
+                git("add", "--", *planning.PLAN_FILES)
+                git("commit", "-q", "-m", "plan: backlog v1", "-m", approved_by, "--", *planning.PLAN_FILES)
+                commit = git("rev-parse", "HEAD").strip()
+                changed = set(git("diff-tree", "--no-commit-id", "--name-only", "-r", commit).split())
+                if git("rev-parse", commit + "^").strip() != base_head or not changed <= set(planning.PLAN_FILES) or \
+                        any(git("rev-parse", "%s:%s" % (commit, name)).strip() != blob for name, blob in blobs.items()):
+                    raise ValueError("The commit does not match the plan you approved (a Git hook may have changed it). "
+                                     "Nothing was pushed. Undo it with: git reset --soft HEAD^")
+                # The verified commit by its SHA, never HEAD: a commit made meanwhile is not published (review of dce95aa).
+                target_ref = "%s:refs/heads/%s" % (commit, base)
+                log_human_act(self, root, "approve-plan", who, commit)
+                result = self.run(list(planning.GIT) + ["-C", str(root), "push", remote, target_ref], cwd=str(root), timeout=120)
+                if result.returncode:
+                    raise ValueError("Your approval is committed here (%s) but %s refused the push: %s Fix the cause, then run: "
+                                     "git push %s %s" % (commit[:7], remote, (result.stderr or result.stdout).strip()[-300:], remote, target_ref))
+                pushed = True
+                check = self.run([bash_binary(), str(uak), "start"], cwd=str(root), timeout=120, env=dict(COMMAND_ENV))
+                with self.lock:
+                    self.plan = None
+                    self.apply_readiness(check)
+            except Exception as exc:
+                with self.lock:
+                    self.state.update(phase="error", ready=False, details=redact(exc),
+                                      error=redact(exc) if isinstance(exc, ValueError) else
+                                      ("The plan was published, but the readiness check stopped. Check again." if pushed else
+                                       "The approval stopped. Correct the issue and retry."))
+
+        self.start_worker(work)
+
+    def publish_run(self, root, files, approved, human, base_head, remote, base):
+        """Commit exactly the previewed kit files (never the plan before its approval), check the commit, push its SHA."""
+        planning, uak = self.planning, self.engine()
+        with self.lock:
+            self.state.update(phase="publishing", error="", details="")
+
+        def git(*args, timeout=60):
+            return planning.git_out(self.run, root, *args, timeout=timeout)
+
+        def reason(result):
+            """What Git said, on one line; a hook that exits without a word reads as "(no message)"."""
+            text = " ".join(redact((result.stderr or result.stdout or "").strip()).split())[-300:].rstrip(". ")
+            return text or "(no message)"
+
+        def restore():
+            """Refs and index as they were before publishing (contract #46; review of 57ef048: a rejected commit left
+            505 files staged on an empty repository)."""
+            head = planning.git(self.run, root, "rev-parse", "-q", "--verify", "HEAD").stdout.strip()
+            if base_head:
+                planning.git(self.run, root, "reset", "-q", "--mixed", base_head)
+            else:
+                if head:
+                    planning.git(self.run, root, "update-ref", "-d", "HEAD")
+                planning.git(self.run, root, "read-tree", "--empty")
+
+        def work():
+            pushed = False
+            try:
+                with self.lock:
+                    if planning.publish_digest(root, files) != approved:
+                        raise ValueError("The kit files changed after the preview. Nothing was committed; open the preview again.")
+                    git("add", "-A", "--", *files)
+                    # The tree the person approved: mode and blob of each staged path; a deletion is staged as absent.
+                    expected = {}
+                    for entry in git("ls-files", "-s", "-z", "--", *files).split("\0"):
+                        if entry:
+                            meta, name = entry.split("\t", 1)
+                            mode, blob = meta.split()[:2]
+                            expected[name] = (mode, blob)
+                committed = planning.git(self.run, root, "commit", "-q", "-m", "chore: uak setup", "-m",
+                                         signed_line("Published-By", human), "--", *files, timeout=120)
+                if committed.returncode:
+                    restore()
+                    raise ValueError("Git did not create the commit (a pre-commit hook or Git refused it): %s. Nothing was "
+                                     "published and nothing stays staged. Fix the cause, then publish again."
+                                     % reason(committed))
+                commit = git("rev-parse", "HEAD").strip()
+                parents = git("rev-list", "--parents", "-n", "1", commit).split()[1:]
+                changed = set(n for n in git("diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-z", commit).split("\0") if n)
+                tree = {}
+                for entry in git("ls-tree", "-r", "-z", commit, "--", *files).split("\0"):
+                    if entry:
+                        meta, name = entry.split("\t", 1)
+                        mode, kind, blob = meta.split()[:3]
+                        tree[name] = (mode, blob)
+                # Every previewed path as approved (blob, type and mode), every deletion absent, nothing else changed.
+                if parents != ([base_head] if base_head else []) or changed != set(files) or tree != expected:
+                    restore()  # refs and index as they were before publishing (review of 0386bec, contract #46)
+                    raise ValueError("The commit did not match the files you reviewed (a Git hook changed it), so it was "
+                                     "undone and nothing was published. Check your pre-commit hooks, then publish again.")
+                ref = "%s:refs/heads/%s" % (commit, base)
+                log_human_act(self, root, "publish-kit", human, commit)
+                result = self.run(list(planning.GIT) + ["-C", str(root), "push", remote, ref], cwd=str(root), timeout=120)
+                if result.returncode:
+                    # Review of f8d5d84 (P2): a refused push is a failure before publishing, so the commit is undone
+                    # (contract #46) and the page must not offer a push of a commit that no ref holds any more.
+                    restore()
+                    raise ValueError("%s refused the push: %s. Nothing was published, and nothing stays committed or "
+                                     "staged here. Fix the cause (for example a pre-push hook or a protected branch), "
+                                     "then publish again." % (remote, reason(result)))
+                pushed = True
+                check = self.run([bash_binary(), str(uak), "start"], cwd=str(root), timeout=120, env=dict(COMMAND_ENV))
+                with self.lock:
+                    self.apply_readiness(check)
+            except Exception as exc:
+                if not pushed:
+                    try:
+                        restore()
+                    except Exception:  # noqa: BLE001 - the original failure is what the person needs to see
+                        pass
+                with self.lock:
+                    self.state.update(phase="error", ready=False, details=redact(exc),
+                                      error=redact(exc) if isinstance(exc, ValueError) else
+                                      ("The kit was published, but the readiness check stopped. Check again." if pushed else
+                                       "Publishing stopped. Correct the issue and retry."))
+
+        self.start_worker(work)
+
+    def register_run(self, root, name, who, uak):
+        """Run the engine's register-reviewer as NAME (UAK_HUMAN), then read the result back from claims. The result
+        lives in the remote cache of this project (UI-009), never in a server-wide flag."""
+        with self.lock:
+            back = "ready" if self.state.get("ready") else "setup"
+            self.state.update(phase="registering", error="", details="")
+
+        def work():
+            try:
+                # Recorded first, as publishing and approving are: when the record cannot be written, nothing is done.
+                log_human_act(self, root, "register-reviewer", name, planning_head(self, root), detail=who)
+                result = self.run([bash_binary(), str(uak), "register-reviewer", who], cwd=str(root), timeout=180,
+                                  group=True, env=registration_env(name))
+                output = redact((result.stdout or "") + "\n" + (result.stderr or "")).strip()
+                found = reviewer_record(remote_state(self, root, fresh=True), who, name)
+                with self.lock:
+                    if found["registered"]:
+                        self.state.update(phase=back, details=output)
+                    else:
+                        last = (output.splitlines() or ["(no message)"])[-1][-300:]
+                        self.state.update(phase="error", details=output,
+                                          error="%s is not registered: %s. Check the connection, then register again."
+                                          % (who, last))
+            except Exception as exc:  # noqa: BLE001 - the page needs one plain message
+                with self.lock:
+                    self.state.update(phase="error", details=redact(exc),
+                                      error="%s is not registered: %s" % (who, redact(exc) if isinstance(exc, ValueError)
+                                                                           else "the registration stopped. Try again."))
+
+        self.start_worker(work)
+
+    def launch(self, operation, command):
+        checking = operation == "checking"
+        with self.lock:
+            # UI-024 (A-F7): a check keeps the last list (dimmed by the page) until the new one arrives; emptying it
+            # made the page jump 1,014 px. An install still starts from an empty list.
+            self.state.update(phase=operation, ready=False, next_command="", next_note="", details="", error="",
+                              checked=False, checks_stale=checking)
+            if not checking:
+                self.state["checks"] = []
+
+        def work():
+            try:
+                if checking:
+                    result = self.run(command, cwd=self.target, timeout=CHECK_TIMEOUT, group=True,
+                                      env=dict(CHECK_ENV, **COMMAND_ENV))
+                else:
+                    result = self.run(command, cwd=self.target, timeout=120)
+                output = redact(result.stdout + "\n" + result.stderr)
+                with self.lock:
+                    installed = kit_present(self.target)
+                    if checking and result.returncode == 124:
+                        # B-10: the remote did not answer in time; the last result stays, marked current again.
+                        self.state.update(phase="setup", checks_stale=False, details=output,
+                                          error=CHECK_TIMEOUT_ERROR % (remote_and_base()[0], CHECK_TIMEOUT))
+                    elif operation == "installing":
+                        success = result.returncode == 0 and installed
+                        self.failed_target = "" if success else self.target
+                        error = "Installation did not finish. Check details, correct the issue, and retry."
+                        for name in (".claude", ".codex", ".cursor", ".gemini", ".agents", ".github"):
+                            path = Path(self.target) / name
+                            if path.exists() and not path.is_dir():
+                                error = "A file named %s is blocking a folder the kit needs. Rename or move that file yourself, then choose Repair or update kit." % name
+                                break
+                        self.state.update(phase="installed" if success else "error", installed=success, can_repair=True, ready=False,
+                                          error="" if success else error, details=output)
+                    else:
+                        self.apply_readiness(result)
+            except Exception as exc:
+                with self.lock:
+                    if operation == "installing":
+                        self.failed_target = self.target
+                        self.state["installed"] = False
+                    self.state.update(phase="error", ready=False, checks_stale=False,
+                                      error="The operation stopped. Correct the issue and retry.", details=redact(exc))
+
+        self.start_worker(work)
+
+
+# UI-017: the demo video of the welcome screen (shipped by UI-016). A fixed allowlist: the request picks one of these
+# four routes, never a path, and the files come from the kit that runs this setup (.uak/media beside bin/lib), never
+# from the chosen project.
+MEDIA = {
+    "/media/tutorial.mp4": ("tutorial.mp4", "video/mp4"),
+    "/media/tutorial-en.vtt": ("tutorial-en.vtt", "text/vtt; charset=utf-8"),
+    "/media/tutorial-es.vtt": ("tutorial-es.vtt", "text/vtt; charset=utf-8"),
+    "/media/tutorial-poster.jpg": ("tutorial-poster.jpg", "image/jpeg"),
+}
+
+
+FONTS = {"/fonts/Inter.woff2": "Inter.woff2", "/fonts/JetBrainsMono.woff2": "JetBrainsMono.woff2"}
+
+
+def look_palette(target):
+    """The palette the pages start with (UAK-158): what dash.py would pick for this project, read from files only (a page
+    load starts no process). Lavanda unless the project's dashboard directory already exists: then Clasico."""
+    if not target:
+        return "lavanda"
+    try:
+        git = Path(target) / ".git"
+        if git.is_file():
+            text = git.read_text(encoding="utf-8").strip()
+            git = Path(text[len("gitdir:"):].strip()) if text.startswith("gitdir:") else git
+            if git.parent.name == "worktrees":
+                git = git.parent.parent
+        return dashboard_module().look_default(git / "uak-dash")
+    except (OSError, ValueError, TypeError):
+        return "lavanda"
+
+
+def media_file(name):
+    """The engine's media file `name` when it is a regular file reached without a symlink, else None."""
+    folder = Path(__file__).resolve().parents[2] / "media"
+    try:
+        if os.path.islink(str(folder)) or not os.path.isdir(str(folder)):
+            return None
+        path = folder / name
+        info = os.lstat(str(path))
+    except OSError:
+        return None
+    return path if stat.S_ISREG(info.st_mode) else None
+
+
+def media_available():
+    """The page shows the demo block only when all four files are there."""
+    return all(media_file(name) for name, _ in MEDIA.values())
+
+
+def byte_range(header, size):
+    """A single `bytes=a-b`, `bytes=a-` or `bytes=-n` range as (start, end); None to send the whole file (no header,
+    or one this server does not use: several ranges, another unit, a malformed one); "unsatisfiable" for a 416."""
+    m = re.match(r"^bytes=(\d*)-(\d*)$", (header or "").strip())
+    if not m or not (m.group(1) or m.group(2)):
+        return None
+    if not m.group(1):
+        suffix = int(m.group(2))
+        return (max(0, size - suffix), size - 1) if suffix and size else "unsatisfiable"
+    start = int(m.group(1))
+    end = int(m.group(2)) if m.group(2) else size - 1
+    if start >= size:
+        return "unsatisfiable"
+    if end < start:
+        return None
+    return start, min(end, size - 1)
+
+
+class SetupHandler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.0"
+
+    def setup(self):
+        super().setup()
+        self.connection.settimeout(10)
+
+    def log_message(self, *args):
+        pass  # Requests and tokens never appear in the terminal log.
+
+    def reply(self, code, payload, html=False, javascript=False):
+        data = payload.encode("utf-8") if html or javascript else json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "text/html; charset=utf-8" if html else "text/javascript; charset=utf-8" if javascript else "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-UAK-Setup", "1")
+        if self.path.startswith("/api/") and getattr(self, "page", ""):
+            count, at = self.server.reopens_for(self.page)
+            self.send_header("X-UAK-Reopens", str(count))
+            self.send_header("X-UAK-Reopened-At", at)
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("Content-Security-Policy", "default-src 'none'; script-src 'nonce-%s'; style-src 'unsafe-inline'; font-src 'self'; connect-src 'self'; frame-src 'self'; img-src data: 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors %s" % (self.server.nonce, "'self'" if self.path == "/dashboard" else "'none'"))
+        try:
+            self.end_headers()
+            self.wfile.write(data)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass  # Closing a tab does not cancel an installation or print session data.
+
+    def authorized(self, write=False):
+        self.page = self.headers.get("X-UAK-Page", "")
+        self.page = self.page if PAGE_ID.fullmatch(self.page) else ""
+        origin = "http://127.0.0.1:%d" % self.server.server_port
+        if self.headers.get("Host") != origin[len("http://"):] or (write and self.headers.get("Origin") != origin):
+            self.reply(403, {"error": "This request must come from the local setup page."})
+            return False
+        if not self.path.startswith("/api/") or self.path in ("/api/session", "/api/reopen"):
+            self.server.seen_request()  # the shell, the media and the code exchange: a use, but no page is named
+        if self.path.startswith("/api/") and self.path not in ("/api/session", "/api/reopen"):
+            if not hmac.compare_digest(self.headers.get("X-UAK-Token", "").encode("utf-8"), self.server.token.encode("utf-8")):
+                self.reply(403, {"error": "This setup session expired. Reopen the address printed in the terminal."})
+                return False
+            if self.server.expire_if_idle():
+                self.reply(403, {"error": "This setup session ended after 30 minutes without activity. Start setup again "
+                                          "from your terminal: %s" % RESTART})
+                return False
+            self.server.seen_request(self.page)  # a valid session: now the page counts
+            if self.path != "/api/status":  # the page's own poll is not an action of the person
+                self.server.touch()
+        return True
+
+    def do_GET(self):
+        if not self.authorized():
+            return
+        if self.path == "/" or re.fullmatch(r"/\?step=[a-z]{3,12}", self.path):  # UAK-159: a step has its own address (the query keeps fonts/ relative)
+            html = Path(__file__).with_name("setup.html").read_text(encoding="utf-8")
+            html = html.replace('data-pal="clasico">', 'data-pal="%s">' % look_palette(self.server.target or self.server.state.get("target", "")), 1)
+            self.reply(200, html.replace("__NONCE__", self.server.nonce), html=True)
+        elif self.path in FONTS:
+            self.font(FONTS[self.path])
+        elif self.path == "/workspace.js":
+            self.reply(200, Path(__file__).with_name("workspace.js").read_text(encoding="utf-8"), javascript=True)
+        elif self.path in MEDIA:
+            self.media(*MEDIA[self.path])
+        elif self.path == "/dashboard":
+            html = Path(__file__).with_name("dash.html").read_text(encoding="utf-8")
+            html = html.replace('data-pal="clasico">', 'data-pal="%s">' % look_palette(self.server.target or self.server.state.get("target", "")), 1)
+            bridge = ('<script nonce="%s">window.UAK_EMBEDDED=true;'
+                      'window.addEventListener("message",function(e){'
+                      'if(e.source!==window.parent||!e.data||e.data.type!=="uak:dashboard")return;'
+                      'window.UAK_DATA=e.data.snapshot;'
+                      'window.UAK_DASH_LANGUAGE=e.data.language;'
+                      'window.UAK_DASH_LOOK=e.data.look;'
+                      'document.dispatchEvent(new Event("uak:state"));});</script>') % self.server.nonce
+            html = html.replace('<script src="data.js"></script>', bridge)
+            html = html.replace('<script src="workspace.js">', '<script nonce="%s" src="workspace.js">' % self.server.nonce)
+            html = html.replace('<script>', '<script nonce="%s">' % self.server.nonce)
+            self.reply(200, html, html=True)
+        elif self.path == "/api/dashboard":
+            try:
+                with self.server.lock:
+                    root = self.server.target
+                    busy = self.server.worker and self.server.worker.is_alive()
+                if not root:
+                    raise ValueError("Choose a project first.")
+                module = dashboard_module()
+                if busy:
+                    # UI-024 (B-10): while the engine runs the dashboard still answers, from what is known here.
+                    self.reply(200, self.dashboard_meanwhile(root, module))
+                    return
+                data = self.dashboard_data(root, module)
+                with self.server.lock:
+                    self.server.state["freeze"] = data.get("freeze") or 0
+                    self.server.state["needs_human"] = data["needs_human"]
+                    data["guidance"] = guidance(self.server.state, data)
+                    self.server.dash_cache[os.path.normcase(root)] = data
+                self.reply(200, data)
+            except (ValueError, OSError, RuntimeError, subprocess.SubprocessError) as exc:
+                self.reply(400, {"error": redact(exc)})
+        elif self.path in ("/api/publish-kit", "/api/team", "/api/plan"):
+            try:
+                if self.path == "/api/publish-kit":
+                    def preview():
+                        _, files, digest, _, _, _ = publish_checks(self.server)
+                        return {"files": files, "digest": digest}
+                    self.reply(200, self.slow_lane(preview, self.busy))
+                elif self.path == "/api/team":
+                    self.reply(200, self.slow_lane(self.fresh_team, self.cached_team))
+                else:
+                    self.reply(200, self.slow_lane(lambda: self.plan_view(True), lambda: self.plan_view(False)))
+            except Busy:
+                self.reply(409, {"error": "An operation is running. Wait for it to finish."})
+            except (ValueError, OSError, subprocess.SubprocessError) as exc:
+                self.reply(400, refusal(exc))
+        elif self.path == "/api/status":
+            # Never waits on the slow lane (UI-011): a copy of the state under the lock, everything else outside it.
+            try:
+                s = self.server
+                with s.lock:
+                    state = dict(s.state)
+                    target = s.target
+                    running = state.get("phase") == "planning" and s.plan_started
+                    progress = {"elapsed": max(0, int(time.time() - s.plan_started)), "last": s.plan_last} if running else {}
+                runs, agents = s.run_view()
+                self.reply(200, dict(state, plan_progress=progress, settings=read_config(target) if target else {},
+                                     runs=runs, agents=agents,
+                                     run_actions={n: {"kind": a["kind"], "what": a.get("what", "")} for n, a in RUN_ACTIONS.items()},
+                                     branch=remote_default(s, target, state.get("branch") or {}),
+                                     guidance=guidance(state), completed=completed_steps(state),
+                                     completed_items=completed_items(state), team=team_phase(state),
+                                     demo=media_available(),
+                                     reviewer=reviewer_status(s, target, state.get("human") or "")))
+            except (ValueError, OSError, subprocess.SubprocessError) as exc:
+                self.reply(400, {"error": redact(exc)})
+        else:
+            self.reply(404, {"error": "Page not found."})
+
+    def font(self, name):
+        """One of the two shipped font files (Inter, JetBrains Mono): same-origin only, never from the network."""
+        try:
+            data = (Path(__file__).with_name("fonts") / name).read_bytes()
+        except OSError:
+            self.reply(404, {"error": "Page not found."})
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "font/woff2")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "max-age=86400")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+        self.end_headers()
+        try:
+            self.wfile.write(data)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass
+
+    def media(self, name, kind):
+        """One file of the demo video, whole or one byte range so the browser can seek (UI-017).
+        Authorized like "/" and "/workspace.js": a <video> cannot send the X-UAK-Token header, so the loopback Host
+        check is the gate, as for the page's other same-origin assets; the files are the kit's public demo and carry no
+        project data. Sec-Fetch-Site and Cross-Origin-Resource-Policy keep other sites from embedding them."""
+        if self.headers.get("Sec-Fetch-Site", "same-origin") not in ("same-origin", "none"):
+            self.reply(403, {"error": "This request must come from the local setup page."})
+            return
+        path = media_file(name)
+        if not path:
+            self.reply(404, {"error": "Page not found."})
+            return
+        try:
+            handle = open(str(path), "rb")
+        except OSError:
+            self.reply(404, {"error": "Page not found."})
+            return
+        with handle:
+            size = os.fstat(handle.fileno()).st_size
+            span = byte_range(self.headers.get("Range"), size)
+            if span == "unsatisfiable":
+                self.send_response(416)
+                self.send_header("Content-Range", "bytes */%d" % size)
+                start, end = 0, -1
+            elif span:
+                start, end = span
+                self.send_response(206)
+                self.send_header("Content-Range", "bytes %d-%d/%d" % (start, end, size))
+            else:
+                start, end = 0, size - 1
+                self.send_response(200)
+            self.send_header("Content-Type", kind)
+            self.send_header("Content-Length", str(end - start + 1))
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
+            try:
+                self.end_headers()
+                handle.seek(start)
+                left = end - start + 1
+                while left > 0:
+                    chunk = handle.read(min(65536, left))
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    left -= len(chunk)
+            except OSError:
+                pass  # the browser often drops a range it no longer needs while seeking
+
+    def slow_lane(self, compute, when_busy):
+        """Run `compute` in the slow lane, or `when_busy` when a worker runs, checked again after waiting (amendment 3)."""
+        s = self.server
+        with s.lock:
+            busy = s.worker and s.worker.is_alive()
+        if busy:
+            return when_busy()
+        with s.slow:
+            with s.lock:
+                busy = s.worker and s.worker.is_alive()
+            return when_busy() if busy else compute()
+
+    def busy(self):
+        raise Busy()
+
+    def team_key(self):
+        with self.server.lock:
+            return (self.server.target, self.server.state.get("human") or "")
+
+    def fresh_team(self):
+        key = self.team_key()
+        view = team_view(self.server)
+        with self.server.lock:
+            self.server.team_cache[key] = view
+        return view
+
+    def cached_team(self):
+        """While the engine runs: the last view of this project and name, marked stale; never a fetch. Without one, a
+        view with no command that says why (UI-024, B-10: a 409 here left the team step blank during a check)."""
+        key = self.team_key()
+        with self.server.lock:
+            view = self.server.team_cache.get(key)
+            checking = self.server.state.get("phase") == "checking"
+        if view:
+            return dict(view, stale=True)
+        target, name = key
+        if not HUMAN_NAME.fullmatch(name):
+            raise Need("Tell setup your name first (on the People screen): registering the reviewer is a human act.", "human")
+        who = name + "-r"
+        return {"task": "", "human": name, "reviewer": who, "phase": "", "stale": True, "checking": checking,
+                "remote": {"state": "", "detail": ""}, "commands": [], "review_note": "", "claimed": [], "tools": [],
+                "note": CHECKING_NOTE if checking else BUSY_NOTE,
+                "roles": effective_roles(None, set()), "retry": False, "can_check": False,
+                "people": team_size(target) if target else 0,
+                "registered": {"name": who, "registered": None, "registered_by": "", "retired": False, "message": ""}}
+
+    def dashboard_data(self, root, module):
+        """The dashboard of the project. When the tips of claims and of the base branch did not move (one `git
+        ls-remote`) and no local file the page reads changed, nothing else runs in git: the claims copy of that tip is
+        kept, and what depends on the clock (stalled, idle, gone, lease, late, `generated`) is built again from it on
+        every answer, with no process."""
+        s = self.server
+        key = dashboard_key(s, root)
+        slot = os.path.normcase(str(root))
+        with s.lock:
+            kept = s.dash_tips.get(slot)
+        if key and kept and kept[0] == key and Path(kept[1]["dir"]).is_dir():
+            parts = kept[1]
+            data = module.build(Path(parts["dir"]), parts["backlog"], Path(root).name)
+            data.update(source="remote", connection="ok", warning="", refresh=20, live_url=parts["live_url"])
+            data["mode"] = data.get("mode") or parts["base_mode"]
+            return self.finish_dashboard(root, data, parts["known"], parts)
+        parts = {}
+        data = module.workspace_data(root, keep=parts)
+        if data.get("source") == "local" and data.get("connection") == "unreachable":
+            # UI-023 (B-08): offline, the last claims this clone read, marked stale, not "everything free".
+            try:
+                data = last_claims(s, root, module) or data
+            except (OSError, ValueError, RuntimeError, subprocess.SubprocessError, tarfile.TarError):
+                pass  # no readable copy: the plainly labelled local plan stays
+        known = team_known(s, root, data)
+        data = self.finish_dashboard(root, data, known, parts)
+        if key and parts.get("dir") and data.get("source") == "remote" and data.get("connection") == "ok":
+            parts.update(known=known, mode=data.get("mode", ""), freeze=data.get("freeze") or 0)
+            with s.lock:
+                old = s.dash_tips.get(slot)
+                s.dash_tips[slot] = (key, parts)
+            if old:
+                shutil.rmtree(old[1].get("dir", ""), ignore_errors=True)
+        elif parts.get("dir"):
+            shutil.rmtree(parts["dir"], ignore_errors=True)
+        return data
+
+    def finish_dashboard(self, root, data, known, parts):
+        name_the_team(self.server, Path(root), data, known)
+        if "mode" in parts and "freeze" in parts:  # a kept answer: the config was read when it was kept
+            data["mode"], freeze = parts["mode"], parts["freeze"]
+            if not data.get("freeze"):
+                data["freeze"] = freeze
+        else:
+            config = read_config(root)
+            data["mode"] = config.get("Mode", "")
+            if not data.get("freeze"):
+                # UI-023 (B-06): claims' config has no freeze until the engine writes one; PROJECT.md has it.
+                try:
+                    data["freeze"] = max(0, int(read_config(root, ("Freeze-Epoch",)).get("Freeze-Epoch") or 0))
+                except ValueError:
+                    data["freeze"] = 0
+        truthful(data)
+        return data
+
+    def dashboard_meanwhile(self, root, module):
+        """GET /api/dashboard while a worker runs: the last good dashboard of this project marked stale, or one built
+        from local copies only (the last claims this clone read, else the local plan). Never the network."""
+        s = self.server
+        with s.lock:
+            cached = s.dash_cache.get(os.path.normcase(root))
+        if cached:
+            return dict(cached, stale=True, checking=True)
+        try:
+            data = last_claims(s, root, module)
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError, tarfile.TarError):
+            data = None
+        if not data:
+            with tempfile.TemporaryDirectory(prefix="uak-local-dashboard-") as folder:
+                data = module.build(Path(folder), module.read(Path(root) / ".uak/TASKS.md"), Path(root).name)
+            data["source"] = "local"
+        data.update(connection="checking", stale=True, checking=True, warning=CHECKING_WARNING, refresh=20)
+        data["mode"] = read_config(root).get("Mode", "")
+        try:
+            data["freeze"] = data.get("freeze") or max(0, int(read_config(root, ("Freeze-Epoch",)).get("Freeze-Epoch") or 0))
+        except ValueError:
+            data["freeze"] = 0
+        truthful(data)
+        with s.lock:
+            data["guidance"] = guidance(s.state, data)
+        return data
+
+    def plan_view(self, probe=True):
+        """The planning page: what can plan here, the idea, and the last proposed plan with its check and lint. Without
+        `probe` (a worker runs) the last known tools and kit state are shown: no probe, no fetch."""
+        s, planning = self.server, self.server.planning
+        with s.lock:
+            target, plan = s.target, dict(s.plan or {})
+            resume = dict(s.state.get("resume") or {})
+        if not target:
+            raise ValueError("Choose a project first.")
+        root = project_root(target)
+        remote_note, remote_technical = "", ""
+        if probe:
+            offers = planners(s, root)
+            known = remote_state(s, root) if kit_present(root) else {}
+            kit = bool(known.get("kit"))
+            if known.get("state") == "offline":
+                # Offline is not "publish the kit" (review of 993e112): the same words as POST /api/plan.
+                failure = unreachable(remote_and_base()[0], known["failure"])
+                remote_note, remote_technical = str(failure), failure.technical
+            with s.lock:
+                s.plan_known[str(root)] = (offers, kit, remote_note, remote_technical)
+        else:
+            with s.lock:
+                offers, kit, remote_note, remote_technical = s.plan_known.get(str(root), ([], False, "", ""))
+
+        def text(name):
+            path = planning.regular_file(root, name)
+            return path.read_text(encoding="utf-8", errors="replace")[:200000] if path.is_file() else ""
+
+        return {"project": root.name, "mode": read_config(root).get("Mode", ""), "planners": offers,
+                "idea": text("IDEA.md"), "violations": plan.get("violations", []),
+                "lint": plan.get("lint", {"ok": False, "lines": []}), "cards": plan.get("cards", []),
+                "digest": plan.get("digest", ""), "failed": bool(plan.get("failed")),
+                "tasks": text(".uak/TASKS.md") if plan else "",
+                "owners": text(".uak/OWNERS.md") if plan else "", "planned": bool(plan) and not plan.get("failed"),
+                "kit_on_main": kit, "remote_note": remote_note, "remote_technical": remote_technical,
+                # UI-019: an approved plan is shown done, never offered again (from the last local copy of main).
+                "approved": resume.get("plan_approved") is True, "approved_sha": resume.get("base_sha") or "",
+                # Only Claude Code has the one-time folder trust (UI-008); a Codex-only project shows no notice.
+                "trust_command": planning.trust_command(root) if (root / ".claude").is_dir() else "",
+                # UI-024 (A-F6): whether Claude Code already trusts the project folder (None: could not read).
+                "trust": claude_trust((str(root),), s)[str(root)] if (root / ".claude").is_dir() else None,
+                "undo": plan.get("undo") or {"text": "", "command": ""}}
+
+    def do_POST(self):
+        if not self.authorized(write=True):
+            return
+        if self.headers.get("Content-Type") != "application/json":
+            self.reply(415, {"error": "Expected JSON."})
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length < 1 or length > LIMIT:
+                self.reply(413, {"error": "Request is too large or empty."})
+                return
+            if self.headers.get("Transfer-Encoding"):
+                raise ValueError("Unsupported transfer encoding.")
+            data = json.loads(self.rfile.read(length).decode("utf-8"))
+            if not isinstance(data, dict):
+                raise ValueError("Expected a settings object.")
+            if self.path == "/api/close":
+                try:
+                    self.server.close_now()
+                    self.reply(200, {"closed": True})
+                except Busy as exc:
+                    self.reply(409, {"error": str(exc)})
+                return
+            if self.path == "/api/closing":
+                self.server.page_closed(self.page)  # a request within the grace says it was a reload
+                self.reply(200, {"closing": True})
+                return
+            if self.path == "/api/reopen":
+                # A second start of setup for this project: the key is in a private file of the git directory.
+                key = self.headers.get("X-UAK-Reopen", "")
+                if not key or not hmac.compare_digest(key.encode("utf-8"), self.server.key.encode("utf-8")):
+                    self.reply(403, {"error": "That request is not from a setup start of this project."})
+                else:
+                    try:
+                        self.reply(200, {"launcher": str(self.server.reopening())})
+                    except Busy as exc:
+                        self.reply(409, {"error": str(exc)})
+                return
+            if self.path == "/api/session":
+                token = self.server.exchange(data.get("code")) if set(data) == {"code"} else None
+                if token is None:
+                    self.reply(403, {"error": "That code was already used or has expired. Open a new page from the terminal."})
+                else:
+                    self.server.forget_launcher()
+                    self.server.session_began(self.page, data["code"])
+                    self.reply(200, {"token": token})
+                return
+            if self.path == "/api/run/stop":
+                if data:
+                    raise ValueError("Stopping an action accepts no options.")
+                self.reply(200, {"stopped": self.server.stop_run()})
+                return
+            # Who signs is read before taking the lock (review of 949eca1: it blocked status polling) and synchronously
+            # (a background read kept a process inside the project, and Windows could not delete it: WinError 32).
+            self.identity = self.read_identity(data)
+            with self.server.lock:
+                busy = self.server.worker and self.server.worker.is_alive()
+            if busy:
+                self.reply(409, {"error": "An operation is running. Wait for it to finish."})
+                return
+            # POSTs stay one at a time (the slow lane), but no longer under the state lock: network Git, the engine and
+            # tool probes never block /api/status (UI-011). The worker check is repeated after waiting.
+            with self.server.slow:
+                with self.server.lock:
+                    busy = self.server.worker and self.server.worker.is_alive()
+                if busy:
+                    self.reply(409, {"error": "An operation is running. Wait for it to finish."})
+                    return
+                self.dispatch(data)
+        except RecursionError:
+            # Deeply nested JSON: a bad request, never a dropped connection with a traceback in the terminal.
+            self.reply(400, {"error": "The request is nested too deeply."})
+        except (ValueError, TypeError, UnicodeError, OSError, subprocess.SubprocessError) as exc:
+            # The planning module's Conflict: valid, but it would replace something the person has not confirmed.
+            self.reply(409 if type(exc).__name__ == "Conflict" else 400, refusal(exc))
+
+    def read_identity(self, data):
+        """signing_identity() for the project an inspect names, or the current one on a readiness check; None otherwise."""
+        try:
+            if self.path == "/api/inspect" and set(data) == {"target"} and isinstance(data["target"], str):
+                root = project_root(data["target"])
+            elif self.path == "/api/check" and not data:
+                with self.server.lock:
+                    target = self.server.target
+                if not target:
+                    return None
+                root = project_root(target)
+            else:
+                return None
+        except ValueError:
+            return None
+        return signing_identity(self.server.identity_run, root)
+
+    def schedule(self, data):
+        """The event schedule: what `uak clock START DEADLINE ZONE --write` does, from a form (UI-005)."""
+        s = self.server
+        # `preview` (UI-010) computes the schedule and writes nothing, so the page can ask before a past freeze is saved.
+        preview = data.pop("preview", False) if isinstance(data, dict) else False
+        if preview not in (True, False) or not isinstance(preview, bool):
+            raise ValueError("Give the event's start, end and time zone.")
+        if set(data) != {"start", "end", "zone"} or not all(isinstance(v, str) for v in data.values()):
+            raise ValueError("Give the event's start, end and time zone.")
+        for field in ("start", "end"):
+            if not SCHEDULE_TIME.fullmatch(data[field]):
+                raise FieldError("Write dates as YYYY-MM-DD HH:MM (for example 2026-11-12 10:00).", field)
+        if data["end"] <= data["start"]:
+            raise FieldError("The event must end after it starts.", "end")
+        if not TIME_ZONE.fullmatch(data["zone"]):
+            raise FieldError("Choose a time zone such as America/Mexico_City or UTC.", "zone")
+        if not real_zone(data["zone"]):
+            raise FieldError("%s is not a time zone this computer knows. Choose one from the list, such as "
+                             "America/Mexico_City or UTC." % data["zone"], "zone")
+        uak = s.engine()
+        root = project_root(s.target)
+        # The engine computes the schedule; setup writes Freeze-Epoch itself, never through a symlinked PROJECT.md or
+        # the engine's predictable PROJECT.md.tmp (UI-005 review).
+        s.planning.regular_file(root, ".uak/PROJECT.md")
+        result = s.run([bash_binary(), str(uak), "clock", data["start"], data["end"], data["zone"]],
+                       cwd=str(root), timeout=60)
+        output = (result.stdout or "") + "\n" + (result.stderr or "")
+        freeze = re.search(r"(?m)^freeze\s+(.+?)\s+Freeze-Epoch: (\d+)", output)
+        first = re.search(r"(?m)^first claim by\s+(\S+ \S+)", output)
+        if result.returncode or not freeze:
+            raise ValueError("The schedule could not be set: %s" % redact(output.strip())[-400:])
+        # The page shows dates, in the order they happen (UI-021); "freeze"/"first_claim" stay the engine's words.
+        freeze_at = dated(freeze.group(1), data["start"], data["end"], last=True)
+        first_at = dated(first.group(1), data["start"], data["end"]) if first else ""
+        if preview:
+            self.reply(200, {"freeze": freeze.group(1).strip(), "epoch": int(freeze.group(2)), "freeze_at": freeze_at,
+                             "soon": int(freeze.group(2)) < time.time() + 3600})
+            return
+        s.planning.set_freeze(root, int(freeze.group(2)))
+        with s.lock:
+            s.state.update(phase="setup", ready=False, checks=[], next_command="", next_note="", error="", checked=False)
+        s.refresh_progress()
+        self.reply(200, {"freeze": freeze.group(1).strip(), "epoch": int(freeze.group(2)),
+                         "first_claim": first.group(1) if first else "", "freeze_at": freeze_at,
+                         "first_claim_at": first_at, "details": redact(output.strip())})
+
+    def recheck_plan(self):
+        """Lint, cards and digest of the current plan files again, without running the planner (UI-005)."""
+        s = self.server
+        planning = s.planning
+        if not s.plan or s.plan.get("failed"):
+            raise ValueError("Create the plan first, then check it again.")
+        uak = s.engine()
+        root = project_root(s.target)
+        tasks = planning.regular_file(root, ".uak/TASKS.md")
+        text = tasks.read_text(encoding="utf-8", errors="replace") if tasks.is_file() else ""
+        checked = planning.lint(s.run, root, uak, bash_binary())
+        with s.lock:
+            s.plan.update(lint=checked, cards=planning.cards(text), digest=planning.digest(root))
+            s.state.update(phase="planned", error="")
+        self.reply(200, {"lint": s.plan["lint"], "digest": s.plan["digest"]})
+
+    def approve(self, data):
+        root, approver, head, remote, base = approval_checks(self.server, data)
+        # The same human as the kit's Published-By: the name from the page. Without one, the Git name, labelled as
+        # such (it never claims to come from the setup page; review of 4af5789).
+        with self.server.lock:
+            human = self.server.state.get("human") or ""
+        line = (signed_line("Approved-By", human) if human else
+                "Approved-By: %s (local Git identity, unverified) in local setup" % approver) + ", with a typed confirmation."
+        self.server.approve_run(root, data["digest"], line, head, remote, base)
+        self.reply(202, {"phase": "approving"})
+
+    def run_action(self, data):
+        """UAK-192: one button. The request names an action of RUN_ACTIONS and its fields; the command is built here."""
+        s = self.server
+        action = data.get("action")
+        entry = RUN_ACTIONS.get(action) if isinstance(action, str) else None
+        fields = {k: v for k, v in data.items() if k != "action"}
+        # What the page can never send is refused and recorded; a value it can send (a typo in a field) is the field's
+        # own message, next to the field, and records nothing.
+        if (entry is None or entry["kind"] not in ("run", "terminal") or set(fields) - set(entry["fields"])
+                or any(not isinstance(v, str) for v in fields.values())
+                or (action == "start-agent" and fields.get("role") not in RUN_ROLES)):
+            s.refuse_run(action)
+            raise ValueError(RUN_REFUSAL)
+        with s.lock:
+            target = s.target
+        if not target:
+            raise ValueError("Choose a project first.")
+        root = project_root(target)
+        if action == "start-agent":
+            self.start_agent(root, fields.get("role"))
+            return
+        if action == "skill-add" and not SKILL_NAME.fullmatch(fields.get("name", "")):
+            raise FieldError("Write the skill's name with lowercase letters, digits and - only (for example: frontend-design).", "name")
+        env, timeout = None, RUN_TIMEOUT
+        if action == "open-rules":
+            path = s.planning.regular_file(root, ".uak/PROJECT.md")
+            argv = editor_argv(system_name(), path)
+        else:
+            uak = s.engine()
+            argv = {"deploy-help": ["deploy"], "smoke": ["init-smoke"], "readiness": ["start"]}.get(action)
+            if action == "skill-add":
+                name = fields.get("name")
+                if not isinstance(name, str) or not SKILL_NAME.fullmatch(name):
+                    raise FieldError("Write the skill's name with lowercase letters, digits and - only (for example: frontend-design).", "name")
+                argv = ["skill", "add", name]
+            argv = [bash_binary(), str(uak)] + argv
+            if action == "readiness":
+                env, timeout = dict(CHECK_ENV), CHECK_TIMEOUT
+        try:
+            job, already = s.start_run(action, argv, str(root), env, timeout)
+        except Busy as exc:
+            self.reply(409, {"error": str(exc)})
+            return
+        self.reply(202, {"started": True, "already": already, "action": action, "id": job["id"]})
+
+    def start_agent(self, root, role):
+        """Open a terminal window with the agent's command, built from the team view (never from the request)."""
+        s = self.server
+        with s.lock:
+            prior = s.agents.get(role)
+        if prior and time.time() - prior["at"] < AGENT_AGAIN_SECONDS:
+            self.reply(200, {"opened": True, "already": True, "role": role, "tool": prior["tool"]})
+            return
+        view = team_view(s)
+        found = next((c for c in view.get("commands", []) if c["id"] == role), None)
+        if not found:
+            raise ValueError((view.get("locked") or {}).get("reason") or view.get("note")
+                             or "No agent can start here yet. Press Check what's next, then try again.")
+        opened, sentence = open_terminal(found["command"], root)
+        if not opened:
+            self.reply(200, {"opened": False, "role": role, "sentence": sentence})
+            return
+        with s.lock:
+            s.agents[role] = {"at": time.time(), "tool": found["tool"], "task": found.get("task", "")}
+        self.reply(200, {"opened": True, "already": False, "role": role, "tool": found["tool"], "task": found.get("task", "")})
+
+    def require_installer(self):
+        if not self.server.installer.is_file():
+            raise ValueError("This copy of setup has no kit installer next to it. Run it from the kit's folder: "
+                             "bash path/to/upiixia-agentic-kit/install.sh --wizard")
+
+    def dispatch(self, data):
+        s = self.server
+        if self.path == "/api/inspect":
+            if set(data) != {"target"}:
+                raise ValueError("Provide only the project folder.")
+            root = project_root(data["target"])
+            installed = kit_present(root) and s.failed_target != str(root)
+            repair = (root / ".uak").exists()
+            with s.lock:
+                session = s.state.get("human") or ""
+            # UI-019: where the project is, from local Git only, outside the lock.
+            resume, saved = project_progress(s, root, session)
+            branch = branch_state(s, root)  # UI-020: on the base branch? the remote's default branch?
+            detected = detect_project(s, root)  # UAK-159: what the first screen says it found
+            versions = kit_versions(s, root) if installed else {}
+            git_name = git_human(s.identity_run, root)  # UAK-153: the person is the Git identity of this checkout
+            with s.lock:
+                s.keep_check()  # the project being left keeps its last check
+                previous = dict(s.state) if s.failed_target == str(root) else {}
+                kept = None if previous else s.kept_check(root, installed)
+                s.target = str(root)
+                s.forget(root)
+                s.tools_cache.pop(str(root), None)
+                if self.identity is not None:
+                    s.state["identity"] = self.identity
+                # UAK-153: the name is the Git identity of the checkout, never one typed or kept by something else.
+                human = saved or s.state.get("human") or ""
+                human = human if human and human == git_name else ""
+                saved = saved if saved == human else ""
+                s.state.update(git_human=git_name, target=str(root), installed=installed, can_repair=repair, phase="error" if previous else "setup" if repair else "options", ready=False, checks=[], next_command="", next_note="", freeze=0, needs_human=[], details=previous.get("details", ""), error=previous.get("error", ""),
+                               human=human, human_source="project" if saved else "session" if human else "",
+                               resume=resume, inspect=s.state.get("inspect", 0) + 1, checked=False, branch=branch,
+                               detected=detected, versions=versions, design=design_state(root), home=str(Path.home()))
+                if kept:
+                    s.state.update(ready=kept["ready"], checks=list(kept["checks"]), next_command=kept["next_command"],
+                                   next_note=kept["next_note"], details=kept["details"], phase=kept["phase"],
+                                   freeze=kept["freeze"], checked=True)
+                s.plan_known.setdefault(str(root), ([], bool(resume["kit_on_main"]), "", ""))
+                state = dict(s.state)
+            self.reply(200, dict(state, settings=s.config()))
+        elif self.path in ("/api/install", "/api/repair"):
+            self.require_installer()
+            cmd = install_command(s.installer, s.target, data)
+            if not s.target:
+                raise ValueError("Check the project folder before installing.")
+            wrong = branch_state(s, project_root(s.target))
+            with s.lock:
+                s.state["branch"] = wrong
+            if wrong["wrong"]:
+                raise ValueError(wrong["message"])  # B-01: never install the kit on claims or any other branch
+            if self.path == "/api/repair":
+                existing_mode = s.config().get("Mode")
+                if existing_mode and existing_mode != data["mode"]:
+                    raise ValueError("Repair must preserve the existing %s workflow. Change the mode in PROJECT.md separately." % existing_mode)
+                cmd.insert(-1, "--update")
+            elif (Path(s.target) / ".uak/bin").exists() or (Path(s.target) / ".uak/PROJECT.md").exists():
+                raise ValueError("Kit files already exist. Use Repair or update to continue safely.")
+            s.launch("installing", cmd)
+            self.reply(202, {"phase": "installing"})
+        elif self.path == "/api/settings":
+            if not s.target:
+                raise ValueError("Choose a project first.")
+            save_settings(project_root(s.target), data)
+            with s.lock:
+                s.state.update(phase="setup", ready=False, checks=[], next_command="", next_note="", details="", error="")
+            self.reply(200, {"saved": True, "settings": s.config()})
+        elif self.path == "/api/check":
+            if data:
+                raise ValueError("The readiness check accepts no options.")
+            # The engine that checks readiness is the one shipped with this setup (kit/.uak in the kit's checkout,
+            # .uak in an installed project), so the check needs no installer and never certifies another version.
+            uak = s.engine()
+            with s.lock:
+                s.tools_cache.pop(s.target, None)
+                if self.identity is not None:
+                    s.state["identity"] = self.identity
+            s.launch("checking", [bash_binary(), str(uak), "start"])
+            self.reply(202, {"phase": "checking"})
+        elif self.path == "/api/idea":
+            s.engine()
+            root = project_root(s.target)
+            s.planning.save_idea(root, data, read_config(root).get("Mode", ""))
+            with s.lock:
+                s.plan = None
+            s.refresh_progress()
+            self.reply(200, {"saved": True})
+        elif self.path == "/api/plan":
+            if set(data) - {"harness", "note"} or "harness" not in data:
+                raise ValueError("Choose the coding tool that creates the plan.")
+            note = data.get("note", "")
+            if not isinstance(note, str) or len(note) > 4000:
+                raise ValueError("Keep the requested changes under 4000 characters.")
+            s.engine()
+            root = project_root(s.target)
+            if not (root / "IDEA.md").is_file():
+                raise ValueError("Describe what you are building first.")
+            known = remote_state(s, root, fresh=True)
+            if known["state"] == "offline":
+                raise unreachable(remote_and_base()[0], known["failure"])
+            if not known.get("kit"):
+                raise ValueError("Publish the kit to main first (Prepare: Publish the kit to main), then create the plan. "
+                                 "The plan's checks read the kit from main.")
+            offered = {o["harness"] for o in planners(s, root) if o["available"]}
+            if data["harness"] not in offered:
+                raise ValueError("That coding tool cannot create the plan here. Choose one that setup offers.")
+            s.plan_run(data["harness"], s.planning.planner_command(data["harness"], root), note.strip())
+            self.reply(202, {"phase": "planning"})
+        elif self.path == "/api/plan/approve":
+            self.approve(data)
+        elif self.path == "/api/human":
+            if set(data) != {"name"} or not isinstance(data["name"], str) or not HUMAN_NAME.fullmatch(data["name"]):
+                raise FieldError("Use a short name in lowercase letters, digits, - or _ (for example: ana).", "name")
+            name = data["name"]
+            with s.lock:
+                target = s.target
+            # UAK-153: the name is not free text. It is the Git identity of this checkout, shown on the page.
+            identity = git_human(s.identity_run, project_root(target)) if target else ""
+            if not identity:
+                raise FieldError('Set your Git identity first, in your terminal: git config user.name "Your Name". '
+                                 "Setup uses it as your name.", "name")
+            if name != identity:
+                raise FieldError("Setup acts as the Git identity of this checkout (%s), not as another name. Change it "
+                                 "with git config user.name, not here." % identity, "name")
+            with s.lock:
+                s.state["human"] = name
+            # UI-019: remembered for this project in its Git folder; never blocked by that file.
+            persisted, note = False, ""
+            if target:
+                try:
+                    _, common = git_dirs(s, Path(target), s.identity_run)
+                    if not common:
+                        raise ValueError("no Git folder")
+                    write_human(s.planning, common, name)
+                    persisted = True
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    note = HUMAN_NOT_KEPT
+            with s.lock:
+                if s.target == target:
+                    s.state["human_source"] = "project" if persisted else "session"
+            s.refresh_progress()
+            self.reply(200, {"human": name, "persisted": persisted, "note": note})
+        elif self.path == "/api/schedule":
+            self.schedule(data)
+        elif self.path == "/api/publish-kit":
+            if set(data) != {"digest"} or not isinstance(data["digest"], str):
+                raise ValueError("Open the preview of the kit files, then publish them.")
+            root, files, digest, base_head, remote, base = publish_checks(s)
+            if not hmac.compare_digest(data["digest"], digest):
+                raise ValueError("The kit files changed after the preview. Open the preview again before publishing.")
+            s.publish_run(root, files, digest, s.state.get("human"), base_head, remote, base)
+            self.reply(202, {"phase": "publishing"})
+        elif self.path == "/api/team/reviewer":
+            root, name, who = registration_checks(s, data)
+            # Read fresh from claims (never the cache) before the engine runs; the slow lane, not the state lock.
+            known = remote_state(s, root, fresh=True)
+            if known["state"] == "offline":
+                raise unreachable(remote_and_base()[0], known["failure"])
+            if known["state"] != "ok":
+                raise ValueError("This project has no remote named %s. Add one, then press Retry." % remote_and_base()[0])
+            found = reviewer_record(known, who, name)
+            if found["retired"]:
+                raise ValueError(found["message"])
+            if found["registered"]:
+                self.reply(200, dict(found, message="%s was already registered by %s." % (who, found["registered_by"])))
+                return
+            s.register_run(root, name, who, s.engine())
+            self.reply(202, {"phase": "registering"})
+        elif self.path == "/api/team/roles":
+            self.reply(200, {"roles": save_roles(s, data)})
+        elif self.path == "/api/plan/check":
+            if data:
+                raise ValueError("Checking the plan again accepts no options.")
+            self.recheck_plan()
+        elif self.path == "/api/run":
+            self.run_action(data)
+        else:
+            self.reply(404, {"error": "Action not found."})
+
+
+def approval_checks(server, data):
+    """Everything that must hold before the person's approval is committed; each failure says how to recover."""
+    planning, run = server.planning, server.run
+    if set(data) != {"confirm", "digest"} or not all(isinstance(v, str) for v in data.values()):
+        raise ValueError("Type the project name to approve the plan you reviewed.")
+    server.engine()
+    root = project_root(server.target)
+    plan = server.plan
+    if not plan or plan.get("failed"):
+        raise ValueError("Create the plan first, then review it.")
+    if plan["violations"]:
+        raise ValueError("The last planning run changed things only you may change. Undo them with the instruction "
+                         "under Proposed plan, then create the plan again.")
+    if data["confirm"] != root.name:
+        raise ValueError("Type the project folder name exactly as shown: %s" % root.name)
+    for name in planning.PLAN_FILES:
+        if not planning.regular_file(root, name).is_file():
+            raise ValueError("%s is missing. Create the plan again." % name)
+    if not hmac.compare_digest(data["digest"], planning.digest(root)):
+        raise ValueError("The plan files changed since you reviewed them. Review the plan again before approving.")
+    checked = planning.lint(run, root, server.engine(), bash_binary())
+    if not checked["ok"]:
+        raise ValueError("The plan does not pass uak lint: %s. Ask for changes." % "; ".join(checked["lines"][:3] or ["see Technical details"]))
+
+    def git(*args, timeout=60):
+        return planning.git(run, root, *args, timeout=timeout)
+
+    approver = git("config", "user.name").stdout.strip()
+    if not approver or not git("config", "user.email").stdout.strip():
+        raise ValueError('Set your Git identity first: git config user.name "Your Name" and git config user.email you@example.com')
+    staged = [n for n in git("diff", "--cached", "--name-only", "-z").stdout.split("\0") if n]
+    if staged:
+        raise ValueError("Other files are staged: %s. Unstage them with git restore --staged -- %s, then approve again."
+                         % (", ".join(staged[:5]), " ".join(staged[:5])))
+    remote, base = remote_and_base()
+    if git("symbolic-ref", "--short", "-q", "HEAD").stdout.strip() != base:
+        raise ValueError(switch_advice(server, root, "approve the plan again"))
+    # Into setup's own ref, never FETCH_HEAD (the engine reads its own), with the network timeout (UI-011).
+    fetched = net_git(server, root, "fetch", "-q", "--no-tags", "--no-write-fetch-head", remote,
+                      "+refs/heads/%s:%s" % (base, SETUP_BASE))
+    if fetched.returncode:
+        raise unreachable(remote, git_failure(fetched))
+    head = git("rev-parse", "HEAD").stdout.strip()
+    upstream = git("rev-parse", SETUP_BASE).stdout.strip()
+    if head != upstream:
+        if git("merge-base", "--is-ancestor", head, upstream).returncode == 0:
+            raise ValueError("%s/%s has newer commits. Run git pull --ff-only %s %s, then review the plan again." % (remote, base, remote, base))
+        raise ValueError("This branch has commits that are not on %s/%s. Push or move them first, so the approval "
+                         "publishes only the plan." % (remote, base))
+    if git("diff", "--quiet", "HEAD", "--", ".uak/PROJECT.md").returncode:
+        raise ValueError("You have your own uncommitted changes in .uak/PROJECT.md. Commit or discard them first.")
+    return root, approver, head, remote, base
+
+
+def publish_checks(server):
+    """Everything that must hold before the kit is published from the page; each failure says how to recover."""
+    planning, run = server.planning, server.run
+    if not server.state.get("human"):
+        raise ValueError("Tell setup your name first (on the People screen): publishing is a human act.")
+    server.engine()
+    root = project_root(server.target)
+
+    def git(*args, timeout=60):
+        return planning.git(run, root, *args, timeout=timeout)
+
+    if not git("config", "user.name").stdout.strip() or not git("config", "user.email").stdout.strip():
+        raise ValueError('Set your Git identity first: git config user.name "Your Name" and git config user.email you@example.com')
+    staged = [n for n in git("diff", "--cached", "--name-only", "-z").stdout.split("\0") if n]
+    if staged:
+        raise ValueError("Other files are staged: %s. Unstage them with git restore --staged -- %s, then publish again."
+                         % (", ".join(staged[:5]), " ".join(staged[:5])))
+    remote, base = remote_and_base()
+    if git("symbolic-ref", "--short", "-q", "HEAD").stdout.strip() != base:
+        raise ValueError(switch_advice(server, root, "publish again"))
+    if git("remote", "get-url", remote).returncode:
+        raise ValueError("This project has no remote named %s. Create an empty repository and run: "
+                         "git remote add %s <its URL>" % (remote, remote))
+    head = git("rev-parse", "-q", "--verify", "HEAD").stdout.strip()
+    listed = net_git(server, root, "ls-remote", "--heads", remote, "refs/heads/" + base)
+    if listed.returncode:
+        raise unreachable(remote, git_failure(listed))
+    if heads_of(listed.stdout).get("refs/heads/" + base):
+        fetched = net_git(server, root, "fetch", "-q", "--no-tags", "--no-write-fetch-head", remote,
+                          "+refs/heads/%s:%s" % (base, SETUP_BASE))
+        if fetched.returncode:
+            raise unreachable("%s/%s" % (remote, base), git_failure(fetched), read=True)
+        upstream = git("rev-parse", SETUP_BASE).stdout.strip()
+        if head != upstream:
+            if head and git("merge-base", "--is-ancestor", head, upstream).returncode == 0:
+                raise ValueError("%s/%s already has commits this folder lacks. Run git pull %s %s, then publish again."
+                                 % (remote, base, remote, base))
+            if not head or not git("merge-base", head, upstream).stdout.strip():
+                raise unrelated_history(server, root, head, remote, base)
+            # B-03: after the way-out's git pull this branch is ahead; a refusal always carries its exact command.
+            if git("merge-base", "--is-ancestor", upstream, head).returncode == 0:
+                raise ValueError("This branch has commits that are not on %s/%s yet. Send them first with git push %s %s, "
+                                 "then publish again: publishing sends only the kit." % (remote, base, remote, base))
+            raise ValueError("This branch and %s/%s both have new commits. Join them first with git pull --no-rebase %s %s "
+                             "and then git push %s %s, then publish again." % (remote, base, remote, base, remote, base))
+    elif head:
+        raise ValueError("This branch has commits and %s has no %s yet. Push them yourself first "
+                         "(git push -u %s HEAD:%s), then publish the kit." % (remote, base, remote, base))
+    files = planning.publish_files(run, root)
+    if not files:
+        raise ValueError("Nothing to publish: the kit is already on %s." % base)
+    return root, files, planning.publish_digest(root, files), head, remote, base
+
+def unrelated_history(server, root, head, remote, base):
+    """The remote base has its own first commits and no common ancestor with this folder (round 4: a GitHub repository
+    created with a .gitignore). One exact command that keeps both histories, or a new empty repository. Files that
+    exist here and would be overwritten (untracked or ignored: a merge overwrites ignored files silently) are renamed to
+    NAME.mine first; anything setup cannot make safe gives no command at all. Setup never runs any of it."""
+    planning = server.planning
+
+    def git(*args):
+        return planning.git(server.run, root, *args, timeout=60)
+
+    folded = sys.platform == "darwin" or os.name == "nt"  # case-insensitive file systems
+    fold = (lambda p: p.lower()) if folded else (lambda p: p)
+    tracked = {fold(p) for p in git("ls-files", "-z").stdout.split("\0") if p} if head else set()
+    # Tracked files with uncommitted changes: git pull refuses to merge over them ("Your local changes … would be
+    # overwritten by merge"; Windows QA of 993e112: the installer had changed the committed .gitignore).
+    dirty = {fold(p) for p in git("diff", "--name-only", "-z", "HEAD").stdout.split("\0") if p} if head else set()
+    collide, unsafe, changed, both = [], False, [], []
+    for path in [p for p in git("ls-tree", "-r", "--name-only", "-z", SETUP_BASE).stdout.split("\0") if p]:
+        parts = path.split("/")
+        for depth in range(1, len(parts)):
+            parent = root.joinpath(*parts[:depth])
+            if parent.is_symlink() or (os.path.lexists(str(parent)) and not parent.is_dir()):
+                unsafe = True  # a file here where the remote has a folder
+        local = root.joinpath(*parts)
+        if fold(path) in tracked:
+            (changed if fold(path) in dirty else both).append(path)
+            continue
+        if not os.path.lexists(str(local)):
+            continue
+        if local.is_dir() and not local.is_symlink():
+            unsafe = True  # a folder here where the remote has a file
+        else:
+            collide.append(path)
+    text = root.as_posix()
+    if changed or unsafe or len(collide) > 8 or not printable(text) or any(
+            not SAFE_PATH.fullmatch(p) or ".." in p.split("/") or os.path.lexists(str(root / (p + ".mine")))
+            for p in collide):
+        command = ""
+    else:
+        parts = ["cd " + shell_quote(text)]
+        for p in collide:
+            mine = shell_quote(p + ".mine")
+            # mv -n would exit 0 without moving: the tests stop the chain before git pull instead (amendment 8).
+            parts += ["test ! -e " + mine, "test ! -L " + mine, "mv -- %s %s" % (shell_quote(p), mine)]
+        command = " && ".join(parts + ["git pull --no-rebase --no-edit --allow-unrelated-histories %s %s" % (remote, base)])
+    # B-03: with commits of its own, this folder is ahead after the pull: the second command sends them (a separate
+    # command, so the first never pushes anything; an unborn folder simply becomes the remote's history).
+    push = "cd %s && git push %s %s" % (shell_quote(text), remote, base) if command and head else ""
+    steps = []
+    if changed:
+        names = " ".join(shell_quote(p) for p in changed[:8])
+        steps.append("You changed files that %s/%s also has and that are not committed yet: %s. Commit them first "
+                     "(git add -- %s && git commit -m 'Keep my changes'), then press Review the files again."
+                     % (remote, base, ", ".join(changed[:8]), names))
+    if command and both:
+        steps.append("%s exist here and on %s/%s, so git pull stops with a conflict in them: keep the lines you need "
+                     "from both, then run git add on them and git commit." % (", ".join(both[:8]), remote, base))
+    if command:
+        steps.append("If Git reports a conflict, open the files it names, keep what you need from both, then run git add "
+                     "on them and git commit.")
+        if push:
+            steps.append("Then run the second command: git push %s %s sends your own commits to %s/%s, so publishing "
+                         "sends only the kit. Then press Review the files again." % (remote, base, remote, base))
+        if collide:
+            steps.append("Your copies are kept with .mine added to their names: %s. Choose Repair or update kit so the kit "
+                         "adds its lines to .gitignore again, then compare and delete the .mine files."
+                         % ", ".join(p + ".mine" for p in collide))
+        steps.append("Or publish to a new empty repository (no README, no .gitignore, no license): git remote set-url %s "
+                     "<its URL>" % remote)
+    elif changed:
+        steps.append("Or publish to a new empty repository (no README, no .gitignore, no license): git remote set-url %s "
+                     "<its URL>" % remote)
+    else:
+        steps.append("Setup cannot write a safe command for the files this folder and %s/%s both have. Publish to a new "
+                     "empty repository instead (no README, no .gitignore, no license): git remote set-url %s <its URL>"
+                     % (remote, base, remote))
+    first = ("%s/%s already has its own first commits (for example a README or .gitignore created on GitHub), and they "
+             "do not share history with this folder. Nothing was changed. " % (remote, base))
+    # B-09: "the command below" only when there is one.
+    first += ("The command below runs git pull to join both histories; read it before you run it." if command else
+              "Setup cannot write a safe git pull command to join them here: follow the steps below.")
+    return WayOut(first, {"command": command, "push": push, "renamed": collide if command else [], "steps": steps})
+
+
+def refusal(exc):
+    body = {"error": redact(exc)}
+    if getattr(exc, "field", ""):
+        body["field"] = exc.field  # UI-021: the page shows it under that field (setup's or the planning module's)
+    if getattr(exc, "technical", ""):
+        body["technical"] = redact(exc.technical)  # git's own words, under Technical details
+    if isinstance(exc, Need):
+        body["need"] = exc.need
+    if isinstance(exc, WayOut):
+        body["way_out"] = exc.way_out
+    return body
+
+
+def shell_quote(path):
+    """A path as one single-quoted Bash word (forward slashes, as Git Bash and wt write it)."""
+    return "'" + path.replace("'", "'\\''") + "'"
+
+
+def quotable(text):
+    """A path setup shows inside an agent's launch command: no quote mark and no control character."""
+    return "'" not in text and printable(text)
+
+
+def printable(text):
+    """A path shell_quote makes one exact Bash word: any quote mark, no control character (B-16)."""
+    return not any(ord(c) < 32 or ord(c) == 127 for c in text)
+
+
+def switch_step(head, base, has_base, born):
+    """The one command that puts this folder on the base branch, or "" when setup cannot write it exactly."""
+    if has_base:
+        return "git switch " + base
+    if not head or not born:
+        return "git switch -c " + base  # detached, or no commit yet: the new branch starts here
+    return "git branch -m %s %s" % (head, base) if valid_ref_name(head) else ""
+
+
+def branch_state(server, root, then="check the project folder again"):
+    """UI-020 (B-01, Dylan's live run): the branch this folder is on and its remote's default branch, from local Git
+    only (setup's own reader, never the operation runner). `wrong` when the folder has commits and HEAD is not the base
+    branch: a clone of a remote whose default branch is claims lands on claims, and the kit was installed there."""
+    remote, base = remote_and_base()
+
+    def git(*args):
+        return server.planning.git(server.identity_run, root, *args, timeout=10)
+
+    head = git("symbolic-ref", "-q", "HEAD").stdout.strip()
+    head = head[len("refs/heads/"):] if head.startswith("refs/heads/") else ""
+    tracking, origin_head = "refs/remotes/%s/%s" % (remote, base), "refs/remotes/%s/HEAD" % remote
+    wanted = ["refs/heads/" + base, tracking, origin_head] + (["refs/heads/" + head] if head else [])
+    refs = {}
+    for line in git("for-each-ref", "--format=%(refname) %(symref)", *wanted).stdout.splitlines():
+        name, _, points = line.strip().partition(" ")
+        refs[name] = points.strip()  # for-each-ref also matches refs below a name: only exact names are read
+    pointed = refs.get(origin_head, "")
+    prefix = "refs/remotes/%s/" % remote
+    view = {"head": head, "base": base, "wrong": False, "message": "", "command": "", "step": "",
+            "remote_default": pointed[len(prefix):] if pointed.startswith(prefix) else "", "remote_note": ""}
+    view["remote_note"] = default_note(remote, base, view["remote_default"])
+    if head == base:
+        return view
+    born = ("refs/heads/" + head) in refs if head else git("rev-parse", "-q", "--verify", "HEAD").returncode == 0
+    step = switch_step(head, base, ("refs/heads/" + base) in refs or tracking in refs, born)
+    if not head:
+        message = ("This folder is not on any branch (detached HEAD), and the kit lives on %s. Switch first with %s, then "
+                   "%s." % (base, step, then))
+    elif step.startswith("git branch -m"):
+        message = ("This folder is on the branch %s and has no branch %s, where the kit lives. Rename this branch with "
+                   "%s, then %s." % (head, base, step, then))
+    elif step:
+        message = ("This folder is on the branch %s, not %s, and the kit lives on %s. Switch first with %s, then %s."
+                   % (head, base, base, step, then))
+    else:
+        message = ("This folder is on another branch, not %s, and the kit lives on %s. Switch to %s yourself, then %s."
+                   % (base, base, base, then))
+    view.update(step=step, message=message)
+    if not born:
+        return view  # no commit yet: nothing to stop at inspect; publishing names the step
+    text = root.as_posix()
+    if step and printable(text):
+        view["command"] = "cd %s && %s" % (shell_quote(text), step)
+    view["wrong"] = True
+    return view
+
+
+def switch_advice(server, root, then):
+    """The publish and approval refusal off the base branch: the exact step, never a command that cannot work."""
+    return branch_state(server, root, then)["message"]
+
+
+def default_note(remote, base, default):
+    """Dylan's live run: GitHub made claims the default branch (the first branch pushed), so clones open on claims."""
+    if default != "claims" or default == base:
+        return ""
+    return ("The default branch of %s is claims, so new clones open the coordination branch instead of %s. Change it on "
+            "GitHub: Settings, General, Default branch, choose %s and press Update. Then run git remote set-head %s -a "
+            "in each clone that already exists." % (remote, base, base, remote))
+
+
+def remote_default(server, target, branch):
+    """/api/status's branch: what inspect saw, plus the remote's default branch from setup's last read of the remote."""
+    if not target or not branch:
+        return branch
+    try:
+        remote, base = remote_and_base()
+    except ValueError:
+        return branch
+    with server.lock:
+        known = server.remote_cache.get((target, remote, base)) or {}
+    # The remote itself wins over this clone's refs/remotes/origin/HEAD, which stays stale after GitHub is fixed.
+    default = known["default"] if "default" in known else branch.get("remote_default") or ""
+    return dict(branch, remote_default=default, remote_note=default_note(remote, base, default))
+
+
+def codex_flags(gitdir):
+    return CODEX_FLAGS % shell_quote(gitdir)
+
+
+def valid_ref_name(name):
+    """A remote or branch name setup puts into a refspec: plain, and never a path trick (amendment 7)."""
+    return bool(REF_NAME.fullmatch(name)) and ".." not in name and "//" not in name and "@{" not in name and \
+        not name.endswith(("/", ".")) and not any(part.startswith(".") or part.endswith(".lock") for part in name.split("/"))
+
+
+def remote_and_base():
+    """UAK_REMOTE / UAK_BASE or origin / main: the one place every setup reader takes them from (PENDING #41)."""
+    remote, base = os.environ.get("UAK_REMOTE") or "origin", os.environ.get("UAK_BASE") or "main"
+    if not valid_ref_name(remote) or not valid_ref_name(base):
+        raise ValueError("UAK_REMOTE and UAK_BASE must be plain names such as origin and main. Fix them in the terminal "
+                         "that started setup, then restart it.")
+    return remote, base
+
+
+def net_git(server, root, *args):
+    """Git that talks to the remote: 30 s, and a timeout stops the whole tree (git-remote-https)."""
+    return server.run(list(server.planning.GIT) + ["-C", str(root)] + list(args), cwd=str(root), timeout=NET_TIMEOUT,
+                      group=True)
+
+
+# UI-021 (QA round D-4.1): offline, the page showed git's stderr ("fatal: '…/gone.git' does not appear to be a git
+# repository …") followed by "check your connection", which was wrong advice. The common failures are one plain
+# sentence each, with the advice that fits; git's own words go under Technical details. Order matters: a timeout says
+# "timed out" and a refused key says "Could not read from remote repository" too.
+GIT_FAILURES = (
+    ("timeout", r"timed out|time-?out"),
+    ("network", r"could not resolve host|nodename nor servname|name or service not known|temporary failure in name "
+                r"resolution|getaddrinfo|failed to connect|connection refused|network is unreachable|no route to host|"
+                r"could not connect to server"),
+    ("auth", r"authentication failed|permission denied|could not read (username|password)|terminal prompts disabled|"
+             r"invalid username or password|returned error: 40[13]|publickey"),
+    ("repo", r"does not appear to be a git repository|not a git repository|repository not found|repository '[^']*' "
+             r"not found|no such file or directory"),
+)
+GIT_REASON = {
+    "timeout": "it timed out after %d s" % NET_TIMEOUT,
+    "network": "this computer cannot reach its server (no internet, or a wrong address)",
+    "auth": "it refused the sign-in",
+    "repo": "its address does not point to a repository you can read",
+    "other": "Git could not talk to it",
+}
+GIT_ADVICE = {
+    "timeout": "Check your connection, then try again.",
+    "network": "Check your connection, then try again.",
+    "auth": "Sign in with gh auth login (or check your SSH key), then try again.",
+    "repo": "Check the address with git remote -v and that you are signed in (gh auth login), then try again.",
+    "other": "Read Technical details, then try again.",
+}
+
+
+def git_failure(result):
+    """A failed network Git as {"reason", "advice", "technical"}: a plain clause, what to do, and git's own words."""
+    technical = redact((result.stderr or result.stdout or "").strip())[-1200:]
+    kind = "timeout" if result.returncode == 124 else "other"
+    if kind == "other":
+        for name, pattern in GIT_FAILURES:
+            if re.search(pattern, technical, re.I):
+                kind = name
+                break
+    if result.returncode == 124 and not technical:
+        technical = "git was stopped after %d s" % NET_TIMEOUT
+    return {"kind": kind, "reason": GIT_REASON[kind], "advice": GIT_ADVICE[kind], "technical": technical}
+
+
+class GitFailure(ValueError):
+    """A refusal caused by network Git: one plain sentence for the page, git's own words as `technical`."""
+
+    def __init__(self, message, technical=""):
+        super().__init__(message)
+        self.technical = technical
+
+
+def unreachable(remote, failure, read=False):
+    """The refusal for a remote that did not answer: "Could not reach origin: <reason>. <advice>" (UI-021)."""
+    if read:
+        return GitFailure("Could not read %s: %s. %s" % (remote, failure["reason"], failure["advice"]), failure["technical"])
+    return GitFailure("Could not reach %s: %s. %s" % (remote, failure["reason"], failure["advice"]), failure["technical"])
+
+
+def offline_detail(result):
+    """The plain reason a network Git failed (its words stay in git_failure's technical)."""
+    return git_failure(result)["reason"]
+
+
+def heads_of(text):
+    """ls-remote output as {exact ref name: sha}; a tail match would take refs/heads/x/main for main (amendment 6)."""
+    heads = {}
+    for line in (text or "").splitlines():
+        parts = line.strip().split("\t")
+        if len(parts) == 2:
+            heads[parts[1].strip()] = parts[0].strip()
+    return heads
+
+
+def read_remote(server, root, remote, base):
+    """What the team and plan views need from the remote, read into setup's own refs (never FETCH_HEAD)."""
+    planning = server.planning
+    now = time.monotonic()
+
+    def git(*args):
+        return planning.git(server.run, root, *args, timeout=60)
+
+    if git("remote", "get-url", remote).returncode:
+        return {"state": "none", "detail": "", "at": now}
+    # --symref HEAD: the remote's default branch too (UI-020: GitHub made claims the default), in the same call.
+    listed = net_git(server, root, "ls-remote", "--symref", remote, "HEAD", "refs/heads/" + base, "refs/heads/claims")
+    if listed.returncode:
+        failure = git_failure(listed)
+        return {"state": "offline", "detail": failure["reason"], "failure": failure, "at": now}
+    heads = heads_of(listed.stdout)
+    pointed = re.search(r"^ref: refs/heads/(\S+)\s+HEAD\r?$", listed.stdout or "", re.M)
+
+    result = {"state": "ok", "detail": "", "kit": False, "reviewers": {}, "retired": [], "claims": {}, "files": [],
+              "at": now, "default": pointed.group(1) if pointed else ""}
+    # What setup already holds in its private refs (one process); one fetch for every branch that moved.
+    held = {}
+    for line in git("for-each-ref", "--format=%(refname) %(objectname)", "refs/uak/").stdout.splitlines():
+        name, _, sha = line.strip().partition(" ")
+        held[name] = sha
+    pairs = [(base, SETUP_BASE), ("claims", SETUP_CLAIMS)]
+    present = [(branch, ref) for branch, ref in pairs if heads.get("refs/heads/" + branch)]
+    moved = ["+refs/heads/%s:%s" % (branch, ref) for branch, ref in present
+             if held.get(ref) != heads["refs/heads/" + branch]]
+    if moved:
+        got = net_git(server, root, "fetch", "-q", "--no-tags", "--no-write-fetch-head", remote, *moved)
+        if got.returncode:
+            failure = git_failure(got)
+            return {"state": "offline", "detail": failure["reason"], "failure": failure, "at": now}
+    for branch, ref in present:
+        if ref == SETUP_BASE:
+            result["kit"] = git("cat-file", "-e", SETUP_BASE + ":.uak/PROJECT.md").returncode == 0
+        else:
+            read_claims(git, result)
+    return result
+
+
+def read_claims(git, result, ref=SETUP_CLAIMS):
+    """Reviewer roles, retired identities, claims and humans from a local copy of the claims branch (setup's own, or
+    the dashboard's): two local commands. Everything read is data; only files named like NAME.md count, and each line
+    feeds only its own folder's fields."""
+    # The person's Git config must not change the output this parses (review of 993e112: grep.lineNumber or
+    # grep.column in a global config turned every line into ref:path:N:Field and nothing was read).
+    found = git("grep", "--no-color", "--no-line-number", "--no-column", "--full-name", "-E",
+                "^(Reviewer|Registered-By|ID|State|Owner|Role): ", ref, "--", "roles/reviewers", "claims", "meta/agents")
+    records = {}
+    prefix = ref + ":"
+    for line in (found.stdout or "").splitlines() if found.returncode == 0 else []:
+        if not line.startswith(prefix):
+            continue
+        path, _, text = line[len(prefix):].partition(":")
+        folder, _, name = path.rpartition("/")
+        match = re.match(r"([A-Za-z-]+): *(.*?) *\r?$", text)
+        if folder not in ("roles/reviewers", "claims", "meta/agents") or not CLAIM_FILE.fullmatch(name) or not match:
+            continue
+        records.setdefault((folder, name[:-3]), {}).setdefault(match.group(1), match.group(2))
+    for (folder, stem), fields in records.items():
+        if folder == "roles/reviewers" and fields.get("Reviewer") == stem and fields.get("Registered-By"):
+            result["reviewers"][stem] = fields["Registered-By"][:64]
+        elif folder == "claims" and fields.get("ID") == stem:
+            result["claims"][stem] = {"state": fields.get("State", ""), "owner": fields.get("Owner", "")[:64]}
+        elif folder == "meta/agents" and fields.get("Role") == "human":
+            result.setdefault("humans", []).append(stem)
+    listed = git("ls-tree", "--name-only", ref, "claims/", "meta/retired/")
+    for path in (listed.stdout or "").splitlines():
+        folder, _, name = path.strip().rpartition("/")
+        if CLAIM_FILE.fullmatch(name):
+            (result["files"] if folder == "claims" else result["retired"] if folder == "meta/retired" else []).append(name[:-3])
+
+
+def remote_state(server, root, fresh=False):
+    """The only reader of the remote for the team and plan views. Results are kept per project, remote and base (status
+    reads the last one); only an `ok` younger than 15 s is reused, and never for a decision (`fresh`)."""
+    remote, base = remote_and_base()
+    key = (str(root), remote, base)
+    if not fresh:
+        with server.lock:
+            hit = server.remote_cache.get(key)
+        if hit and hit["state"] == "ok" and time.monotonic() - hit["at"] < REMOTE_TTL:
+            return hit
+    result = read_remote(server, root, remote, base)
+    with server.lock:
+        server.remote_cache[key] = result
+    return result
+
+
+DASH_CLAIMS = "refs/uak/dash-claims"
+
+
+def detect_project(server, root):
+    """What the first screen says it found (UAK-159): the folder's own facts, from local files and Git only, never the
+    network and never a write. repo: "new" (no commit yet) or "existing"; hooks: the manager that owns the hooks (the
+    kit's checks are called from it, doctor's own list: .husky, lefthook, .pre-commit-config.yaml); ci; tests (the
+    command the project already runs); stack (one of STACKS, "" when unknown)."""
+    root = Path(root)
+
+    def text(name, limit=65536):
+        try:
+            path = root / name
+            if path.is_file() and not path.is_symlink():
+                return path.read_text(encoding="utf-8", errors="replace")[:limit]
+        except OSError:
+            pass
+        return ""
+
+    found = {"repo": "new", "commits": 0, "hooks": "", "ci": "", "tests": "", "stack": "", "kit_files": kit_file_counts(server)}
+    try:
+        counted = server.planning.git(server.identity_run, root, "rev-list", "--count", "HEAD", timeout=10)
+        found["commits"] = int((counted.stdout or "0").strip() or 0) if counted.returncode == 0 else 0
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
+    found["repo"] = "existing" if found["commits"] else "new"
+    found["harness"] = [h for h, folder in (("claude", ".claude"), ("codex", ".codex"), ("cursor", ".cursor"), ("gemini", ".gemini"))
+                        if (root / folder).is_dir() and not (root / folder).is_symlink()]
+    if (root / ".husky").is_dir():
+        found["hooks"] = "husky"
+    elif (root / "lefthook.yml").is_file() or (root / "lefthook.yaml").is_file():
+        found["hooks"] = "lefthook"
+    elif (root / ".pre-commit-config.yaml").is_file():
+        found["hooks"] = "pre-commit"
+    workflows = root / ".github/workflows"
+    if workflows.is_dir() and any(workflows.glob("*.y*ml")):
+        found["ci"] = "GitHub Actions"
+    else:
+        for name, label in ((".gitlab-ci.yml", "GitLab CI"), (".circleci/config.yml", "CircleCI"), ("Jenkinsfile", "Jenkins"),
+                            ("azure-pipelines.yml", "Azure Pipelines")):
+            if (root / name).is_file():
+                found["ci"] = label
+                break
+    package = text("package.json")
+    python = (text("pyproject.toml") + text("requirements.txt") + text("setup.cfg")).lower()
+    try:
+        scripts = json.loads(package).get("scripts") if package else None
+    except ValueError:
+        scripts = None
+    test = scripts.get("test") if isinstance(scripts, dict) else None
+    if isinstance(test, str) and test.strip() and "no test specified" not in test:
+        found["tests"] = "npm test"
+    elif "pytest" in python or (root / "pytest.ini").is_file() or (root / "tox.ini").is_file() or \
+            ((root / "tests").is_dir() and any((root / "tests").glob("test_*.py"))):
+        found["tests"] = "pytest"
+    elif (root / "go.mod").is_file():
+        found["tests"] = "go test ./..."
+    elif (root / "Cargo.toml").is_file():
+        found["tests"] = "cargo test"
+    elif (root / "pom.xml").is_file():
+        found["tests"] = "mvn test"
+    elif re.search(r"(?m)^test:", text("Makefile")):
+        found["tests"] = "make test"
+    lowered = package.lower()
+    if '"expo"' in lowered:
+        found["stack"] = "expo"
+    elif '"next"' in lowered:
+        found["stack"] = "nextjs"
+    elif (root / "go.mod").is_file():
+        found["stack"] = "go"
+    elif (root / "manage.py").is_file() or "django" in python:
+        found["stack"] = "django"
+    elif "spring" in (text("pom.xml") + text("build.gradle") + text("build.gradle.kts")).lower():
+        found["stack"] = "spring-boot"
+    elif "fastapi" in python:
+        found["stack"] = "fastapi-react"
+    return found
+
+
+def design_state(root):
+    """The design direction of a project that has screens (UAK-159): whether it has any (a web/ folder or UI-Paths in
+    PROJECT.md), whether the lock exists (web/DESIGN.md), how many rounds were made and the creativity index (1-5,
+    Design-Creativity in PROJECT.md, 3 when unset). Local files only."""
+    root = Path(root)
+    out = {"screens": False, "locked": False, "rounds": 0, "creativity": 3}
+    try:
+        text = (root / ".uak/PROJECT.md").read_text(encoding="utf-8", errors="replace")[:65536] if (root / ".uak/PROJECT.md").is_file() else ""
+        paths = re.search(r"(?m)^UI-Paths:[ \t]*(\S.*)$", text)
+        out["screens"] = (root / "web").is_dir() or bool(paths and paths.group(1).strip() not in ("-", ""))
+        design = root / "web/DESIGN.md"
+        out["locked"] = design.is_file() and design.stat().st_size > 400
+        rounds = root / ".uak/design/rounds"
+        out["rounds"] = len([p for p in rounds.iterdir() if p.is_dir()]) if rounds.is_dir() else 0
+        level = re.search(r"(?m)^Design-Creativity:[ \t]*([1-5])\b", text)
+        out["creativity"] = int(level.group(1)) if level else 3
+    except OSError:
+        pass
+    return out
+
+
+def kit_file_counts(server):
+    """How many files the installer places, by harness folder (a count of the kit's own copy, without its tests and
+    skill library, which stay in the kit's repository). A missing copy counts nothing: the page then says no number."""
+    kit = Path(server.installer).resolve().parent / "kit"
+    counts = {"base": 0, ".claude": 0, ".codex": 0, ".cursor": 0, ".gemini": 0}
+    if not kit.is_dir():
+        return counts
+    for path in kit.rglob("*"):
+        try:
+            if not path.is_file():
+                continue
+            parts = path.relative_to(kit).parts
+        except (OSError, ValueError):
+            continue
+        if parts[:2] in ((".uak", "tests"), (".uak", "skills")) or "__pycache__" in parts:
+            continue
+        counts[parts[0] if parts[0] in counts else "base"] += 1
+    return counts
+
+
+def kit_versions(server, root):
+    """The kit this project has and the one this setup carries (UAK-159: an older kit opens "Update"). Numbers compare
+    as numbers (6.10.0 is newer than 6.9.0); an unreadable file says nothing, never "older"."""
+    def read(path):
+        try:
+            return path.read_text(encoding="utf-8").strip()[:32]
+        except OSError:
+            return ""
+
+    have = read(Path(root) / ".uak/VERSION")
+    current = read(Path(server.installer).resolve().parent / "kit/.uak/VERSION")
+
+    def parts(v):
+        m = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", v)
+        return tuple(int(x) for x in m.groups()) if m else None
+    older = bool(parts(have) and parts(current) and parts(have) < parts(current))
+    return {"installed": have, "current": current, "older": older}
+
+
+def project_progress(server, root, session=""):
+    """Where a project is (UI-019: a restart, a reload or re-picking it landed on Welcome or Prepare): (resume, the
+    name saved for this clone). Local Git only (at most seven processes, 10 s each), never the network, the engine or a
+    coding tool, and through the identity runner, never the operation runner. A hint from the last local copy of main
+    and claims ("source": "local"); None means "no local copy to read", never done. `uak start` stays the only gate."""
+    root = Path(root)
+    resume = {"step": "install", "installed": False, "main_checkout": None, "human": False, "freeze": 0, "idea": False,
+              "kit_on_main": None, "plan_approved": None, "base_sha": "", "reviewer": None, "claims": None,
+              "source": "local"}
+    saved = ""
+
+    def git(*args):
+        return server.planning.git(server.identity_run, root, *args, timeout=10)
+
+    try:
+        resume["installed"] = kit_present(root) and server.failed_target != str(root)
+        git_dir, common = git_dirs(server, root, server.identity_run)
+        resume["main_checkout"] = bool(git_dir and common) and git_dir == common
+        saved = read_human(common) if common else ""
+        human = saved or session
+        resume["human"] = bool(human)
+        if resume["installed"]:
+            try:
+                resume["freeze"] = max(0, int(read_config(root, ("Freeze-Epoch",)).get("Freeze-Epoch") or 0))
+            except ValueError:
+                resume["freeze"] = 0
+        try:
+            idea = server.planning.regular_file(root, "IDEA.md")
+            resume["idea"] = idea.is_file() and idea.stat().st_size > 0
+        except ValueError:
+            resume["idea"] = False
+        remote, base = remote_and_base()
+        refs = {}
+        listed = git("for-each-ref", "--format=%(refname) %(objectname)", "refs/uak/", "refs/remotes/%s/" % remote)
+        for line in (listed.stdout or "").splitlines() if listed.returncode == 0 else []:
+            name, _, sha = line.strip().partition(" ")
+            refs[name] = sha
+        tracking = "refs/remotes/%s/%s" % (remote, base)
+        base_ref = next((r for r in (SETUP_BASE, tracking) if r in refs), None)
+        # Setup's own copy is read first; a push from this clone moves only the tracking ref, so the newer one wins.
+        if base_ref == SETUP_BASE and tracking in refs and refs[tracking] != refs[SETUP_BASE] and \
+                git("merge-base", "--is-ancestor", SETUP_BASE, tracking).returncode == 0:
+            base_ref = tracking
+        if base_ref:
+            shown = git("show", base_ref + ":.uak/PROJECT.md")
+            resume["kit_on_main"] = shown.returncode == 0
+            approved = re.search(r"(?m)^Backlog-Approved:[ \t]*(\S+)", shown.stdout or "") if shown.returncode == 0 else None
+            resume["plan_approved"] = bool(approved and approved.group(1) == "yes")
+            resume["base_sha"] = refs[base_ref][:7]
+        claims_ref = next((r for r in (SETUP_CLAIMS, DASH_CLAIMS, "refs/remotes/%s/claims" % remote) if r in refs), None)
+        if claims_ref:
+            known = {"reviewers": {}, "retired": [], "claims": {}, "files": []}
+            read_claims(git, known, claims_ref)
+            resume["claims"] = len(known["files"])
+            who = human + "-r"
+            resume["reviewer"] = (who in known["reviewers"] and who not in known["retired"]) if human else None
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
+    if not resume["installed"]:
+        resume["step"] = "install"
+    elif resume["claims"]:
+        resume["step"] = "progress"
+    elif resume["plan_approved"] is True:
+        resume["step"] = "team"
+    elif resume["kit_on_main"] is True:
+        resume["step"] = "plan"
+    else:
+        resume["step"] = "prepare"
+    return resume, saved
+
+
+def team_known(server, root, data):
+    """What the claims copy says about the team (registered reviewers, humans, retired), read once per tip; None when the
+    page is not reading the remote or the copy is not there."""
+    if data.get("source") != "remote":
+        return None
+
+    def git(*args):
+        return server.planning.git(server.run, root, *args, timeout=60)
+
+    if git("rev-parse", "-q", "--verify", DASH_CLAIMS + "^{commit}").returncode:
+        return None
+    known = {"reviewers": {}, "retired": [], "claims": {}, "files": [], "humans": []}
+    try:
+        read_claims(git, known, DASH_CLAIMS)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+    return known
+
+
+def name_the_team(server, root, data, known=None):
+    """The Agents tab lists who has acted (dash.py); setup also names the reviewer the person registered and marks the
+    human (UI-012, test round r3: luis-r was missing until its first command, and luis read "offline · 20770 d ago").
+    Read from the claims copy dash.py has just fetched (`known`); a registered reviewer never seen has last_seen 0."""
+    if known is None:
+        return
+    agents = data.setdefault("agents", [])
+    names = {a.get("name") for a in agents}
+    for agent in agents:
+        if agent.get("name") in known["humans"]:
+            agent["is_human"] = True
+        if agent.get("name") in known["reviewers"]:
+            agent["role"] = "reviewer"
+    for who, by in sorted(known["reviewers"].items()):
+        if who in names or who in known["retired"]:
+            continue
+        agents.append({"name": who, "human": by, "is_human": False, "last_seen": 0, "status": "offline", "role": "reviewer",
+                       "tasks": [], "sessions": 0, "events": 0, "checkpoints": 0, "messages": 0, "verdicts": 0,
+                       "started": 0})
+
+
+def reviewer_record(known, who, human):
+    """Whether NAME-r reviews in this project, from its claims (roles/reviewers minus meta/retired); None when unknown."""
+    record = {"name": who, "registered": False, "registered_by": "", "retired": False, "message": ""}
+    if known.get("state") != "ok":
+        return dict(record, registered=None)
+    by = known["reviewers"].get(who, "")
+    if who in known["retired"]:
+        return dict(record, retired=True, registered_by=by,
+                    message="%s was retired, so it cannot review. Choose another name in Your name, or ask the human "
+                            "who retired it." % who)
+    if by:
+        record.update(registered=True, registered_by=by,
+                      message="%s is registered: it reviews your agents' work." % who if by == human else
+                      "%s was already registered by %s." % (who, by))
+    return record
+
+
+def reviewer_status(server, target, human):
+    """/api/status's reviewer: derived from the last read of this project's claims, for this name; {} before any."""
+    if not target or not human:
+        return {}
+    try:
+        key = (target,) + remote_and_base()
+    except ValueError:
+        return {}
+    with server.lock:
+        known = server.remote_cache.get(key)
+    return reviewer_record(known, human + "-r", human) if known else {}
+
+
+def planners(server, root):
+    """available_planners, probed in the slow lane with the whole tree stopped after 20 s (amendment 5); cached 60 s."""
+    key = str(root)
+    with server.lock:
+        hit = server.tools_cache.get(key)
+    if hit and time.monotonic() - hit[0] < TOOLS_TTL:
+        return hit[1]
+
+    def probe(command, cwd=None, timeout=PROBE_TIMEOUT, **kwargs):
+        return server.run(command, cwd=cwd, timeout=min(timeout, PROBE_TIMEOUT), group=True)
+
+    offers = server.planning.available_planners(root, probe)
+    with server.lock:
+        server.tools_cache[key] = (time.monotonic(), offers)
+    return offers
+
+
+def team_context(server):
+    """The team step needs the human's name (UI-005), a READY or waiting check and an installed kit; returns
+    (root, name, phase)."""
+    with server.lock:
+        state = dict(server.state)
+    name = state.get("human") or ""
+    if not HUMAN_NAME.fullmatch(name):
+        raise Need("Tell setup your name first (on the People screen): registering the reviewer is a human act.", "human")
+    phase = team_phase(state)
+    if not phase:
+        raise Need("Press Check what's next first: the team starts after the readiness check says Ready.", "check")
+    server.engine()
+    return project_root(server.target), name, phase
+
+
+def git_dirs(server, root, run=None):
+    """(this checkout's Git dir, the common Git dir), physical; the main checkout is where they are the same."""
+    lines = server.planning.git(run or server.run, root, "rev-parse", "--absolute-git-dir",
+                                "--git-common-dir").stdout.splitlines()
+    paths = [(Path(t.strip()) if os.path.isabs(t.strip()) else root / t.strip()).resolve() if t.strip() else None
+             for t in lines[:2]]
+    return tuple(paths + [None] * (2 - len(paths)))
+
+
+def planning_head(server, root):
+    return server.planning.git(server.run, root, "rev-parse", "HEAD").stdout.strip() or "0" * 40
+
+
+def main_checkout(server, root):
+    """True in the project's main checkout (its Git dir is the common dir), false in a linked task worktree."""
+    git_dir, common = git_dirs(server, root)
+    return bool(git_dir and common) and git_dir == common
+
+
+def private_read(gitdir, name, limit):
+    """The JSON of <git common dir>/uak-setup/NAME, or None: a link (folder or file), not a regular file, larger than
+    LIMIT bytes or not JSON reads as nothing. Per clone, inside .git: never committed or shared."""
+    folder = Path(gitdir) / "uak-setup"
+    path = folder / name
+    try:
+        if folder.is_symlink() or path.is_symlink() or not path.is_file() or path.stat().st_size > limit:
+            return None
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def private_write(planning, gitdir, name, data, refused):
+    """Replace <git common dir>/uak-setup/NAME atomically; `refused` when the folder or the file is a link or not
+    what setup writes there."""
+    folder = Path(gitdir) / "uak-setup"
+    path = folder / name
+    if folder.is_symlink() or (os.path.lexists(str(folder)) and not folder.is_dir()):
+        raise refused
+    folder.mkdir(exist_ok=True)
+    if path.is_symlink() or (os.path.lexists(str(path)) and not path.is_file()):
+        raise refused
+    planning.write_atomic(path, data)
+
+
+HUMAN_NOT_KEPT = ("Setup could not remember your name for this project (.git/uak-setup/human.json is a link or not a "
+                  "regular file). It is kept until you close setup.")
+
+
+def read_human(gitdir):
+    """The person's name for this clone (UI-019: a restart forgot it), or "" for anything unexpected."""
+    data = private_read(gitdir, "human.json", 4096)
+    name = data.get("name") if isinstance(data, dict) else None
+    return name if isinstance(name, str) and HUMAN_NAME.fullmatch(name) else ""
+
+
+def write_human(planning, gitdir, name):
+    private_write(planning, gitdir, "human.json", (json.dumps({"version": 1, "name": name}) + "\n").encode("utf-8"),
+                  ValueError(HUMAN_NOT_KEPT))
+
+
+def read_roles(gitdir):
+    """Each person's saved picks in <git common dir>/uak-setup/roles.json: per clone, never committed or shared.
+    Anything unexpected (a link, too big, not JSON, an unknown tool or name) is ignored."""
+    data = private_read(gitdir, "roles.json", 16384)
+    people = data.get("people") if isinstance(data, dict) else None
+    if not isinstance(people, dict):
+        return {}
+    tools = ("claude", "codex")
+    return {name: {"implement": pick["implement"], "review": pick["review"]} for name, pick in people.items()
+            if isinstance(name, str) and HUMAN_NAME.fullmatch(name) and isinstance(pick, dict)
+            and pick.get("implement") in tools and pick.get("review") in tools}
+
+
+def write_roles(planning, gitdir, name, implement, review):
+    refused = ValueError("Setup keeps your choice in .git/uak-setup/roles.json, and that is a link or not a regular "
+                         "file. Remove it, then choose again.")
+    people = read_roles(gitdir)  # other people's picks are kept
+    people[name] = {"implement": implement, "review": review}
+    private_write(planning, gitdir, "roles.json",
+                  (json.dumps({"version": 1, "people": people}, indent=2, sort_keys=True) + "\n").encode("utf-8"), refused)
+
+
+def effective_roles(saved, available):
+    """The saved pick when both its tools are available now; otherwise Claude Code implements and Codex reviews, or the
+    only available tool does both (UI-014)."""
+    tools = [t for t in ("claude", "codex") if t in available]
+    if not tools:
+        return {"implement": "", "review": "", "saved": False, "same_tool": False, "note": ""}
+    note = ""
+    if saved and saved["implement"] in tools and saved["review"] in tools:
+        implement, review, kept = saved["implement"], saved["review"], True
+    else:
+        implement, review, kept = tools[0], tools[-1], False
+        if saved:
+            note = "Your saved choice used a tool that is not available now, so setup chose again."
+    return {"implement": implement, "review": review, "saved": kept, "same_tool": implement == review, "note": note}
+
+
+def tool_view(server, root):
+    """The coding tools setup can start here: the same detection planning uses (installed in the project, found on
+    this computer, signed in), Claude Code and Codex only."""
+    rows = []
+    for offer in planners(server, root):
+        if offer["harness"] in TOOL_LABEL:  # reasons are planning's own texts, each with a Spanish entry
+            rows.append({"id": offer["harness"], "label": TOOL_LABEL[offer["harness"]], "available": offer["available"],
+                         "reason": offer["reason"], "role": "none"})
+    return rows
+
+
+def save_roles(server, data):
+    """POST /api/team/roles: who implements and who reviews, for this person, in this clone."""
+    tools = ("claude", "codex")
+    if set(data) != {"implement", "review"} or not all(isinstance(v, str) and v in tools for v in data.values()):
+        raise ValueError("Choose which coding tool implements and which one reviews.")
+    root, name, _ = team_context(server)
+    git_dir, common = git_dirs(server, root)
+    if not common or git_dir != common:
+        raise ValueError("Choose the main project folder in this page (not a task worktree): agents start from there.")
+    rows = {row["id"]: row for row in tool_view(server, root)}
+    for tool in (data["implement"], data["review"]):
+        if not rows[tool]["available"]:
+            raise ValueError("That coding tool is not available here: %s" % rows[tool]["reason"])
+    write_roles(server.planning, common, name, data["implement"], data["review"])
+    with server.lock:
+        server.forget(root)
+    return effective_roles(read_roles(common).get(name), {t for t, r in rows.items() if r["available"]})
+
+
+def implement_command(tool, root, worktree, gitdir, task, identity, name):
+    head = "cd %s && UAK_HUMAN= bash .uak/bin/wt new %s --agent %s --human %s && cd %s && UAK_HUMAN= " % (
+        shell_quote(root), task, identity, name, shell_quote(worktree))
+    if tool == "claude":
+        return head + "claude " + shell_quote(IMPL_PROMPT % task)
+    return head + "codex %s %s" % (codex_flags(gitdir), shell_quote(IMPL_PROMPT_CODEX % task))
+
+
+def resume_command(tool, worktree, gitdir):
+    return "cd %s && UAK_HUMAN= %s" % (shell_quote(worktree), "claude" if tool == "claude" else "codex " + codex_flags(gitdir))
+
+
+def review_command(tool, root, gitdir, who):
+    if tool == "claude":
+        return "cd %s && UAK_HUMAN= UAK_AGENT=%s claude %s" % (shell_quote(root), who, shell_quote(REVIEW_PROMPT_CLAUDE % who))
+    return "cd %s && UAK_HUMAN= UAK_AGENT=%s codex %s %s" % (shell_quote(root), who, codex_flags(gitdir),
+                                                            shell_quote(REVIEW_PROMPT % who))
+
+
+def checkout_agent_note(root, who):
+    """R3 (amendment 10): .uak-env in the main checkout overrides UAK_AGENT, so the review would not run as NAME-r."""
+    env_file = root / ".uak-env"
+    if env_file.is_symlink():
+        return (".uak-env in the project folder is a symbolic link, so setup cannot tell which agent a reviewer started "
+                "there would be. Remove the link, then press Retry.")
+    if not env_file.is_file():
+        return ""
+    for line in env_file.read_text(encoding="utf-8", errors="replace").splitlines():
+        value = line.strip().rstrip("\r")
+        if value.startswith("UAK_AGENT=") and value != "UAK_AGENT=" + who:
+            return (".uak-env in the project folder says this checkout is the agent %s, so a reviewer started there "
+                    "would not be %s. Remove that line (or the file), then press Retry." % (value[len("UAK_AGENT="):][:64], who))
+    return ""
+
+
+def claude_config_path():
+    """Claude Code's own config: $CLAUDE_CONFIG_DIR/.claude.json, else .claude.json in the home folder."""
+    return Path(os.environ.get("CLAUDE_CONFIG_DIR") or str(Path.home())) / ".claude.json"
+
+
+def trust_key(text):
+    """A folder as Claude Code's config names it; on Windows compared leniently (separators, case)."""
+    if os.name == "nt":
+        text = text.replace("\\", "/").casefold()
+    return text.rstrip("/") or "/"
+
+
+def trust_candidates(folder):
+    """The folder and each of its parents, as given and physical (macOS /var is /private/var)."""
+    found = []
+    for text in (os.path.abspath(str(folder)), os.path.realpath(str(folder))):
+        path = Path(text)
+        for one in [path] + list(path.parents):
+            key = trust_key(one.as_posix())
+            if key not in found:
+                found.append(key)
+    return found
+
+
+def claude_trust(folders, server=None):
+    """{folder: True|False|None}. Reads Claude Code's own config, never writes it, keeps only booleans."""
+    unknown = {folder: None for folder in folders}
+    try:
+        path = claude_config_path()
+        info = os.stat(str(path))
+        if not stat.S_ISREG(info.st_mode) or info.st_size > CLAUDE_CONFIG_MAX:
+            return unknown
+        # One read per version of the file (its mtime and size), whichever folders the view asks about.
+        key = (str(path), info.st_mtime_ns, info.st_size)
+        trusted = None
+        if server is not None:
+            with server.lock:
+                trusted = server.trust_cache.get(key)
+        if trusted is None:
+            with open(str(path), "rb") as handle:
+                data = json.loads(handle.read(CLAUDE_CONFIG_MAX + 1).decode("utf-8"))
+            projects = data.get("projects") if isinstance(data, dict) else None
+            if not isinstance(projects, dict):
+                return unknown
+            # Only which folders are trusted is kept (their names, one flag each): no other value of the file.
+            trusted = frozenset(trust_key(name) for name, entry in projects.items() if isinstance(name, str)
+                                and isinstance(entry, dict) and entry.get("hasTrustDialogAccepted") is True)
+            del data, projects
+            if server is not None:
+                with server.lock:
+                    server.trust_cache = {key: trusted}
+        return {folder: any(c in trusted for c in trust_candidates(folder)) for folder in folders}
+    except Exception:  # noqa: BLE001 - unreadable, not JSON, a race with Claude Code writing it: "could not read"
+        return unknown
+
+
+def team_size(root):
+    """IDEA.md's "- Team size: N people" (UI-024, A-F19), or 0 when there is none."""
+    path = Path(root) / "IDEA.md"
+    try:
+        if path.is_symlink() or not path.is_file():
+            return 0
+        found = TEAM_SIZE.search(path.read_text(encoding="utf-8", errors="replace")[:200000])
+    except OSError:
+        return 0
+    return int(found.group(1)) if found else 0
+
+
+def undo_instruction(run, root, before, after, found):
+    """How to undo what a planning run changed beyond the plan (UI-024, D-7.1): a command when Git can restore every
+    change from the commit before the run, otherwise words. Setup only shows it, never runs it."""
+    by_hand = {"text": UNDO_BY_HAND_TEXT, "command": ""}
+    head = before.get("head") or ""
+    if not found or not head or before["config"] != after["config"] or before["hooks"] != after["hooks"]:
+        return by_hand
+    plan_files = (".uak/TASKS.md", ".uak/OWNERS.md", ".uak/plan-request.md")  # the plan is never restored
+    changed = sorted(name for name in set(before["files"]) | set(after["files"])
+                     if name not in plan_files and before["files"].get(name, "absent") != after["files"].get(name, "absent"))
+    for name in changed:
+        # Only plain paths: no quote mark, control character, glob or pathspec magic in a pasted git restore; a file
+        # the planner created is not Git's to restore.
+        if not quotable(name) or re.search(r"[*?\[\]\\]", name) or name.startswith(":") or \
+                before["files"].get(name, "absent") == "absent":
+            return by_hand
+    if changed:
+        listed = run(["git", "-c", "core.fsmonitor=false", "-c", "core.quotePath=false", "--literal-pathspecs", "-C",
+                      str(root), "ls-tree", "-r", "--name-only", "-z", head, "--"] + changed, cwd=str(root), timeout=60)
+        tracked = set(n for n in (listed.stdout or "").split("\0") if n) if listed.returncode == 0 else set()
+        if set(changed) - tracked:
+            return by_hand
+    parts = []
+    if before["head"] != after["head"] or before["index"] != after["index"]:
+        parts.append("git reset -q %s" % head)
+    if changed:
+        parts.append("git restore --source=%s --worktree -- %s" % (head, " ".join(shell_quote(n) for n in changed)))
+    home = Path(root).resolve().as_posix()
+    if not parts or not quotable(home):
+        return by_hand
+    return {"text": UNDO_COMMAND_TEXT, "command": " && ".join(["cd %s" % shell_quote(home)] + parts)}
+
+
+def team_view(server):
+    """GET /api/team: who implements and who reviews (per person), the reviewer's state in this project's claims, the
+    tasks already claimed, and the Copy commands. Commands are built only from server values (the READY line's task,
+    the name, enum tools, constant prompts, paths from Git here) and never run by setup."""
+    root, name, phase = team_context(server)
+    who = name + "-r"
+    view = {"task": "", "human": name, "reviewer": who, "phase": phase, "stale": False,
+            "remote": {"state": "", "detail": ""}, "commands": [], "note": "", "review_note": "", "claimed": [], "tools": [],
+            "roles": effective_roles(None, set()), "retry": False, "can_check": False,
+            "registered": {"name": who, "registered": False, "registered_by": "", "retired": False, "message": ""},
+            "people": team_size(root)}
+    text = root.as_posix()
+    if not quotable(text) or root.parent == root:
+        view["note"] = ("Rename the project folder (no quote mark or control character, and not a drive's root), then "
+                        "press Check again: setup only shows commands it can quote exactly.")
+        return view
+    git_dir, common = git_dirs(server, root)  # one look at Git (each process costs on Windows)
+    if not (git_dir and common) or git_dir != common:
+        view["note"] = ("Choose the main project folder in this page (not a task worktree): agents start from there.")
+        return view
+    gitdir = common.as_posix()
+    if not quotable(gitdir):
+        view["note"] = ("The project's Git folder has a quote mark or control character in its path, so setup cannot "
+                        "quote the commands exactly. Move it to a path without them, then press Check again.")
+        return view
+    remote, base = remote_and_base()
+    known = remote_state(server, root)
+    view["remote"] = {"state": known["state"], "detail": known.get("detail", "")}
+    if known["state"] == "offline":
+        failure = known["failure"]
+        view.update(retry=True, registered=dict(view["registered"], registered=None),
+                    note="Setup cannot reach %s right now (%s). %s" % (remote, failure["reason"], failure["advice"]),
+                    technical=failure["technical"])
+        return view
+    if known["state"] == "none":
+        view.update(retry=True, registered=dict(view["registered"], registered=None),
+                    note="This project has no remote named %s. Add one, then press Retry." % remote)
+        return view
+    if not known["kit"]:
+        view["note"] = "Publish the kit to main first (Prepare: Publish the kit to main): agents read the kit from there."
+        return view
+    view["registered"] = reviewer_record(known, who, name)
+    tools = tool_view(server, root)
+    available = {t["id"] for t in tools if t["available"]}
+    roles = effective_roles(read_roles(gitdir).get(name), available)
+    for tool in tools:
+        picked = [role for role in ("implement", "review") if roles[role] == tool["id"]]
+        tool["role"] = "both" if len(picked) == 2 else picked[0] if picked else "none"
+    view.update(tools=tools, roles=roles)
+    wt_root = root.parent / (root.name + "-wt")
+    claims = known["claims"]
+    owner = re.compile(r"(claude|codex)-%s(-[1-9])?\Z" % re.escape(name))
+    for task in sorted(claims):
+        claim = claims[task]
+        if claim["state"] not in LIVE_STATES or not TEAM_TASK.fullmatch(task):
+            continue
+        mine = owner.fullmatch(claim["owner"])
+        folder = wt_root / task.lower()
+        row = {"task": task, "state": claim["state"], "owner": claim["owner"], "mine": bool(mine),
+               "here": folder.is_dir(), "tool": TOOL_LABEL[mine.group(1)] if mine else "", "resume": ""}
+        if mine and row["here"] and mine.group(1) in available:
+            row["resume"] = resume_command(mine.group(1), folder.as_posix(), gitdir)
+        view["claimed"].append(row)
+    with server.lock:
+        claim = CLAIM_COMMAND.match(server.state.get("next_command") or "")
+        frozen = frozen_since(server.state)
+    task = claim.group(1) if claim and TEAM_TASK.fullmatch(claim.group(1)) else ""
+    if frozen:
+        # UI-023 (B-06): after the freeze nothing new is claimed; the page says frozen, not "your team is working".
+        view["note"] = FROZEN_NOTE
+        task = ""
+    if not available:
+        reasons = tuple(next(t["reason"] for t in tools if t["id"] == i) for i in ("claude", "codex"))
+        # B-09: no command is shown below this note, so the command it talks about is in the note itself.
+        if frozen:
+            pass
+        elif task and task not in known["files"] and not (wt_root / task.lower()).exists():
+            view["note"] = ("No coding tool can start here: Claude Code: %s Codex: %s With Cursor or Gemini, claim %s "
+                            "yourself with cd %s && bash .uak/bin/wt new %s and open the tool in its folder."
+                            % (reasons + (task, shell_quote(text), task)))
+        else:
+            view["note"] = ("No coding tool can start here: Claude Code: %s Codex: %s With Cursor or Gemini, press "
+                            "Check what's next to get a free task first." % reasons)
+        return view
+    commands = []
+    if frozen:
+        pass
+    elif phase == "waiting":
+        view["note"] = "No task is free to start right now."
+    elif not task:
+        # A READY line that does not parse to a valid task: no command at all (amendment 2).
+        view["note"] = "No task is free to start right now. Press Check what's next again in a moment."
+        return view
+    elif task in known["files"] or (wt_root / task.lower()).exists():
+        # claim.sh refuses a claim whenever claims/ID.md exists, in any state (amendment 6).
+        view.update(can_check=True, note="%s was claimed since the last check. Press Check what's next to find a free "
+                                         "task." % task)
+    else:
+        # One identity holds one live task (claim.sh): the first free TOOL-NAME, TOOL-NAME-2 … TOOL-NAME-9. Lease
+        # expiry is ignored on purpose: a stale claim keeps its name until the engine frees it.
+        held = {c["owner"] for c in claims.values() if c["state"] in ("CLAIMED", "BLOCKED")}
+        tool = roles["implement"]
+        identity = next((i for i in ["%s-%s" % (tool, name)] + ["%s-%s-%d" % (tool, name, n) for n in range(2, 10)]
+                         if i not in held and i not in known["retired"]), "")
+        if identity:
+            folder = (wt_root / task.lower()).as_posix()
+            view["task"] = task
+            commands.append({"id": "implement", "harness": tool, "tool": TOOL_LABEL[tool], "identity": identity,
+                             "task": task, "terminal": "Terminal 1: a new terminal window on your computer, any folder",
+                             "command": implement_command(tool, text, folder, gitdir, task, identity, name),
+                             "resume": resume_command(tool, folder, gitdir)})
+        else:
+            view["note"] = ("Each of your implementer names (%s-%s to %s-%s-9) already holds a task. Finish or release one, "
+                            "then press Check what's next." % (tool, name, tool, name))
+    env_note = checkout_agent_note(root, who)
+    if env_note:
+        # Its own field, so an earlier note never hides it (review of 993e112); the page shows both.
+        view["review_note"] = env_note
+        view["note"] = view["note"] or env_note
+        view["retry"] = True
+    elif not view["registered"]["retired"]:
+        tool = roles["review"]
+        commands.append({"id": "review", "harness": tool, "tool": TOOL_LABEL[tool], "identity": who,
+                         "terminal": "Terminal 2: another new terminal window on your computer, any folder",
+                         "command": review_command(tool, text, gitdir, who)})
+    if "claude" in (roles["implement"], roles["review"]):
+        # UI-024 (A-F6): whether Claude Code already trusts the folders its commands open (the review runs in the
+        # project, the implementer in its task worktree), from Claude Code's own config; None when unreadable.
+        worktree = str(wt_root / (task or "").lower()) if task else str(wt_root)
+        found = claude_trust((text, worktree), server)
+        view["trust"] = {"project": found[text], "worktree": found[worktree]}
+    if view["registered"]["registered"] is not True:
+        # UI-024 (D-3.2, A-F11): no launch command until a reviewer can review the agents' work; resume lines of
+        # tasks already claimed stay (they start nothing new).
+        retired = bool(view["registered"]["retired"])
+        reason = view["registered"]["message"] if retired else LOCK_REASON % who
+        view["locked"] = {"reason": reason, "target": "human-name" if retired else "team-register"}
+        view["waiting"] = [{"id": role, "harness": roles[role], "tool": TOOL_LABEL[roles[role]]}
+                           for role in ("implement", "review")]
+        if view["note"] == reason:
+            view["note"] = ""  # one place per reason (A-F15)
+        commands = []
+    view["commands"] = commands
+    return view
+
+
+def registration_checks(server, data):
+    """Everything that must hold before the reviewer is registered from the page (UI-006 contract, amendments 1-2)."""
+    if set(data) != {"confirm"} or not isinstance(data["confirm"], str):
+        raise ValueError("Confirm the reviewer's name to register it.")
+    root, name, _ = team_context(server)
+    who = name + "-r"
+    if not hmac.compare_digest(data["confirm"].encode("utf-8"), who.encode("utf-8")):
+        raise ValueError("Confirm exactly the reviewer shown on the page: %s" % who)
+    planning = server.planning
+
+    def git(*args, timeout=60):
+        return planning.git(server.run, root, *args, timeout=timeout)
+
+    if not main_checkout(server, root):
+        raise ValueError("Register the reviewer from the project's main checkout, not from a task worktree. Choose the "
+                         "main project folder in this page.")
+    # The engine names the registrar from .uak-env, then git config uak.agent; registering yourself is refused
+    # (review-merge.sh: "cannot grant a role to themselves"), so setup says where that name comes from first.
+    env_file = root / ".uak-env"
+    if env_file.is_symlink():
+        raise ValueError("%s is a symbolic link, so setup cannot tell which agent this checkout is. Remove the link, "
+                         "then register again." % env_file)
+    if env_file.is_file():
+        for line in env_file.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.strip().rstrip("\r") == "UAK_AGENT=" + who:
+                raise ValueError("%s in this folder says this checkout is the agent %s, so it cannot register itself. "
+                                 "Remove that line (or the file), then register again." % (env_file, who))
+    # -z: the origin path is printed as is (without it Git quotes and octal-escapes a path with an accent).
+    origin = git("config", "-z", "--show-scope", "--show-origin", "--get", "uak.agent")
+    if origin.returncode == 0 and origin.stdout.strip("\0\n"):
+        parts = re.split(r"[\t\0]", origin.stdout.rstrip("\0\n"), maxsplit=2)
+        scope, source, value = (parts + ["", "", ""])[:3]
+        value = value.rstrip("\0\n")
+        if value == who:
+            source = source[len("file:"):] if source.startswith("file:") else source
+            if source and not os.path.isabs(source):
+                source = str(root / source)
+            flag = "--global " if scope == "global" else "--system " if scope == "system" else ""
+            raise ValueError("Git config uak.agent = %s (set in %s) makes this checkout the agent %s, so it cannot "
+                             "register itself. Remove it: git config %s--unset uak.agent, then register again."
+                             % (value, source or scope, who, flag))
+    return root, name, who
+
+
+def registration_env(name):
+    env = {"UAK_HUMAN": name, "UAK_AGENT": ""}
+    for key in ("UAK_REMOTE", "UAK_BASE"):  # the same remote and base publish_checks uses
+        if os.environ.get(key):
+            env[key] = os.environ[key]
+    return env
+
+
+def make_server(target="", installer=None, run=None):
+    installer = installer or Path(__file__).resolve().parents[4] / "install.sh"
+    return SetupServer(target, installer, run)
+
+
+def running_wizard(announced):
+    """The first wizard of this project when it answers, as (port, reopened launcher path or "", why not); None for a stale record
+    (a dead process, or a port nobody answers on, or something that is not a wizard)."""
+    import http.client
+    try:
+        pid, port = announced.read_text(encoding="ascii").split()[:2]
+        port = int(port)
+        int(pid)
+    except (OSError, ValueError):
+        return None
+    host = "127.0.0.1:%d" % port
+    try:
+        conn = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+        conn.request("GET", "/", headers={"Host": host})
+        answer = conn.getresponse()
+        answer.read()
+        conn.close()
+        if answer.status != 200 or answer.getheader("X-UAK-Setup") != "1":
+            return None
+    except (OSError, http.client.HTTPException):
+        return None
+    launcher, failure = "", ""
+    try:
+        key = (announced.parent / KEY_FILE).read_text(encoding="ascii").strip()
+        conn = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
+        conn.request("POST", "/api/reopen", b"{}", {"Host": host, "Origin": "http://" + host, "X-UAK-Reopen": key,
+                                                    "Content-Type": "application/json"})
+        answer = conn.getresponse()
+        body = answer.read()
+        conn.close()
+        if answer.status == 200:
+            launcher = json.loads(body.decode("utf-8")).get("launcher", "")
+        else:
+            failure = str(json.loads(body.decode("utf-8")).get("error", ""))
+    except (OSError, ValueError, http.client.HTTPException):
+        launcher = ""
+    return port, launcher, failure
+
+
+def stale_key(path):
+    """The key a previous wizard left in uak-wizard.key, or "" (no file, a link, not text): "" proves nothing."""
+    try:
+        if os.path.islink(str(path)):
+            return ""
+        text = Path(path).read_text(encoding="ascii").strip()
+    except (OSError, UnicodeError):
+        return ""
+    return text if re.fullmatch(r"[A-Za-z0-9_-]{16,128}", text) else ""
+
+
+def duration(seconds):
+    return "%d minutes" % (seconds // 60) if seconds >= 60 and seconds % 60 == 0 else "%d seconds" % seconds
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Configure the kit in a local browser. Keep this terminal open.")
+    parser.add_argument("target", nargs="?", default=str(Path.cwd()))
+    parser.add_argument("--no-open", action="store_true", help="print the local address without opening a browser")
+    args = parser.parse_args()
+    # UAK-153: the wizard acts for the human, so it does not start for an agent.
+    reason = agent_reason(Path.cwd(), args.target) or terminal_reason()
+    if reason:
+        print(refusal_text(reason), file=sys.stderr, flush=True)
+        return 2
+    # UAK-156: one server per project. A record that answers is the server to open; a stale one is replaced, and the
+    # children a killed server left are ended from its record.
+    announced = port_file(args.target)
+    if announced:
+        reused = running_wizard(announced)
+        if reused:
+            port, launcher, failure = reused
+            print("UAK SETUP is already running for this project at http://127.0.0.1:%d/ (it starts nothing new)." % port,
+                  flush=True)
+            if not launcher:
+                print("%s It did not give a new page. Use the terminal where it runs, or end it there with Ctrl+C and "
+                      "start again: %s" % (failure, RESTART), flush=True)
+                return 1
+            print("Launcher file: %s" % launcher, flush=True)
+            if not args.no_open:
+                try:
+                    webbrowser.open(Path(launcher).as_uri())
+                except (OSError, webbrowser.Error):
+                    print("Could not open a browser. Open the launcher file above in your browser.", flush=True)
+            return 0
+        try:
+            seen = announced.read_bytes()
+        except OSError:
+            seen = None
+        if seen is not None:
+            reap_children(announced.parent / CHILD_RECORD)
+            # UAK-196: the folders of the wizard that left this record are proved by ITS key (uak-wizard.key of the
+            # record's wizard); with no key file nothing is proved and nothing is removed.
+            LAUNCH_KEY[0] = stale_key(announced.parent / KEY_FILE)
+            sweep_launchers(announced.parent / LAUNCH_RECORD)
+            try:
+                unchanged = announced.read_bytes() == seen  # another start may have replaced it meanwhile
+            except OSError:
+                unchanged = False
+            for stale in ((announced, announced.parent / KEY_FILE) if unchanged else ()):
+                try:
+                    stale.unlink()
+                except OSError:
+                    pass
+        CHILD_FILE[0] = announced.parent / CHILD_RECORD
+        LAUNCHERS[0] = announced.parent / LAUNCH_RECORD
+    server = make_server(args.target)
+    LAUNCH_KEY[0] = server.key  # written to uak-wizard.key below, so the next start can prove this wizard's folders
+    why = ["it was stopped"]
+
+    def ended(signum, frame):
+        try:
+            why[0] = "it received %s" % signal.Signals(signum).name
+        except ValueError:
+            pass
+        raise KeyboardInterrupt  # the finally below removes the launcher folder
+
+    for name in ("SIGTERM", "SIGHUP", "SIGINT"):  # SIGHUP does not exist on Windows
+        if hasattr(signal, name):
+            signal.signal(getattr(signal, name), ended)  # before anything is printed or created
+    owned = []
+    if announced:
+        # The key first, then the port, each created exclusively: a second start never sees a port without its key, and
+        # of two starts at once one wins and the other opens the winner's page.
+        try:
+            descriptor = os.open(str(announced.parent / KEY_FILE), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            owned.append(announced.parent / KEY_FILE)
+            with os.fdopen(descriptor, "w", encoding="ascii") as handle:
+                handle.write(server.key + "\n")
+            descriptor = os.open(str(announced), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+            owned.append(announced)
+            with os.fdopen(descriptor, "w", encoding="ascii") as handle:
+                handle.write("%d %d\n" % (os.getpid(), server.server_port))
+        except FileExistsError:
+            server.server_close()
+            for name in owned:
+                try:
+                    name.unlink()
+                except OSError:
+                    pass
+            for _ in range(100):  # the winner writes its port a moment after its key
+                time.sleep(0.1)
+                reused = running_wizard(announced)
+                if reused:
+                    port, launcher, failure = reused
+                    print("UAK SETUP is already running for this project at http://127.0.0.1:%d/ (it starts nothing new)."
+                          % port, flush=True)
+                    if launcher:
+                        print("Launcher file: %s" % launcher, flush=True)
+                        return 0
+                    print("%s Start again: %s" % (failure, RESTART), flush=True)
+                    return 1
+            if not announced.exists():  # a start that died between its key and its port
+                try:
+                    (announced.parent / KEY_FILE).unlink()
+                except OSError:
+                    pass
+            print("Another setup is starting for this project and did not answer. Start again: %s" % RESTART, flush=True)
+            return 1
+        except OSError:
+            for name in owned:
+                try:
+                    name.unlink()
+                except OSError:
+                    pass
+            owned, announced = [], None
+    try:
+        server.open_target()  # UI-019: an installed project opens where it is, not on the welcome screen
+        launcher = server.make_launcher()
+        print("UAK SETUP http://127.0.0.1:%d/" % server.server_port, flush=True)
+        print("Launcher file: %s" % launcher, flush=True)
+        print("Keep this terminal open. The page opens from that file with a one-time code (valid %d seconds, used once); "
+              "press Ctrl+C here to stop. Setup ends by itself when the page is closed or after %s with no request."
+              % (CODE_SECONDS, duration(IDLE_EXIT_SECONDS)), flush=True)
+        if not args.no_open:
+            try:
+                webbrowser.open(launcher.as_uri())
+            except (OSError, webbrowser.Error):
+                print("Could not open a browser. Open the launcher file above in your browser.", flush=True)
+
+        def watch():
+            while True:
+                time.sleep(1)
+                server.expire_if_idle()
+                found = server.end_reason()
+                if found:
+                    why[0] = found
+                    server.shutdown()
+                    return
+
+        threading.Thread(target=watch, daemon=True).start()
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()  # the port is free before anything else is done
+        stop_children()
+        server.forget_launcher()
+        if announced:
+            sweep_launchers(announced.parent / LAUNCH_RECORD)
+            for name in (announced.name, KEY_FILE, CHILD_RECORD):
+                try:
+                    (announced.parent / name).unlink()
+                except OSError:
+                    pass
+        try:
+            print("UAK SETUP ended: %s. To open it again run: %s" % (why[0], RESTART), flush=True)
+        except (OSError, ValueError):
+            pass  # the terminal is gone (a closed window): the exit is still clean
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
