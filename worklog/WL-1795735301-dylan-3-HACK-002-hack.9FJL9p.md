@@ -15,3 +15,4 @@
 - 1795736001 | CLAIMED | dylan-3 | pending decision HACK-002-1795736001; option: Pause edits until one session owns this worktree; Why: Another session created app/tests/test_schemas.py and schema/db stubs during read-only reconnaissance; concurrent-writer warning confirmed | Harness: codex | Model: gpt-6.1-sol
 - 1795736005 | BLOCKED | dylan-3 | Concurrent writer in HACK-002 worktree: schema tests and stubs appeared during read-only reconnaissance. Waiting for human to stop the other session before editing. | Harness: codex | Model: gpt-6.1-sol
 - 1795736024 | BLOCKED | dylan-3 | checkpoint; next: Human stops other HACK-002 session, then resume existing tests with uak red HACK-002 | Harness: codex | Model: gpt-6.1-sol
+- 1795736310 | BLOCKED | dylan-3 | heartbeat; lease until 1795739010 | Harness: codex | Model: gpt-6.1-sol
