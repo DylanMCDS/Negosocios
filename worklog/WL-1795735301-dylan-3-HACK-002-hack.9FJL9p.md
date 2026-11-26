@@ -22,3 +22,4 @@
 - 1795736774 | REVIEW | dylan-3 | checkpoint; next: Complete HACK-003 review; HACK-002 awaits reviewer on PR4 | Harness: codex | Model: gpt-6.1-sol
 - 1795736821 | REVIEW | scheduler | deadline decision HACK-002-1795735889; option: Document payment confirm as legacy 409; only signed pey webhook updates paid status; Why: IDEA flow lists confirm but integrity rule and HACK-007 require verified webhooks
 - 1795736937 | REVIEW | dylan-3 | checkpoint; next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass | Harness: codex | Model: gpt-6.1-sol
+- 1795736940 | REVIEW | dylan-3 | handoff; next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass | Harness: codex | Model: gpt-6.1-sol
