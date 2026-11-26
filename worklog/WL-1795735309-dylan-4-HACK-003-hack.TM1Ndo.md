@@ -10,3 +10,4 @@
 
 ## History
 - 1795735309 | CLAIMED | dylan-4 | claim; next: leer `docs/PEY.md`, escribir los tests con `httpx.MockTransport` y `uak red HACK-003`. | Harness: unknown | Model: unknown
+- 1795735404 | CLAIMED | dylan-4 | heartbeat; lease until 1795738104 | Harness: codex | Model: gpt-6.1-sol
