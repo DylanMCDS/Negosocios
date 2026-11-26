@@ -6,7 +6,7 @@
 - Why: test index without web/dist
 - Failing: none
 - Commands: Verify green
-- Next: Humano: Shared resource/CI needs a human: uv.lock
+- Next: Integrated in main: 6508a277171420c0a69f7f317d7e45ccf3247f37 (recorded by dylan)
 
 ## History
 - 1795735284 | CLAIMED | dylan-1 | claim; next: `uv init --bare --name app --python 3.12 --pin-python .` y copiar `app/main.py` de STACK.md. | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795735625 | REVIEW | dylan-2 | review; approve; SHA 1b58595ded3e862fba7c2fea9243e8cabb62a17c; reviewer dylan-2 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795736279 | REVIEW | dylan-1 | heartbeat; lease until 1795750679 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795736924 | REVIEW | dylan-1 | merge rechazado; Shared resource/CI needs a human: uv.lock | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795737007 | INTEGRATED | dylan | integrate; recorded by dylan; PR https://github.com/DylanMCDS/Negosocios/pull/2; merged 6508a277171420c0a69f7f317d7e45ccf3247f37; proof ancestry | Harness: unknown | Model: unknown
