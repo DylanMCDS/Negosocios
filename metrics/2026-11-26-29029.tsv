@@ -11,6 +11,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795733818	start	-	1	-	6000	-	claude-code
 1795734678	start	-	1	-	9000	-	claude-code
 1795734678	clock	-	0	-	0	-	claude-code
@@ -220,3 +221,12 @@
 1795735860	bb	-	0	-	10000	dylan-3	codex
 1795735860	map	-	0	-	0	dylan-4	codex
 1795735871	bb	-	0	-	11000	dylan-4	codex
+1795735903	map	-	0	-	0	dylan-3	codex
+1795735903	bb	-	0	-	3000	dylan-4	codex
+1795735871	inbox	-	1	remote-unreachable	6000	dylan-4	codex
+1795735881	hook-inbox	-	0	-	2000	dylan-4	other
+1795735889	decision	HACK-002	0	-	5000	dylan-3	codex
+1795735895	msg	-	0	-	3000	dylan-3	codex
+1795735903	red	HACK-002	0	-	2000	dylan-3	codex
+1795735899	hook-inbox	-	0	-	1000	dylan-3	other
+1795735901	inbox	-	0	-	2000	dylan-4	codex
