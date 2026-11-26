@@ -1,4 +1,4 @@
-# PROJECT · <event name> (sprint mode)
+# PROJECT · Negosocios (sprint mode)
 
 > Filled in by `/uak-setup` with the human at minute 0. uak reads the flat fields of the last block from
 > the remote `main`, so a stale worktree can never change permissions.
@@ -6,15 +6,15 @@
 ## Event
 | Field | Value |
 |---|---|
-| Event / challenge | `<name, number, official URL>` |
-| Start | `<YYYY-MM-DD HH:MM IANA zone>` |
-| Official deadline | `<YYYY-MM-DD HH:MM IANA zone>` · platforms: `<platform, form, repo>` |
-| Freeze | `uak clock START DEADLINE ZONE --write` (15% of the event, 30 min to 6 h) → `Freeze-Epoch` |
-| Clean rehearsal / plan B | `<deadline − 2 h>` |
-| Internal submission | `<deadline − 1 h>` |
-| Humans | `<name: role>` · submission owner: `<name>` (starts at T−8 h) |
-| Agents | `<name-1, name-2>` per human (max 2) |
-| Machines | `<laptop, Jetson…>` · ports already taken: `<8000…>` |
+| Event / challenge | `<pendiente: nombre, reto, URL oficial>` · producto: Negosocios (ver IDEA.md, docs/CONTEXTO-CoDi.md) |
+| Start | `2026-11-26 16:59 America/Mexico_City` |
+| Official deadline | `2026-11-29 23:59 America/Mexico_City` · platforms: `<pendiente>` |
+| Freeze | `2026-11-29 17:59` (Freeze-Epoch 1795996740) · design lock Thu 17:59 · first claim by Thu 18:59 · plan-B video Sat 08:29 |
+| Clean rehearsal / plan B | `2026-11-29 21:59` |
+| Internal submission | `2026-11-29 22:59` |
+| Humans | `Dylan: todo` · submission owner: `Dylan` (starts at T−8 h) |
+| Agents | `dylan-1, dylan-2` (Claude Code) · `dylan-3, dylan-4` (Codex) — 4 por decisión del humano |
+| Machines | `MacBook de Dylan` · ports already taken: `<pendiente>` |
 
 ## Official rubric (weights sum to 100)
 | ID | Criterion | Weight | Evidence in the demo |
@@ -44,7 +44,7 @@ Autonomy: yes
 Auto-Merge: yes
 Review-Mode: claims
 Plan-Channel: claims
-Freeze-Epoch: 0
+Freeze-Epoch: 1795996740
 Lease-Seconds: 2700
 Review-Lease-Seconds: 14400
 Events-Per-Session: 100
