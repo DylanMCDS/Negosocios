@@ -1,13 +1,14 @@
 # worklog/WL-1795735284-dylan-1-HACK-001-hack.g4z0ZM.md · HACK-001
 
 ## Live summary
-- Done: Claim created; implementation pending
-- Decision: Own branch and worktree
-- Why: Parallel work without touching the main checkout
-- Failing: No validation run yet
-- Commands: `uv run pytest -q app/tests/test_health.py && npm --prefix web ci && npm --prefix web run build`
-- Next: `uv init --bare --name app --python 3.12 --pin-python .` y copiar `app/main.py` de STACK.md.
+- Done: backend+web skeleton, deploy files
+- Decision: create_app factory for testable static mount
+- Why: test index without web/dist
+- Failing: none
+- Commands: Verify green
+- Next: uak done
 
 ## History
 - 1795735284 | CLAIMED | dylan-1 | claim; next: `uv init --bare --name app --python 3.12 --pin-python .` y copiar `app/main.py` de STACK.md. | Harness: unknown | Model: unknown
 - 1795735334 | CLAIMED | dylan-1 | heartbeat; lease until 1795738034 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795735415 | CLAIMED | dylan-1 | checkpoint; next: uak done | Harness: claude-code | Model: claude-sonnet-5-5

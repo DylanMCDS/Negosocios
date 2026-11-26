@@ -9,10 +9,10 @@ Priority: P0
 Paths: pyproject.toml, uv.lock, .python-version, app/__init__.py, app/main.py, app/config.py, app/routers/__init__.py, app/routers/health.py, app/services/__init__.py, app/tests/__init__.py, app/tests/conftest.py, app/tests/test_health.py, web/package.json, web/package-lock.json, web/index.html, web/vite.config.ts, web/vitest.config.ts, web/tsconfig.json, web/tsconfig.node.json, web/src/main.tsx, web/src/App.tsx, web/src/lib/api.ts, web/src/test/, Dockerfile, .dockerignore, render.yaml
 Depends: None
 Verify: `uv run pytest -q app/tests/test_health.py && npm --prefix web ci && npm --prefix web run build`
-Lease-Until: 1795738034
-Updated: 1795735334
+Lease-Until: 1795738115
+Updated: 1795735415
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: `uv init --bare --name app --python 3.12 --pin-python .` y copiar `app/main.py` de STACK.md.
+Next: uak done
 PR: -
 Evidence: -
 Thread-Read: 0
