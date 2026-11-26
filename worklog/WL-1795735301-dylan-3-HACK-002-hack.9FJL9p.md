@@ -1,12 +1,12 @@
 # worklog/WL-1795735301-dylan-3-HACK-002-hack.9FJL9p.md · HACK-002
 
 ## Live summary
-- Done: Read criteria, verified concurrent writes, consulted contract advisor; no code edited by this session
-- Decision: Pause code edits until single writer confirmed
-- Why: Tests and stubs appeared during read-only reconnaissance
-- Failing: Concurrent writer warning confirmed; tests/red/Verify not run by this session
-- Commands: uak next; uak status --task HACK-002 --summary; git status --short
-- Next: Human stops other HACK-002 session, then resume existing tests with uak red HACK-002
+- Done: 7c349db: schema/db/fixture/types/API; red recorded and 6 tests green
+- Decision: Preserved four inherited tests; added docs red and TS parity coverage
+- Why: Human confirmed sole writer; advisor GO plan and done
+- Failing: No code failures; smoke exit0 PRODUCT_UNVERIFIED package-only
+- Commands: uak red HACK-002; q uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py; smoke --affected
+- Next: Create PR, uak done; next offers HACK-003 review
 
 ## History
 - 1795735301 | CLAIMED | dylan-3 | claim; next: escribir `app/tests/test_schemas.py` con los 4 nombres y `uak red HACK-002`. | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795736024 | BLOCKED | dylan-3 | checkpoint; next: Human stops other HACK-002 session, then resume existing tests with uak red HACK-002 | Harness: codex | Model: gpt-6.1-sol
 - 1795736310 | BLOCKED | dylan-3 | heartbeat; lease until 1795739010 | Harness: codex | Model: gpt-6.1-sol
 - 1795736339 | CLAIMED | dylan-3 | Human confirmed sole writer; resume existing tests and red. | Harness: codex | Model: gpt-6.1-sol
+- 1795736622 | CLAIMED | dylan-3 | checkpoint; next: Create PR, uak done; next offers HACK-003 review | Harness: codex | Model: gpt-6.1-sol
