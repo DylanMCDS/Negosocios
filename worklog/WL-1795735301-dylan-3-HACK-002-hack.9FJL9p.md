@@ -1,12 +1,12 @@
 # worklog/WL-1795735301-dylan-3-HACK-002-hack.9FJL9p.md · HACK-002
 
 ## Live summary
-- Done: 7c349db: schema/db/fixture/types/API; red recorded and 6 tests green
+- Done: 7c349db; red: docs assertion failed (1 failed 4 passed); Verify: uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py = 6 passed; smoke --affected exit0 SECRET_SCAN_PASS, PRODUCT_UNVERIFIED package-only; advisor GO; all four criteria delivered · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints
 - Decision: Preserved four inherited tests; added docs red and TS parity coverage
 - Why: Human confirmed sole writer; advisor GO plan and done
 - Failing: No code failures; smoke exit0 PRODUCT_UNVERIFIED package-only
 - Commands: uak red HACK-002; q uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py; smoke --affected
-- Next: Create PR, uak done; next offers HACK-003 review
+- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/4; run .uak/bin/smoke
 
 ## History
 - 1795735301 | CLAIMED | dylan-3 | claim; next: escribir `app/tests/test_schemas.py` con los 4 nombres y `uak red HACK-002`. | Harness: unknown | Model: unknown
@@ -18,3 +18,4 @@
 - 1795736310 | BLOCKED | dylan-3 | heartbeat; lease until 1795739010 | Harness: codex | Model: gpt-6.1-sol
 - 1795736339 | CLAIMED | dylan-3 | Human confirmed sole writer; resume existing tests and red. | Harness: codex | Model: gpt-6.1-sol
 - 1795736622 | CLAIMED | dylan-3 | checkpoint; next: Create PR, uak done; next offers HACK-003 review | Harness: codex | Model: gpt-6.1-sol
+- 1795736673 | REVIEW | dylan-3 | done; PR https://github.com/DylanMCDS/Negosocios/pull/4; evidence: 7c349db; red: docs assertion failed (1 failed 4 passed); Verify: uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py = 6 passed; smoke --affected exit0 SECRET_SCAN_PASS, PRODUCT_UNVERIFIED package-only; advisor GO; all four criteria delivered · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints; reviewer: - | Harness: codex | Model: gpt-6.1-sol
