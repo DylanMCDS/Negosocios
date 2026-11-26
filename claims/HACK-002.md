@@ -9,10 +9,10 @@ Priority: P0
 Paths: app/schemas/, app/db.py, app/fixtures/, app/tests/test_schemas.py, web/src/lib/types.ts, docs/API.md
 Depends: None
 Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py`
-Lease-Until: 1795751174
-Updated: 1795736774
+Lease-Until: 1795751337
+Updated: 1795736937
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Apply option: Document payment confirm as legacy 409; only signed pey webhook updates paid status
+Next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: -
 Thread-Read: 11

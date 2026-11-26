@@ -9,3 +9,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795736635 | HACK-003 | Keep HACK-003 in REVIEW; report missing shared product smoke rather than edit outside Paths | Why: uak next requested full smoke; adapter Verify is green but shared adapter is absent
 - 1795736774 | HACK-002 | Keep missing full product smoke adapter with skeleton task HACK-001 | Why: Adapter is outside HACK-002 Paths; no runnable app in this contract task
 - 1795736821 | deadline decision/HACK-002-1795735889/1795736789 | REVERSIBLE_AND_LOG | Option: Document payment confirm as legacy 409; only signed pey webhook updates paid status; Why: IDEA flow lists confirm but integrity rule and HACK-007 require verified webhooks; no money, accounts, publishing or scope expansion.
+- 1795736937 | HACK-002 | Contract complete; runtime smoke adapter requested from HACK-001 in message14 | Why: Missing adapter outside contract task Paths
