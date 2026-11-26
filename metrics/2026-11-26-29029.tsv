@@ -14,6 +14,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795733818	start	-	1	-	6000	-	claude-code
 1795734678	start	-	1	-	9000	-	claude-code
 1795734678	clock	-	0	-	0	-	claude-code
@@ -315,3 +316,37 @@
 1795736380	red	HACK-002	0	-	1000	dylan-3	codex
 1795736372	hook-inbox	-	0	-	2000	dylan-4	other
 1795736373	hook-away	-	0	-	4000	dylan-2	claude-code
+1795736521	hook-inbox	-	0	-	2000	dylan-4	other
+1795736379	hook-inbox	-	0	-	1000	dylan-3	other
+1795736521	bb	-	0	-	3000	dylan-4	codex
+1795736521	map	-	0	-	1000	dylan-4	codex
+1795736384	hook-away	-	0	-	15000	dylan-1	claude-code
+1795736390	inbox	-	1	remote-unreachable	6000	dylan-4	codex
+1795736397	hook-inbox	-	0	-	1000	dylan-4	other
+1795736521	red	HACK-003	0	-	1000	dylan-4	codex
+1795736412	inbox	-	0	-	2000	dylan-4	codex
+1795736435	hook-inbox	-	0	-	2000	dylan-3	other
+1795736495	msg	-	0	-	4000	dylan-4	codex
+1795736500	hook-inbox	-	0	-	2000	dylan-3	other
+1795736514	inbox	-	1	remote-unreachable	6000	dylan-3	codex
+1795736668	bb	-	0	-	11000	dylan-3	codex
+1795736534	checkpoint	HACK-003	0	-	4000	dylan-4	codex
+1795736547	hook-inbox	-	0	-	1000	dylan-4	other
+1795736572	inbox	-	0	-	1000	dylan-3	codex
+1795736574	hook-inbox	-	0	-	2000	dylan-3	other
+1795736574	msg	-	0	-	3000	dylan-3	codex
+1795736578	msg	-	0	-	3000	dylan-3	codex
+1795736578	hook-inbox	-	0	-	5000	dylan-4	other
+1795736583	done	HACK-003	0	-	5000	dylan-4	codex
+1795736591	next	-	0	-	3000	dylan-4	codex
+1795736597	hook-inbox	-	0	-	2000	dylan-3	other
+1795736617	hook-pr-sync	HACK-002	0	-	2000	dylan-3	other
+1795736619	hook-inbox	-	0	-	1000	dylan-4	other
+1795736619	hook-status	-	0	-	2000	dylan-3	other
+1795736622	hook-pr-sync	HACK-003	0	-	2000	dylan-4	other
+1795736624	hook-status	-	0	-	2000	dylan-4	other
+1795736622	checkpoint	HACK-002	0	-	4000	dylan-3	codex
+1795736635	checkpoint	HACK-003	0	-	4000	dylan-4	codex
+1795736639	msg	-	0	-	3000	dylan-4	codex
+1795736643	hook-inbox	-	0	-	2000	dylan-4	other
+1795736650	hook-inbox	-	0	-	2000	dylan-3	other
