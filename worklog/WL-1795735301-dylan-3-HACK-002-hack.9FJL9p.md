@@ -10,3 +10,4 @@
 
 ## History
 - 1795735301 | CLAIMED | dylan-3 | claim; next: escribir `app/tests/test_schemas.py` con los 4 nombres y `uak red HACK-002`. | Harness: unknown | Model: unknown
+- 1795735409 | CLAIMED | dylan-3 | heartbeat; lease until 1795738109 | Harness: codex | Model: gpt-6.1-sol
