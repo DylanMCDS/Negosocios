@@ -1,0 +1,11 @@
+# dylan-4
+Agent: dylan-4
+Started: 1795735309
+Events: 1
+Events-Since-Checkpoint: 1
+Checkpoints: 0
+Sessions: 1
+Last-Checkpoint: 0
+Human: dylan
+Last-Session: dylan-4-1795735308
+Updated: 1795735309
