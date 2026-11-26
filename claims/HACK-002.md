@@ -12,7 +12,7 @@ Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/t
 Lease-Until: 1795751174
 Updated: 1795736774
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Complete HACK-003 review; HACK-002 awaits reviewer on PR4
+Next: Apply option: Document payment confirm as legacy 409; only signed pey webhook updates paid status
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: -
 Thread-Read: 11
