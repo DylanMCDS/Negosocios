@@ -9,10 +9,10 @@ Priority: P0
 Paths: app/services/pey.py, app/services/pey_webhook.py, app/tests/test_pey.py, scripts/pey_smoke.py, docs/PEY.md
 Depends: None
 Verify: `uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py`
-Lease-Until: 1795750983
-Updated: 1795736583
+Lease-Until: 1795751035
+Updated: 1795736635
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/3; run .uak/bin/smoke
+Next: Independent review of PR #3; shared product smoke setup requires its owner
 PR: https://github.com/DylanMCDS/Negosocios/pull/3
 Evidence: -
 Thread-Read: 1
