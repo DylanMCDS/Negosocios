@@ -7,6 +7,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795733818	start	-	1	-	6000	-	claude-code
 1795734678	start	-	1	-	9000	-	claude-code
 1795734678	clock	-	0	-	0	-	claude-code
@@ -171,3 +172,29 @@
 1795735817	hook-inbox	-	0	-	3000	dylan-3	other
 1795735817	hook-pr-sync	HACK-003	0	-	3000	dylan-4	other
 1795735821	hook-status	-	0	-	0	dylan-4	other
+1795735824	status	HACK-002	0	-	0	dylan-3	codex
+1795735845	bb	-	0	-	3000	dylan-2	claude-code
+1795735824	inbox	-	0	-	2000	dylan-3	codex
+1795735845	map	-	0	-	0	dylan-3	codex
+1795735826	status	HACK-003	0	-	1000	dylan-4	codex
+1795735845	map	-	0	-	0	dylan-4	codex
+1795735829	hook-inbox	-	0	-	1000	dylan-2	claude-code
+1795735845	map	-	0	-	0	dylan-3	codex
+1795735834	hook-next	-	0	-	3000	dylan-2	claude-code
+1795735834	hook-next	-	0	-	3000	dylan-1	claude-code
+1795735845	map	-	0	-	0	dylan-4	codex
+1795735845	map	-	0	-	1000	dylan-4	codex
+1795735836	hook-next	-	0	-	3000	dylan-3	other
+1795735837	hook-next	-	0	-	3000	dylan-4	other
+1795735838	next	-	0	-	1000	dylan-1	claude-code
+1795735837	hook-inbox	-	0	-	2000	dylan-3	other
+1795735838	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795735839	hook-inbox	-	0	-	2000	dylan-4	other
+1795735838	next	-	0	-	3000	dylan-2	claude-code
+1795735841	next	-	0	-	0	dylan-3	codex
+1795735840	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795735842	status	HACK-003	0	-	0	dylan-4	codex
+1795735840	hook-inbox	-	0	-	3000	dylan-4	other
+1795735843	status	HACK-003	0	-	0	dylan-4	codex
+1795735839	hook-inbox	-	0	-	4000	dylan-3	other
+1795735837	inbox	-	1	remote-unreachable	7000	dylan-4	codex
