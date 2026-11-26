@@ -12,11 +12,11 @@ Verify: `uv run --no-project --with pytest pytest -q app/tests/test_finance.py`
 Lease-Until: 1795750694
 Updated: 1795736294
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/1; run .uak/bin/smoke
+Next: Humano: Smoke red or product unverified: PRODUCT_UNVERIFIED: missing .uak/bin/smoke-project; exit 2. (log: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios/.git/worktrees/hack-004/uak-out/gate-HACK-004-smoke-1795736960.log)
 PR: https://github.com/DylanMCDS/Negosocios/pull/1
 Evidence: uv run --no-project --with pytest pytest -q app/tests/test_finance.py exit 0 (5 passed); 100/60/30 -> 10%; negative -> 'el precio actual ya incumple la meta'; closing counts only paid, pending separate, missing flags · red at 892d30a: FAILED app/tests/test_finance.py::test_max_discount_keeps_min_contribution - ...
-Participants: author dylan-2 (unknown); author dylan-2 (claude-sonnet-5-5); reviewer dylan-1 (claude-sonnet-5-5) approve
-Events: 5
+Participants: author dylan-2 (unknown); author dylan-2 (claude-sonnet-5-5); reviewer dylan-1 (claude-sonnet-5-5) approve; merged-by dylan-2 (claude-sonnet-5-5)
+Events: 6
 Checkpoints: 0
 Sessions: 2
 Last-Checkpoint: 0

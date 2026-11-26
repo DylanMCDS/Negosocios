@@ -12,7 +12,7 @@ Verify: `uv run --no-project --with pytest pytest -q app/tests/test_finance.py`
 Lease-Until: 1795750694
 Updated: 1795736294
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/1; run .uak/bin/smoke
+Next: Humano: Smoke red or product unverified: PRODUCT_UNVERIFIED: missing .uak/bin/smoke-project; exit 2. (log: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios/.git/worktrees/hack-004/uak-out/gate-HACK-004-smoke-1795736960.log)
 PR: https://github.com/DylanMCDS/Negosocios/pull/1
 Evidence: -
 Thread-Read: 8
