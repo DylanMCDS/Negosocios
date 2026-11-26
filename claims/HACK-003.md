@@ -9,8 +9,8 @@ Priority: P0
 Paths: app/services/pey.py, app/services/pey_webhook.py, app/tests/test_pey.py, scripts/pey_smoke.py, docs/PEY.md
 Depends: None
 Verify: `uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py`
-Lease-Until: 1795738104
-Updated: 1795735404
+Lease-Until: 1795739023
+Updated: 1795736323
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
 Next: leer `docs/PEY.md`, escribir los tests con `httpx.MockTransport` y `uak red HACK-003`.
 PR: -
