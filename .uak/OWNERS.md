@@ -7,15 +7,18 @@ An owner is not a prerequisite for everyone: consumers work on published contrac
 |---|---|
 | pyproject.toml | HACK-001 |
 | uv.lock | HACK-001 |
-| package.json | HACK-001 |
-| package-lock.json | HACK-001 |
 | web/package.json | HACK-001 |
 | web/package-lock.json | HACK-001 |
+| web/vite.config.ts | HACK-001 |
 | app/main.py | HACK-001 |
-| web/src/App.tsx | HACK-001 |
+| app/config.py | HACK-001 |
+| Dockerfile | HACK-001 |
+| render.yaml | HACK-001 |
 | app/schemas/ | HACK-002 |
-| web/DESIGN.md | HACK-002 |
-| .github/workflows/ | HACK-001 |
-| .uak/PROJECT.md | HACK-001 |
-
-Delete rows for technologies you don't use. `/uak-plan` creates HACK-001 (setup) and HACK-002 (contract).
+| app/db.py | HACK-002 |
+| web/src/lib/types.ts | HACK-002 |
+| app/services/pey.py | HACK-003 |
+| web/src/App.tsx | HACK-005 |
+| web/src/index.css | HACK-005 |
+| web/src/lib/ui/ | HACK-005 |
+| web/DESIGN.md | HACK-005 |
