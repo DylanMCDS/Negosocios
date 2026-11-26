@@ -12,7 +12,7 @@ Verify: `uv run pytest -q app/tests/test_health.py && npm --prefix web ci && npm
 Lease-Until: 1795750679
 Updated: 1795736279
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/2; run .uak/bin/smoke
+Next: Humano: Shared resource/CI needs a human: uv.lock
 PR: https://github.com/DylanMCDS/Negosocios/pull/2
 Evidence: -
 Thread-Read: 4

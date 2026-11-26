@@ -12,11 +12,11 @@ Verify: `uv run pytest -q app/tests/test_health.py && npm --prefix web ci && npm
 Lease-Until: 1795750679
 Updated: 1795736279
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/2; run .uak/bin/smoke
+Next: Humano: Shared resource/CI needs a human: uv.lock
 PR: https://github.com/DylanMCDS/Negosocios/pull/2
 Evidence: uv run pytest -q app/tests/test_health.py && npm --prefix web ci && npm --prefix web run build exit 0 (3 passed, vite build ok); npm --prefix web test -- --run exit 0; uak deploy --write wrote Dockerfile/.dockerignore/render.yaml; config reads PEY_*/DATABASE_PATH/PUBLIC_BASE_URL · red at 892d30a: exit 2 (no assertion line recognized: the reviewer reads the log)
-Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-2 (claude-sonnet-5-5) approve
-Events: 6
+Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-2 (claude-sonnet-5-5) approve; merged-by dylan-1 (claude-sonnet-5-5)
+Events: 7
 Checkpoints: 1
 Sessions: 2
 Last-Checkpoint: 1795735415
