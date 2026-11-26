@@ -10,3 +10,4 @@
 
 ## History
 - 1795735293 | CLAIMED | dylan-2 | claim; next: escribir `test_max_discount_keeps_min_contribution` con el ejemplo 100/60/30 y `uak red HACK-004`. | Harness: unknown | Model: unknown
+- 1795735342 | CLAIMED | dylan-2 | heartbeat; lease until 1795738042 | Harness: claude-code | Model: claude-sonnet-5-5
