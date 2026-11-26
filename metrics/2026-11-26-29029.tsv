@@ -2,6 +2,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795733818	start	-	1	-	6000	-	claude-code
 1795734678	start	-	1	-	9000	-	claude-code
 1795734678	clock	-	0	-	0	-	claude-code
@@ -41,3 +42,33 @@
 1795735363	hook-inbox	-	0	-	2000	dylan-2	claude-code
 1795735371	done	HACK-004	0	-	6000	dylan-2	claude-code
 1795735377	next	-	0	-	5000	dylan-2	claude-code
+1795735382	hook-inbox	-	0	-	2000	dylan-2	claude-code
+1795735560	bb	-	0	-	3000	dylan-2	claude-code
+1795735391	hook-next	-	0	-	1000	dylan-4	other
+1795735391	hook-inbox	-	0	-	2000	dylan-2	claude-code
+1795735392	hook-inbox	-	0	-	2000	dylan-4	other
+1795735396	hook-next	-	0	-	1000	dylan-3	other
+1795735396	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795735560	deploy	-	0	-	0	dylan-1	claude-code
+1795735397	hook-inbox	-	0	-	2000	dylan-3	other
+1795735398	status	-	0	-	6000	dylan-4	codex
+1795735404	hook-pr-sync	HACK-003	0	-	2000	dylan-4	other
+1795735404	hook-heartbeat	HACK-003	0	-	4000	dylan-4	other
+1795735406	hook-status	-	0	-	2000	dylan-4	other
+1795735403	status	-	0	-	6000	dylan-3	codex
+1795735408	hook-status	-	0	-	2000	dylan-4	other
+1795735409	hook-pr-sync	HACK-002	0	-	3000	dylan-3	other
+1795735409	hook-heartbeat	HACK-002	0	-	4000	dylan-3	other
+1795735410	hook-inbox	-	0	-	3000	dylan-3	other
+1795735413	hook-status	-	0	-	2000	dylan-3	other
+1795735412	hook-status	-	0	-	4000	dylan-3	other
+1795735410	inbox	-	1	remote-unreachable	7000	dylan-4	codex
+1795735415	checkpoint	HACK-001	0	-	8000	dylan-1	claude-code
+1795735420	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795735417	inbox	-	1	remote-unreachable	6000	dylan-3	codex
+1795735428	done	HACK-001	0	-	6000	dylan-1	claude-code
+1795735437	next	-	0	-	4000	dylan-1	claude-code
+1795735441	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795735445	review	HACK-004	0	-	4000	dylan-1	claude-code
+1795735457	hook-away	-	0	-	4000	dylan-1	claude-code
+1795735461	hook-away	-	0	-	8000	dylan-2	claude-code
