@@ -16,7 +16,7 @@ Next: escribir `app/tests/test_schemas.py` con los 4 nombres y `uak red HACK-002
 PR: -
 Evidence: -
 Participants: author dylan-3 (unknown); author dylan-3 (gpt-6.1-sol)
-Events: 3
+Events: 4
 Checkpoints: 0
 Sessions: 2
 Last-Checkpoint: 0
