@@ -9,10 +9,10 @@ Priority: P0
 Paths: app/schemas/, app/db.py, app/fixtures/, app/tests/test_schemas.py, web/src/lib/types.ts, docs/API.md
 Depends: None
 Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py`
-Lease-Until: 1795752303
-Updated: 1795737903
+Lease-Until: 1795752317
+Updated: 1795737917
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/4; run .uak/bin/smoke
+Next: Await exact SHA bcabc41 approval, then uak merge HACK-002
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: -
 Thread-Read: 20

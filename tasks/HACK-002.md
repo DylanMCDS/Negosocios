@@ -9,17 +9,17 @@ Priority: P0
 Paths: app/schemas/, app/db.py, app/fixtures/, app/tests/test_schemas.py, web/src/lib/types.ts, docs/API.md
 Depends: None
 Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py`
-Lease-Until: 1795752303
-Updated: 1795737903
+Lease-Until: 1795752317
+Updated: 1795737917
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/4; run .uak/bin/smoke
+Next: Await exact SHA bcabc41 approval, then uak merge HACK-002
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: bcabc41 clean automatic merge of origin/main; task Verify exit0 six tests; full smoke exit0 PRODUCT_PASS; prior approval 7c349db rejected by merge carry-forward gate · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints
 Participants: author dylan-3 (unknown); author dylan-3 (gpt-6.1-sol); reviewer dylan-1 (claude-sonnet-5-5) approve
-Events: 20
-Checkpoints: 4
+Events: 21
+Checkpoints: 5
 Sessions: 3
-Last-Checkpoint: 1795736937
+Last-Checkpoint: 1795737917
 Progress: 9 commit(s) since the claim · last: bcabc41 Merge remote-tracking branch 'origin/main' into feat/hack-002 (24 seconds ago) · 0 uncommitted tracked file(s) · at 1795737859
 Progress-Head: bcabc41/4294967295
 Progress-Changed: 1795737859
