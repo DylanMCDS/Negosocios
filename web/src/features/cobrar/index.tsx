@@ -3,10 +3,9 @@ import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, PageLayout, Stat, Surface } from "../../lib/ui";
 import { api } from "../../lib/api";
+import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
 
-// Demo merchant: the real id comes from the business profile (HACK-006).
-const BUSINESS_ID = "rosa";
 const POLL_MS = 2000;
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
@@ -56,6 +55,13 @@ export default function Cobrar() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [order, setOrder] = useState<Order | null>(null);
   const idempotencyKey = useRef<string>("");
+  // null while a saved business is being checked against the server; no saved business = the demo one.
+  const [active, setActive] = useState<{ id: string; name: string | null } | null>(() =>
+    getBusinessId() ? null : { id: DEMO_BUSINESS_ID, name: null },
+  );
+  useEffect(() => {
+    if (getBusinessId()) void resolveActiveBusiness().then(setActive);
+  }, []);
   const amountCents = (Number(digits) || 0) * 100;
 
   const create = useCallback(async () => {
@@ -65,7 +71,7 @@ export default function Cobrar() {
         method: "POST",
         headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey.current },
         body: JSON.stringify({
-          business_id: BUSINESS_ID,
+          business_id: active?.id ?? DEMO_BUSINESS_ID,
           amount_cents: amountCents,
           concept: concept.trim().slice(0, 40) || "Cobro",
           currency: "MXN",
@@ -76,7 +82,7 @@ export default function Cobrar() {
     } catch {
       setPhase("failed");
     }
-  }, [amountCents, concept]);
+  }, [amountCents, concept, active]);
 
   const charge = () => {
     idempotencyKey.current = crypto.randomUUID();
@@ -117,7 +123,10 @@ export default function Cobrar() {
 
   return (
     <>
-      <PageHeader title="Cobrar" lead={showOrder ? "Muestra el QR. Tu cliente paga con su celular." : "Escribe el importe y cobra."} />
+      <PageHeader
+        title="Cobrar"
+        action={active && <Chip>{active.name ?? "Puesto de ejemplo"}</Chip>}
+        lead={showOrder ? "Muestra el QR. Tu cliente paga con su celular." : "Escribe el importe y cobra."} />
       <PageLayout
         aside={
           <Surface className="flex flex-col gap-6">
@@ -162,7 +171,7 @@ export default function Cobrar() {
                   </div>
                 )}
                 {phase !== "failed" && (
-                  <Button onClick={charge} disabled={amountCents <= 0 || phase === "creating"}>
+                  <Button onClick={charge} disabled={amountCents <= 0 || phase === "creating" || !active}>
                     <QrCode size={24} aria-hidden="true" />
                     Cobrar
                   </Button>

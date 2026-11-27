@@ -59,19 +59,28 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
     }
   }
 
-  const labeled = (id: keyof typeof values, label: string) => (
-    <label className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
-      {label}
-      <input className={field} value={values[id]} onChange={set(id)} />
-    </label>
+  const labeled = (id: keyof typeof values, label: string, placeholder?: string, help?: string) => (
+    <div className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
+      <label className="flex flex-col gap-1">
+        {label}
+        <input
+          className={field}
+          value={values[id]}
+          onChange={set(id)}
+          placeholder={placeholder}
+          aria-describedby={help ? `${id}-help` : undefined}
+        />
+      </label>
+      {help && <p id={`${id}-help`}>{help}</p>}
+    </div>
   );
 
   return (
     <Surface className="flex max-w-xl flex-col gap-6">
       <form className="flex flex-col gap-4" onSubmit={submit}>
         {labeled("name", "Nombre del puesto")}
-        {labeled("category", "Giro")}
-        {labeled("zone", "Zona")}
+        {labeled("category", "Giro", "Ej. Tacos, Barbería, Abarrotes")}
+        {labeled("zone", "Zona", "Ej. Tianguis de Santa Cruz, Iztapalapa", "La zona es aproximada, no la dirección exacta.")}
         <label className="flex items-start gap-3 text-[length:var(--text-body)]">
           <input type="checkbox" className="mt-1 size-6 accent-accent" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
           <span>Acepto que el nombre, giro y zona de mi puesto aparezcan en un perfil público.</span>

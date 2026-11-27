@@ -83,7 +83,14 @@ export default function Pagar() {
     };
   }, [status, orderId]);
 
-  if (!orderId || missing) {
+  if (!orderId) {
+    return (
+      <div className="mx-auto flex max-w-xl flex-col gap-8 py-2">
+        <PageHeader title="Escanea el QR del puesto para pagar" lead="Abre la cámara de tu celular y apunta al QR del comerciante." />
+      </div>
+    );
+  }
+  if (missing) {
     return (
       <div className="mx-auto flex max-w-xl flex-col gap-8 py-2">
         <PageHeader title="No encontramos este cobro" lead="Pide al comerciante que genere otro QR." />
