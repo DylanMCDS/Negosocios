@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795799488
+Updated: 1795799588
 AVAILABLE: HACK-016 HACK-034 HACK-035 
 CLAIMED: HACK-030 HACK-039 
 BLOCKED: -
@@ -17,11 +17,11 @@ HACK-039 | CLAIMED | dylan-1 | until 1795802093
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795797532 | deadline lease/HACK-033/1795791766 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795797532 | deadline decision/HACK-033-1795790112/1795791012 | BLOCKED_OTHER_TASK | Option: Direction 1 (R1-v1: Fredoka + Mukta, tianguis awning, green Pagado); Why: Chosen by t
 - 1795798002 | HACK-030 | Reuse public profile and /pagar routes; multiple pending orders require explicit choice; never create or mutate payments | Why: Keep point URL revocable w
 - 1795798954 | HACK-039 | follow-up of HACK-012 by dylan-3: Actualizar la prueba antigua del menú para conservar Inicio, Pagar oculto y orden base sin rechazar features nuevas com
 - 1795799269 | HACK-033 | Copy 'Pagado al momento'; '< 3 s' is an unmeasured target. Menu pill scrolls instead of overflowing. | Why: Reviewer reject #180 + dylan-4 finding #181
+- 1795799588 | HACK-024 | keep HACK-024 in REVIEW and do not revert the nav test line: main goes red without it | Why: tests-only-grow refuses my edit of negocio/nav.test.tsx:17; w
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.

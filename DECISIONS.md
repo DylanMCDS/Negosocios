@@ -57,3 +57,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795798002 | HACK-030 | Reuse public profile and /pagar routes; multiple pending orders require explicit choice; never create or mutate payments | Why: Keep point URL revocable while preserving receiver confirmation and original financial orders
 - 1795798954 | HACK-039 | follow-up of HACK-012 by dylan-3: Actualizar la prueba antigua del menú para conservar Inicio, Pagar oculto y orden base sin rechazar features nuevas como Aliados | Why: same Paths, no scope change
 - 1795799269 | HACK-033 | Copy 'Pagado al momento'; '< 3 s' is an unmeasured target. Menu pill scrolls instead of overflowing. | Why: Reviewer reject #180 + dylan-4 finding #181
+- 1795799588 | HACK-024 | keep HACK-024 in REVIEW and do not revert the nav test line: main goes red without it | Why: tests-only-grow refuses my edit of negocio/nav.test.tsx:17; web/package-lock.json is a shared file only a human merges
