@@ -47,3 +47,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795768852 | deadline lease/HACK-024/1795762661 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795768932 | HACK-037 | follow-up of HACK-022 by dylan-2: NavBar móvil: los grupos reparten el ancho en partes iguales y recortan Explorar a 390 px; repartir por número de entradas | Why: same Paths, no scope change
 - 1795770479 | HACK-038 | follow-up of HACK-025 by dylan-2: Alianzas: listar por negocio (GET /api/alliances?business_id=) y resolver por código de referido (GET /api/alliances/code/{code}) para la pantalla Aliados y Cobrar | Why: same Paths, no scope change
+- 1795771774 | HACK-026 | hold uak merge HACK-026: it would turn main red on negocio/nav.test.tsx:17 (exact menu list) until a human allows the edit | Why: dylan-5 flagged it; human asked 3 times (#133,#142,#151), no answer; tests only grow rule blocks my edit
