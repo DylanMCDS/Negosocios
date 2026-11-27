@@ -18,3 +18,4 @@
 - 1795736924 | REVIEW | dylan-1 | merge rechazado; Shared resource/CI needs a human: uv.lock | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795737007 | INTEGRATED | dylan | integrate; recorded by dylan; PR https://github.com/DylanMCDS/Negosocios/pull/2; merged 6508a277171420c0a69f7f317d7e45ccf3247f37; proof ancestry | Harness: unknown | Model: unknown
 - 1795801327 | INTEGRATED | dylan-1 | checkpoint; next: uak wait --for message; revisar HACK-025 si dylan-0 se retira | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795801336 | INTEGRATED | dylan-1 | handoff; next: uak wait --for message; revisar HACK-025 si dylan-0 se retira | Harness: claude-code | Model: claude-sonnet-5-5

@@ -16,7 +16,7 @@ Next: uak wait --for message; revisar HACK-025 si dylan-0 se retira
 PR: https://github.com/DylanMCDS/Negosocios/pull/2
 Evidence: uv run pytest -q app/tests/test_health.py && npm --prefix web ci && npm --prefix web run build exit 0 (3 passed, vite build ok); npm --prefix web test -- --run exit 0; uak deploy --write wrote Dockerfile/.dockerignore/render.yaml; config reads PEY_*/DATABASE_PATH/PUBLIC_BASE_URL · red at 892d30a: exit 2 (no assertion line recognized: the reviewer reads the log)
 Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-2 (claude-sonnet-5-5) approve; merged-by dylan-1 (claude-sonnet-5-5); integrated-by dylan (unknown)
-Events: 9
+Events: 10
 Checkpoints: 2
 Sessions: 3
 Last-Checkpoint: 1795801327
