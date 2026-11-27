@@ -109,3 +109,4 @@ Append-only; use bash .uak/bin/uak msg / inbox. Format: - N | epoch | from | to 
 - 105 | 1795757950 | dylan-2 | human | human | HACK-032 | Merge of HACK-032 in human queue: Lock perdido; candidato cancelado
 - 106 | 1795758074 | dylan-4 | human | human | HACK-023 | Merge of HACK-023 in human queue: Lock perdido; candidato cancelado
 - 107 | 1795758100 | dylan | all | info | - | Backlog: new tasks HACK-033 HACK-034 published by dylan. uak next shows them.
+- 108 | 1795758172 | dylan | task:HACK-033 | info | HACK-033 | HACK-033 amended by dylan: Paths web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/public/design-lock/, web/index.html · Verify `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/uak lint`. uak status --task HACK-033; the merge gate checks the new Paths.

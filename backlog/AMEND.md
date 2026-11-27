@@ -42,3 +42,17 @@ Append-only; the last section of an ID replaces its section in the backlog. Why:
 - **Tests:** charges_one_cent_minimum, keypad_accepts_two_decimals, keypad_rejects_second_dot_and_third_decimal, converts_text_amount_to_cents_without_float_error, pey_amount_has_at_most_two_decimals
 - **Verify:** `uv run pytest -q app/tests/test_pey_amounts.py && npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build`
 - **Next step:** test rojo `converts_text_amount_to_cents_without_float_error` con "19.99" → 1999.
+## HACK-033 · Rediseño v2: dirección profesional, atractiva y familiar (Dylan elige)
+
+- **Type:** setup
+- **Priority:** P0
+- **Estimate:** 90 min
+- **Rubric / Spec:** C4 (15 %), C2 · pedido de Dylan 2026-11-26: "el diseño no me termina de encantar; profesional, atractivo y familiar"
+- **Depends on:** HACK-022
+- **Paths:** web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/public/design-lock/, web/index.html
+- **Freeze-Allowed:** yes
+- **Acceptance:** Correr `/uak-design-lock` de nuevo con las skills `redesign-existing-projects`, `frontend-design` y `product-ui`: `bash .uak/bin/uak design round --screen landing --n 4` (y una ronda de Cobrar), con capturas reales; **Dylan elige** la dirección desde las capturas (`uak design pick`). No escribir la dirección en este plan., Diagnóstico de v1 que la nueva dirección debe resolver (capturas en producción 2026-11-26): títulos y montos en tipografía monoespaciada (se ve técnica y fría); bordes negros gruesos en botones, tarjetas y campos; todo morado sobre lila sin jerarquía; sin color de "dinero/éxito"; sin calidez ni contexto mexicano., Referencias de "familiar" para la ronda (inspiración, no copia de marca): apps de pago y banca que los comerciantes mexicanos ya usan (tarjetas blancas con sombra suave, tipografía sans amable, montos grandes y legibles, verde/acento para "Pagado"). La marca Negosocios conserva su nombre; nada que imite el logo o colores exactos de otra empresa., Entregables: tokens nuevos en `web/src/index.css` (color, tipografía sans de Google Fonts para texto **y** números con cifras tabulares, radios, sombras, espaciado), UI kit actualizado en `web/src/lib/ui/` (Button, Surface/Card, Stat/montos, Chip de estado, inputs sin borde negro, NavBar y barra inferior móvil), `web/DESIGN.md` v2 con la tabla de pantallas, y 3 pantallas bloqueadas (Inicio, Cobrar, Cierre) a 390 (principal) y 1280., Como las pantallas usan tokens y el kit, todas cambian sin tocar sus carpetas; verificar con capturas que Cobrar, Pagar, Cierre, Negocio, Voz y Explorar no se rompen. Contraste AA, tamaños táctiles ≥ 44 px., **Prioridad de Dylan: la experiencia de usuario es lo más importante y la mayoría usará celular.** Diseñar primero a 390×844 y después escritorio: rondas de diseño a 390 px; navegación inferior fija con íconos + texto; acción principal al alcance del pulgar (mitad inferior); una sola acción principal por pantalla; texto ≥ 16 px; montos grandes; estados de carga, vacío y error amables en lenguaje simple (sin jerga técnica)., Veredicto `VERDICT: SHIP` del subagente design-critic antes de `uak done`, con capturas a 390 y 1280.
+- **Test-First:** no (dirección visual elegida por el humano desde capturas)
+- **Verify:** `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/uak lint`
+- **Next step:** capturas actuales de landing, cobrar y cierre como "antes", luego `uak design round`.
+
