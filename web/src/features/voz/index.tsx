@@ -156,7 +156,7 @@ export default function Voz() {
   }
 
   const confirm = proposed ? (
-    <Surface>
+    <Surface size="sm">
       <div className="flex flex-col gap-4">
         <h2 className="font-display text-[length:var(--text-l)]">Esto entendí</h2>
         {ambiguous && (
