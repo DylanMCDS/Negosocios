@@ -9,14 +9,14 @@ Priority: P0
 Paths: web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/src/App.tsx, web/public/design-lock/
 Depends: HACK-001
 Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && bash .uak/bin/uak lint`
-Lease-Until: 1795740803
-Updated: 1795738103
+Lease-Until: 1795740873
+Updated: 1795738173
 Task-Base: 07eff25e9f961a824e8df5cdd019320367e07d9c
-Next: /uak-design-lock: direcciones con capturas, Dylan elige
+Next: build v2,v3,v4 sequentially, then design shoot R1, show captures to Dylan for pick
 PR: -
 Evidence: -
 Participants: author dylan-1 (unknown)
-Events: 1
-Checkpoints: 0
+Events: 2
+Checkpoints: 1
 Sessions: 1
-Last-Checkpoint: 0
+Last-Checkpoint: 1795738173
