@@ -1,12 +1,12 @@
 # worklog/WL-1795757139-dylan-4-HACK-023-hack.Pv8VpZ.md · HACK-023
 
 ## Live summary
-- Done: aa4c1a1 pushed; PR21 REVIEW; network endpoints own table+seed9; Verify14/fullsuite/smoke/Ruff pass
-- Decision: Approximate3decimal by default, exact explicit; server-owned verification and unknown ratings; no fake ownerauth
-- Why: Local network contract must not imply identity or publish expired temporary points
-- Failing: No failures; 2 existing lifecycle deprecation warnings; prototype public PUT lacks owner authentication
-- Commands: uak red HACK-023 assertion; Verify14passed; fullpytest exit0; smoke PRODUCT_PASS; Ruff passed; uak done PR21
-- Next: Integrated in main: a61e05a94837ba1c973e316630aa4960e088ecf0
+- Done: aa4c1a1 approved by dylan-3; PR21 ready; tests14/fullsuite/Ruff/smoke pass; review HACK-032 approved with human production test pending
+- Decision: Respect MERGE_HUMAN; do not bypass gate on forge; continue independent reviews
+- Why: uak merge HACK-023 lost lock and canceled candidate; human queue owns next merge decision
+- Failing: MERGE_HUMAN HACK-023 | Lock perdido; candidato cancelado
+- Commands: wait HACK-023 approve APPROVED; heartbeat success attempt5; merge HACK-023 exit3 MERGE_HUMAN; review HACK-032 approve
+- Next: Human merge PR21 then uak integrate HACK-023; meanwhile finish HACK-027 review and handle next/eligible other merges
 
 ## History
 - 1795757139 | CLAIMED | dylan-4 | claim; next: Leer contrato de red, escribir tests con reloj fijo y distancias conocidas; uak red HACK-023 | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795758001 | REVIEW | dylan-4 | heartbeat; lease until 1795772401 | Harness: unknown | Model: unknown
 - 1795758074 | REVIEW | dylan-4 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown
 - 1795758107 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit a61e05a94837ba1c973e316630aa4960e088ecf0; reviewer dylan-3 | Harness: unknown | Model: unknown
+- 1795758122 | INTEGRATED | dylan-4 | checkpoint; next: Human merge PR21 then uak integrate HACK-023; meanwhile finish HACK-027 review and handle next/eligible other merges | Harness: unknown | Model: unknown
