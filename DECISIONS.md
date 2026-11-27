@@ -75,3 +75,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795819582 | HACK-045 | Explicit targets profile/current/assigned; legacy null target preserves prior contract | Why: Meets customization without breaking existing points
 - 1795819805 | HACK-044 | Confirmación en área principal y Surface sm mantiene guardar dentro720 | Why: Gasto mismo puesto que Cierre y reconocimiento termina de forma recuperable
 - 1795819815 | HACK-045 | Human authorized old copy assertion; needs human allow --tests gate | Why: Kit requires human-run test exception; no impersonation
+- 1795820166 | HACK-046 | Contrato public_business_profiles JSON allowlist; schedule canónico network_profiles; 36 fixtures insert-only; edición mantiene modelo de prototipo actual sin ampliar auth | Why: No tocar db.py ni populate/main fuera de Paths; datos públicos excluyen bancarios, costes, ubicación exacta y order_id de reseña
