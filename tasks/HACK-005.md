@@ -1,6 +1,6 @@
 # HACK-005
 ID: HACK-005
-State: CLAIMED
+State: REVIEW
 Owner: dylan-1
 Branch: feat/hack-005
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-005
@@ -9,14 +9,15 @@ Priority: P0
 Paths: web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/src/App.tsx, web/public/design-lock/
 Depends: HACK-001
 Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && bash .uak/bin/uak lint`
-Lease-Until: 1795741515
-Updated: 1795738815
+Lease-Until: 1795753598
+Updated: 1795739198
 Task-Base: 07eff25e9f961a824e8df5cdd019320367e07d9c
-Next: fill web/DESIGN.md from .uak/templates/DESIGN.template.md with v1 genome; tokens in web/src/index.css; UI kit web/src/lib/ui; App.tsx AppShell; 3 locked screens (Cobrar, Pagar, Cierre) captured 1280+390 to web/public/design-lock/screens; design-critic; uak decision; stop gallery: uak design-gallery --round R1 --stop
-PR: -
-Evidence: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/7; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/7
+Evidence: test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && uak lint exit 0 (LINT_OK); build ok; design-critic SHIP 07eff25; Dylan picked v1
 Participants: author dylan-1 (unknown)
-Events: 4
+Events: 5
 Checkpoints: 2
 Sessions: 1
 Last-Checkpoint: 1795738815
+Task-Tip: 8c0e551324c54da150b100802b4de7dd52c75788
