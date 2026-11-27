@@ -1,5 +1,5 @@
 ID: HACK-024
-State: HUMAN
+State: INTEGRATED
 Owner: dylan-5
-Updated: 1795787509
+Updated: 1795788922
 Reason: Shared resource/CI needs a human: web/package-lock.json
