@@ -216,3 +216,30 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** keypad_accepts_two_decimals, keypad_rejects_second_dot_and_third_decimal, converts_text_amount_to_cents_without_float_error, pey_amount_has_at_most_two_decimals
 - **Verify:** `uv run pytest -q app/tests/test_pey_amounts.py && npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build`
 - **Next step:** test rojo `converts_text_amount_to_cents_without_float_error` con "19.99" → 1999.
+## HACK-033 · Rediseño v2: dirección profesional, atractiva y familiar (Dylan elige)
+
+- **Type:** setup
+- **Priority:** P0
+- **Estimate:** 90 min
+- **Rubric / Spec:** C4 (15 %), C2 · pedido de Dylan 2026-11-26: "el diseño no me termina de encantar; profesional, atractivo y familiar"
+- **Depends on:** HACK-022
+- **Paths:** web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/public/design-lock/, web/index.html
+- **Freeze-Allowed:** yes
+- **Acceptance:** Correr `/uak-design-lock` de nuevo con las skills `redesign-existing-projects`, `frontend-design` y `product-ui`: `bash .uak/bin/uak design round --screen landing --n 4` (y una ronda de Cobrar), con capturas reales; **Dylan elige** la dirección desde las capturas (`uak design pick`). No escribir la dirección en este plan., Diagnóstico de v1 que la nueva dirección debe resolver (capturas en producción 2026-11-26): títulos y montos en tipografía monoespaciada (se ve técnica y fría); bordes negros gruesos en botones, tarjetas y campos; todo morado sobre lila sin jerarquía; sin color de "dinero/éxito"; sin calidez ni contexto mexicano., Referencias de "familiar" para la ronda (inspiración, no copia de marca): apps de pago y banca que los comerciantes mexicanos ya usan (tarjetas blancas con sombra suave, tipografía sans amable, montos grandes y legibles, verde/acento para "Pagado"). La marca Negosocios conserva su nombre; nada que imite el logo o colores exactos de otra empresa., Entregables: tokens nuevos en `web/src/index.css` (color, tipografía sans de Google Fonts para texto **y** números con cifras tabulares, radios, sombras, espaciado), UI kit actualizado en `web/src/lib/ui/` (Button, Surface/Card, Stat/montos, Chip de estado, inputs sin borde negro, NavBar y barra inferior móvil), `web/DESIGN.md` v2 con la tabla de pantallas, y 3 pantallas bloqueadas (Inicio, Cobrar, Cierre) a 1280 y 390., Como las pantallas usan tokens y el kit, todas cambian sin tocar sus carpetas; verificar con capturas que Cobrar, Pagar, Cierre, Negocio, Voz y Explorar no se rompen. Contraste AA, tamaños táctiles ≥ 44 px., Veredicto `VERDICT: SHIP` del subagente design-critic antes de `uak done`.
+- **Test-First:** no (dirección visual elegida por el humano desde capturas)
+- **Verify:** `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/uak lint`
+- **Next step:** capturas actuales de landing, cobrar y cierre como "antes", luego `uak design round`.
+
+## HACK-034 · Landing v2 con contexto mexicano y la app en acción
+
+- **Type:** feature
+- **Priority:** P0
+- **Estimate:** 60 min
+- **Rubric / Spec:** C2, C4 · skill `landing-story` · la landing es lo primero que abre el jurado
+- **Depends on:** HACK-033
+- **Paths:** web/src/features/landing/, web/public/landing/, docs/CREDITS.md
+- **Freeze-Allowed:** yes
+- **Acceptance:** Recipe: landing · Hero: un puesto de tianguis cobrando con el celular y la pantalla real de "Pagado"., Rehacer con la dirección v2 y `landing-story`: una línea clara, foto o ilustración de comercio local mexicano (licencia libre: Unsplash/Pexels con crédito en `docs/CREDITS.md`, o SVG propio), maqueta de celular con capturas reales (Cobrar → Pagado, Cierre, Explorar), tres pasos con íconos, un dato con fuente (CoDi sin comisión, codi.org.mx), sección "Para el comerciante / Para el cliente", y CTA "Probar la demo"., Mobile-first: se ve impecable a 390 px; imágenes optimizadas (WebP, < 200 KB cada una) y con `alt`., Mantiene el aviso: usa CoDi y la API de pey, no es producto oficial.
+- **Tests:** shows_value_line_and_demo_cta, shows_real_app_screens, images_have_alt_text
+- **Verify:** `npm --prefix web test -- --run src/features/landing && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** `/landing-story` con `IDEA.md` y la dirección v2 de `web/DESIGN.md`.

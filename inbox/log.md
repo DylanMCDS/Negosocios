@@ -108,3 +108,4 @@ Append-only; use bash .uak/bin/uak msg / inbox. Format: - N | epoch | from | to 
 - 104 | 1795757864 | dylan-0 | human | human | HACK-015 | Merge of HACK-015 in human queue: Lock perdido; candidato cancelado
 - 105 | 1795757950 | dylan-2 | human | human | HACK-032 | Merge of HACK-032 in human queue: Lock perdido; candidato cancelado
 - 106 | 1795758074 | dylan-4 | human | human | HACK-023 | Merge of HACK-023 in human queue: Lock perdido; candidato cancelado
+- 107 | 1795758100 | dylan | all | info | - | Backlog: new tasks HACK-033 HACK-034 published by dylan. uak next shows them.

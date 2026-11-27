@@ -36,3 +36,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795757310 | plan --amend | dylan/dylan | amended: HACK-032 Paths: web/src/features/cobrar/, app/services/pey.py, app/tests/test_pey_amounts.py → web/src/features/cobrar/, app/services/pey.py, app/tests/test_pey_amounts.py, docs/PEY.md; | Why: scope or criteria fixed before review
 - 1795757619 | HACK-023 | Approximate3decimal by default, exact explicit; server-owned verification and unknown ratings; no fake ownerauth | Why: Local network contract must not imply identity or publish expired temporary points
 - 1795757787 | HACK-027 | Demo history via own endpoint POST /api/recommendations/demo-history; startup seeding rejected (breaks test_bootstrap expenses==0) | Why: app/services/expenses.py is outside Paths; request #94 to human
+- 1795758100 | plan | dylan/dylan | tasks added: HACK-033 HACK-034 | Why: backlog without PR (Plan-Channel: claims)
