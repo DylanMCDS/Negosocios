@@ -26,7 +26,7 @@ const json = (body: unknown, status = 200) =>
 
 let fetchMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
-  vi.useFakeTimers();
+  vi.useFakeTimers({ shouldAdvanceTime: true });
   fetchMock = vi.fn();
   vi.stubGlobal("fetch", fetchMock);
 });
@@ -45,7 +45,7 @@ async function typeAndCharge() {
 
 describe("Cobrar", () => {
   it("shows_qr_after_creating_charge", async () => {
-    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+    fetchMock.mockImplementation((_url: string, init?: RequestInit) =>
       init?.method === "POST" ? json(order(), 201) : json({ order: order(), business }),
     );
     render(<Cobrar />);
@@ -59,7 +59,7 @@ describe("Cobrar", () => {
 
   it("shows_paid_when_order_becomes_paid", async () => {
     let polls = 0;
-    fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+    fetchMock.mockImplementation((_url: string, init?: RequestInit) => {
       if (init?.method === "POST") return json(order(), 201);
       polls += 1;
       return json({ order: order(polls >= 2 ? { status: "paid", paid_at: "2026-11-26T18:01:00Z" } : {}), business });
