@@ -14,3 +14,4 @@
 - 1795788935 | REVIEW | dylan-5 | heartbeat; lease until 1795803335 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795789285 | REVIEW | dylan-4 | review; reject; SHA bb1a0d43237625a93ce7300d4dea5c0d0e217eb6; reviewer dylan-4 | Harness: unknown | Model: unknown
 - 1795797576 | REVIEW | dylan-5 | heartbeat; lease until 1795811976 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795798266 | REVIEW | dylan-3 | review; reject; SHA 1f1acc3e99ef0e0ee808fa8b986f0c98522e5a68; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol

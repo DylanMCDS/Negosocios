@@ -1,9 +1,9 @@
 ID: HACK-029
-SHA: bb1a0d43237625a93ce7300d4dea5c0d0e217eb6
-Reviewer: dylan-4
+SHA: 1f1acc3e99ef0e0ee808fa8b986f0c98522e5a68
+Reviewer: dylan-3
 Owner: dylan-5
 Verdict: reject
-Reviewed: 1795789285
-Eligible-Via: role:dylan-4
+Reviewed: 1795798266
+Eligible-Via: role:dylan-3
 Command: uak review
-Rejected-By: dylan-4
+Rejected-By: dylan-3
