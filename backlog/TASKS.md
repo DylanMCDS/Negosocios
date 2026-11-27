@@ -26,3 +26,16 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Acceptance:**
   - Cierre: la línea Cuenta mezcla pesos y % (200 − (100+50) = 25 %); mostrar 200 − 150 = 50 (25 % del precio) y tomar business_id del alta
 - **Verify:** `npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
+## HACK-019 · El puesto demo existe siempre al arrancar (bug en producción)
+
+- **Type:** bug
+- **Priority:** P0
+- **Estimate:** 30 min
+- **Rubric / Spec:** C1, C3 · reportado en Render 2026-11-26
+- **Depends on:** HACK-008
+- **Paths:** app/services/bootstrap.py, app/routers/bootstrap.py, app/tests/test_bootstrap.py
+- **Freeze-Allowed:** yes
+- **Acceptance:** Bug: en Render la base SQLite se borra en cada deploy; la pantalla Cobrar usa el negocio `rosa` y `POST /api/orders` responde 404 "Negocio no encontrado" → "No pudimos crear el cobro"., Al arrancar la app (evento de startup en un router auto-descubierto; `app/main.py` no se toca), si no existe el negocio `rosa`, se crea desde `app/fixtures/demo_day.json` (sólo el negocio; las ventas y gastos demo siguen en `POST /api/demo/seed`)., Idempotente: arrancar dos veces no duplica ni pisa datos existentes.
+- **Tests:** creating_order_for_demo_business_works_on_empty_database, startup_does_not_duplicate_existing_business
+- **Verify:** `uv run pytest -q app/tests/test_bootstrap.py`
+- **Next step:** reproducir con TestClient sobre una base vacía: `POST /api/orders` con `business_id=rosa` da 404.
