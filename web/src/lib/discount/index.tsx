@@ -174,7 +174,7 @@ export function PromoSimulator() {
           values={values}
           keys={["price", "cost", "margin", "budget"]}
           onChange={(k, v) => setValues((o) => ({ ...o, [k]: v }))}
-          finalAction={<Button type="submit" disabled={!ready}>Calcular</Button>}
+          finalAction={<Button type="submit" variant="secondary" disabled={!ready}>Calcular</Button>}
         />
       </form>
     </Surface>
