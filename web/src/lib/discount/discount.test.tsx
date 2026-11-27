@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { PromoSimulator } from "./index";
+import { DiscountFields, emptyValues, PromoSimulator } from "./index";
 
 const simulation = {
   currency: "MXN", ok: true, max_discount_pct: 20, message: null,
@@ -26,6 +26,24 @@ describe("discount fields", () => {
     expect(screen.getByText("¿Cuánto darías en descuentos en total?")).toBeInTheDocument();
     // The merchant question is the field's description; the short name stays its label.
     expect(screen.getByLabelText("Precio")).toHaveAccessibleDescription("¿En cuánto vendes el producto? Ej. $40 la orden");
+  });
+
+  it("every_field_shows_a_concrete_example", () => {
+    mockSimulate();
+    render(<PromoSimulator />);
+    for (const [label, example] of [
+      ["Precio", "Ej. $40 la orden"],
+      ["Costo", "Ej. $22 entre ingredientes y empaque"],
+      ["Ganancia mínima", "Ej. $10 por orden"],
+      ["Presupuesto", "Ej. $300 para toda la promoción"],
+    ] as const) {
+      expect(screen.getByLabelText(label)).toHaveAccessibleDescription(expect.stringContaining(example));
+    }
+  });
+
+  it("uses_field_shows_a_concrete_example", () => {
+    render(<DiscountFields values={emptyValues} keys={["uses"]} onChange={() => undefined} />);
+    expect(screen.getByLabelText("Usos")).toHaveAccessibleDescription(expect.stringContaining("Ej. 20 veces"));
   });
 
   it("result_sentence_updates_while_typing", async () => {

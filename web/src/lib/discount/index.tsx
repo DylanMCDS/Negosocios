@@ -17,12 +17,12 @@ export const toCents = (pesos: string) => Math.round(Number(clean(pesos)) * 100)
 export const validAmount = (pesos: string) => clean(pesos) !== "" && Number.isFinite(toCents(pesos)) && toCents(pesos) >= 0;
 
 // The short name stays the label (what the field is called); the question is its description.
-const FIELDS: Record<DiscountKey, { label: string; question: string }> = {
+const FIELDS: Record<DiscountKey, { label: string; question: string; example?: string }> = {
   price: { label: "Precio", question: "¿En cuánto vendes el producto? Ej. $40 la orden" },
-  cost: { label: "Costo", question: "¿Cuánto te cuesta hacerlo?" },
-  margin: { label: "Ganancia mínima", question: "¿Cuánto quieres ganar como mínimo por venta?" },
-  budget: { label: "Presupuesto", question: "¿Cuánto darías en descuentos en total?" },
-  uses: { label: "Usos", question: "¿Cuántas veces se puede usar?" },
+  cost: { label: "Costo", question: "¿Cuánto te cuesta hacerlo?", example: "Ej. $22 entre ingredientes y empaque" },
+  margin: { label: "Ganancia mínima", question: "¿Cuánto quieres ganar como mínimo por venta?", example: "Ej. $10 por orden" },
+  budget: { label: "Presupuesto", question: "¿Cuánto darías en descuentos en total?", example: "Ej. $300 para toda la promoción" },
+  uses: { label: "Usos", question: "¿Cuántas veces se puede usar?", example: "Ej. 20 veces" },
 };
 
 const input = "h-14 w-full rounded-md border border-line bg-surface px-4 text-[length:var(--text-body)] font-display";
@@ -42,19 +42,20 @@ export function DiscountFields({
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 md:grid-cols-2">
         {keys.map((key, i) => {
-          const { label, question } = FIELDS[key];
+          const { label, question, example } = FIELDS[key];
           return (
             <div key={key} className={`${i === step ? "flex" : "hidden"} flex-col gap-1 md:flex`}>
               <label htmlFor={`${base}-${key}`} className="font-display text-[length:var(--text-s)] text-ink-2">
                 {label}
               </label>
               <p id={`${base}-${key}-q`} className="text-[length:var(--text-body)]">{question}</p>
+              {example && <p id={`${base}-${key}-ex`} className="text-[length:var(--text-s)] text-ink-2">{example}</p>}
               <input
                 id={`${base}-${key}`}
                 className={input}
                 inputMode={key === "uses" ? "numeric" : "decimal"}
                 value={values[key]}
-                aria-describedby={`${base}-${key}-q`}
+                aria-describedby={example ? `${base}-${key}-q ${base}-${key}-ex` : `${base}-${key}-q`}
                 onChange={(e) => onChange(key, e.target.value)}
               />
             </div>
