@@ -13,3 +13,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795737722 | deadline decision/HACK-002-1795736001/1795736901 | REVERSIBLE_AND_LOG | Option: Pause edits until one session owns this worktree; Why: Another session created app/tests/test_schemas.py and schema/db stubs during read-only reconnaissance; concurrent-writer warning confirmed; no money, accounts, publishing or scope expansion.
 - 1795737917 | HACK-002 | Requested exact SHA approval via done after MERGE_WAIT rejected clean merge carry-forward | Why: Gate refused 7c349db approval for bcabc41; blackbox bug recorded
 - 1795738173 | HACK-005 | build variants one at a time (pace critical, parallel cap 1) | Why: plan pace critical
+- 1795738289 | HACK-003 | Serve reviewer role; no implementation assignments; review exact SHA in isolated worktree | Why: uak next offers review work; incoming HACK-008 request requires verdict before ack

@@ -1,12 +1,12 @@
 # worklog/WL-1795735309-dylan-4-HACK-003-hack.TM1Ndo.md · HACK-003
 
 ## Live summary
-- Done: 6369315 pushed; PR #3; task REVIEW; 19 offline tests pass; advisor GO
-- Decision: Keep HACK-003 in REVIEW; report missing shared product smoke rather than edit outside Paths
-- Why: uak next requested full smoke; adapter Verify is green but shared adapter is absent
-- Failing: bash .uak/bin/q bash .uak/bin/smoke: exit 2 PRODUCT_UNVERIFIED: missing .uak/bin/smoke-project; secret scan passed 381 files
-- Commands: Verify 19 passed; smoke --affected exit0 PRODUCT_UNVERIFIED; full smoke exit2; git status --short clean
-- Next: Integrated in main: 7f1b715714f2a918323f2d91ff42a7672cb531a0
+- Done: HACK-003 integrated; main synced; full smoke PRODUCT_PASS; HACK-008 review lease acquired at 29a8cdf and delegated to independent reviewer
+- Decision: Serve reviewer role; no implementation assignments; review exact SHA in isolated worktree
+- Why: uak next offers review work; incoming HACK-008 request requires verdict before ack
+- Failing: HACK-008 review findings under verification; no current HACK-003 failures
+- Commands: review HACK-008 --start OK; main full smoke exit0 PRODUCT_PASS
+- Next: Await HACK-008 reviewer verdict; ack inbox; uak next; merge eligible approvals
 
 ## History
 - 1795735309 | CLAIMED | dylan-4 | claim; next: leer `docs/PEY.md`, escribir los tests con `httpx.MockTransport` y `uak red HACK-003`. | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795736635 | REVIEW | dylan-4 | checkpoint; next: Independent review of PR #3; shared product smoke setup requires its owner | Harness: codex | Model: gpt-6.1-sol
 - 1795736914 | REVIEW | dylan-3 | review; approve; SHA 636931560632eebb55cfb40037da53e781cfcf73; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol
 - 1795737171 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit 7f1b715714f2a918323f2d91ff42a7672cb531a0; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol
+- 1795738289 | INTEGRATED | dylan-4 | checkpoint; next: Await HACK-008 reviewer verdict; ack inbox; uak next; merge eligible approvals | Harness: codex | Model: gpt-6.1-sol

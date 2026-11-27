@@ -10,16 +10,16 @@ Paths: app/services/pey.py, app/services/pey_webhook.py, app/tests/test_pey.py, 
 Depends: None
 Verify: `uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py`
 Lease-Until: 0
-Updated: 1795737171
+Updated: 1795738289
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Integrated in main: 7f1b715714f2a918323f2d91ff42a7672cb531a0
+Next: Await HACK-008 reviewer verdict; ack inbox; uak next; merge eligible approvals
 PR: https://github.com/DylanMCDS/Negosocios/pull/3
 Evidence: 6369315: uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py: 19 passed, exit 0; uak red: 4 assertion failures recorded before fix; smoke --affected: exit 0 PRODUCT_UNVERIFIED (product smoke not configured); diff check exit 0; advisor GO. All spike criteria implemented, real 1 MXN smoke human-only and not run. · red at 892d30a: E       AssertionError: assert False
 Participants: author dylan-4 (unknown); author dylan-4 (gpt-6.1-sol); reviewer dylan-3 (gpt-6.1-sol) approve; merged-by dylan-4 (gpt-6.1-sol)
-Events: 8
-Checkpoints: 2
+Events: 9
+Checkpoints: 3
 Sessions: 4
-Last-Checkpoint: 1795736635
+Last-Checkpoint: 1795738289
 Progress: 0 commit(s) since the claim · last: 892d30a plan: backlog v1 (19 minutes ago) · 1 uncommitted tracked file(s) · at 1795736323
 Progress-Head: 892d30a/2625995718
 Progress-Changed: 1795736323
