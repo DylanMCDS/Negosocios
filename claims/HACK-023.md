@@ -15,4 +15,4 @@ Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
 Next: Leer contrato de red, escribir tests con reloj fijo y distancias conocidas; uak red HACK-023
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 91
