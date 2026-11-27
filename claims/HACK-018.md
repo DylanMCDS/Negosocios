@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/features/cierre/
 Depends: HACK-011
 Verify: `npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
-Lease-Until: 1795756332
-Updated: 1795741932
+Lease-Until: 1795756922
+Updated: 1795742522
 Task-Base: 949857e04d10988d3a2d7bbb856cbabe291a0467
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/12; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/12
