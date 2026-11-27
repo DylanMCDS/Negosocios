@@ -1,12 +1,12 @@
-import { ArrowRight, QrCode, Receipt, SealCheck } from "@phosphor-icons/react";
+import { ArrowRight } from "@phosphor-icons/react";
 
 // Facts come from IDEA.md §1/§4 and docs/CONTEXTO-CoDi.md; nothing here is invented.
 const SOURCE = "https://www.codi.org.mx/secundarias/preguntas_frecuentes.html";
 
 const steps = [
-  { icon: QrCode, title: "Cobra", text: "Escribe el importe y muestra el QR de CoDi." },
-  { icon: SealCheck, title: "Recibe", text: "Tu cliente paga con su celular y ves “Pagado” en segundos." },
-  { icon: Receipt, title: "Cierra el día", text: "Ventas, gastos y utilidad estimada, sin libreta." },
+  { title: "Cobra", text: "Escribe el importe y muestra el QR de CoDi." },
+  { title: "Recibe", text: "Tu cliente paga con su celular y ves “Pagado” en segundos." },
+  { title: "Cierra el día", text: "Ventas, gastos y utilidad estimada, sin libreta." },
 ];
 
 const cta =
@@ -14,32 +14,49 @@ const cta =
 
 export default function Landing() {
   return (
-    <div className="flex flex-col gap-16 py-4 md:gap-24">
-      <section className="grid items-center gap-10 md:grid-cols-2">
-        <div className="flex flex-col gap-6">
-          <h1 className="font-display text-[length:var(--text-2xl)] leading-tight md:text-[length:var(--text-hero)]">
-            Cobra con CoDi y sabe cuánto ganaste hoy.
-          </h1>
-          <p className="max-w-xl text-[length:var(--text-lg)] text-ink-2">
+    <div className="flex flex-col gap-12 py-4 md:gap-20">
+      <section className="flex flex-col gap-6">
+        <h1 className="font-display text-[length:var(--text-2xl)] leading-tight md:text-[length:var(--text-hero)]">
+          Cobra con CoDi y sabe cuánto <span className="text-accent">ganaste hoy.</span>
+        </h1>
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <p className="max-w-2xl text-[length:var(--text-lg)] text-ink-2">
             Para puestos y negocios que cobran en efectivo: cobra con QR, ve la confirmación al instante y cierra el día con tu utilidad.
           </p>
-          <div>
-            <a href="#cobrar" className={cta}>
-              Probar la demo
-              <ArrowRight size={24} aria-hidden="true" />
-            </a>
-          </div>
+          <a href="#cobrar" className={`${cta} shrink-0`}>
+            Probar la demo
+            <ArrowRight size={24} aria-hidden="true" />
+          </a>
         </div>
         <figure className="flex flex-col gap-3">
-          <img
-            src="/landing/cobrar-pagado-1280.png"
-            alt="Pantalla Cobrar: el QR se atenúa y aparece “Pagado”; el importe es 100 MXN"
-            width={1280}
-            height={720}
-            className="h-auto w-full rounded-lg border border-line"
-          />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="relative overflow-hidden rounded-lg border border-ink">
+              <img
+                src="/landing/cobrar-pendiente.png"
+                alt="Pantalla Cobrar con el QR de CoDi listo para escanear"
+                width={1568}
+                height={1036}
+                className="aspect-video h-auto w-full object-cover"
+              />
+              <span className="absolute left-4 top-4 rounded-full border border-ink bg-surface px-4 py-2 font-display text-[length:var(--text-s)]">
+                Pendiente
+              </span>
+            </div>
+            <div className="relative overflow-hidden rounded-lg border border-ink">
+              <img
+                src="/landing/cobrar-pagado.png"
+                alt="Pantalla Cobrar después del pago: el QR se atenúa y aparece Pagado"
+                width={1568}
+                height={1036}
+                className="aspect-video h-auto w-full object-cover"
+              />
+              <span className="absolute left-4 top-4 rounded-full bg-accent px-4 py-2 font-display text-[length:var(--text-s)] text-accent-ink">
+                Pagado 100 MXN
+              </span>
+            </div>
+          </div>
           <figcaption className="text-[length:var(--text-s)] text-ink-2">
-            Pantalla real de Cobrar al confirmarse el pago. Datos de ejemplo.
+            Pantalla real de Cobrar antes y después del pago, en menos de 3 s. Datos de ejemplo.
           </figcaption>
         </figure>
       </section>
@@ -54,15 +71,16 @@ export default function Landing() {
         </p>
       </section>
 
-      <section className="flex flex-col gap-8">
+      <section className="flex flex-col gap-6">
         <h2 className="font-display text-[length:var(--text-xl)]">Así funciona</h2>
-        <ol className="grid gap-6 md:grid-cols-3">
-          {steps.map(({ icon: Icon, title, text }, i) => (
-            <li key={title} className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-6">
-              <Icon size={32} aria-hidden="true" />
-              <p className="font-display text-[length:var(--text-s)] text-ink-2">Paso {i + 1}</p>
-              <p className="font-display text-[length:var(--text-lg)]">{title}</p>
-              <p className="text-ink-2">{text}</p>
+        <ol className="divide-y divide-line border-y border-ink">
+          {steps.map(({ title, text }, i) => (
+            <li key={title} className="grid grid-cols-[4rem_1fr] items-baseline gap-4 py-6 md:grid-cols-[6rem_14rem_1fr]">
+              <span className="font-display text-[length:var(--text-xl)] text-accent" aria-hidden="true">
+                {i + 1}
+              </span>
+              <span className="font-display text-[length:var(--text-lg)]">{title}</span>
+              <span className="col-span-2 text-ink-2 md:col-span-1">{text}</span>
             </li>
           ))}
         </ol>
