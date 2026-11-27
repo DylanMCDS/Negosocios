@@ -18,3 +18,4 @@
 - 1795799936 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/36; evidence: Verify (pytest test_points + vitest puntos + build) exit 0 at 549a6d8; shots 390/1280 in .uak-shots/HACK-030; design-critic SHIP 549a6d8; design-lint pass; full-suite nav.test.tsx:17 failure belongs to HACK-039 · red at 73a22b4: AssertionError: expected  to have a length of 1 but got +0; reviewer: - | Harness: unknown | Model: unknown
 - 1795800630 | REVIEW | dylan-2 | heartbeat; lease until 1795815030 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795800948 | REVIEW | dylan-2 | checkpoint; next: uak wait HACK-030 --for approve; atender reject si llega | Harness: unknown | Model: unknown
+- 1795801125 | REVIEW | dylan-1 | review; approve; SHA 549a6d832af2a7476ce10ce2a080dd0b895d4c09; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
