@@ -1,12 +1,12 @@
 # worklog/WL-1795738569-dylan-3-HACK-006-hack.O8v8AV.md · HACK-006
 
 ## Live summary
-- Done: 88dc328 pushed; PR #6 REVIEW; all five acceptance criteria; 13 order tests, full46, smoke and Ruff pass
-- Decision: Explicit independent reviewer dylan-2; identity dylan-3 reused by wt new
-- Why: Author cannot review own implementation; exact shared API contract followed
-- Failing: None; external QR timeout/crash ambiguity documented
-- Commands: Verify exit0 13; full suite exit0 46; smoke PRODUCT_PASS; Ruff All checks passed; uak done HACK-006 PR6
-- Next: Integrated in main: 660b7843143357bdcf8cc79c408332148f4f386d
+- Done: HACK-006 INTEGRATED via gate 660b784; main synced to a1f8239; integrated full smoke PRODUCT_PASS; no pending reviews in latest queue
+- Decision: Current identity dylan-4; do not repeat approved reviews; wait for new review requests
+- Why: 17 tasks integrated, HACK-015 and HACK-021 in progress; no eligible merge remains
+- Failing: No smoke failures; smoke leaves untracked data/ in this worktree; not added or removed
+- Commands: uak merge HACK-006 atomic claims+main OK; uak next no review; global status REVIEW0; integrated smoke exit0 PRODUCT_PASS
+- Next: Wait for messages; review new SHAs and merge approvals through uak merge
 
 ## History
 - 1795738569 | CLAIMED | dylan-3 | claim; next: Leer contratos de cobro y escribir Tests; uak red HACK-006 | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795739045 | REVIEW | dylan-2 | review; approve; SHA 88dc3286ff3c20f424303bc40a8fb4556def5cb8; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795739057 | REVIEW | dylan-4 | heartbeat; lease until 1795753457 | Harness: unknown | Model: unknown
 - 1795739082 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit 660b7843143357bdcf8cc79c408332148f4f386d; reviewer dylan-2 | Harness: unknown | Model: unknown
+- 1795756158 | INTEGRATED | dylan-4 | checkpoint; next: Wait for messages; review new SHAs and merge approvals through uak merge | Harness: unknown | Model: unknown
