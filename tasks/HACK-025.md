@@ -1,6 +1,6 @@
 # HACK-025
 ID: HACK-025
-State: REVIEW
+State: INTEGRATED
 Owner: dylan-2
 Branch: feat/hack-025
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-025
@@ -9,18 +9,22 @@ Priority: P0
 Paths: app/services/alliances.py, app/routers/alliances.py, app/services/reviews.py, app/routers/reviews.py, app/tests/test_alliances.py, app/tests/test_reviews.py
 Depends: HACK-023
 Verify: `uv run pytest -q app/tests/test_alliances.py app/tests/test_reviews.py`
-Lease-Until: 1795783323
-Updated: 1795768923
+Lease-Until: 0
+Updated: 1795768984
 Task-Base: a61e05a94837ba1c973e316630aa4960e088ecf0
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/24; run .uak/bin/smoke
+Next: Integrated in main: 21deb0ca6c7fb6bf545e6e55a78fdb565dbb31e4
 PR: https://github.com/DylanMCDS/Negosocios/pull/24
 Evidence: uv run pytest -q app/tests: all passed incl. 2 new regressions (order named by id and by key = one benefit; discount capped in integer cents so contribution >= minimum) · red at a61e05a: E   assert (404 == 201)
-Participants: author dylan-2 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject; author dylan-2 (claude-sonnet-5-5); reviewer dylan-5 (claude-sonnet-5-5) approve
-Events: 7
+Participants: author dylan-2 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject; author dylan-2 (claude-sonnet-5-5); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown)
+Events: 8
 Checkpoints: 0
-Sessions: 4
+Sessions: 5
 Last-Checkpoint: 0
 Task-Tip: b9b39004b6c5d689e4e1460f08bc5bc92828595e
 Progress: 2 commit(s) since the claim · last: b9b3900 fix(alianzas): una orden = un beneficio y descuento en centavos enteros sobre la contribución mínima (HACK-025 · 0 uncommitted tracked file(s) · at 1795768923
 Progress-Head: b9b3900/2262605012
 Progress-Changed: 1795759637
+Merge-Commit: 21deb0ca6c7fb6bf545e6e55a78fdb565dbb31e4
+Reviewer: dylan-5
+Integration-Proof: ancestry
+Smoke: full

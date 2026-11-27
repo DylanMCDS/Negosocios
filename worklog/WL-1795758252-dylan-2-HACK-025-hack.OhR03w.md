@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `uv run pytest -q app/tests/test_alliances.py app/tests/test_reviews.py`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/24; run .uak/bin/smoke
+- Next: Integrated in main: 21deb0ca6c7fb6bf545e6e55a78fdb565dbb31e4
 
 ## History
 - 1795758252 | CLAIMED | dylan-2 | claim; next: read spec, write tests, red | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795759637 | REVIEW | dylan-2 | heartbeat; lease until 1795774037 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795768907 | REVIEW | dylan-5 | review; approve; SHA b9b39004b6c5d689e4e1460f08bc5bc92828595e; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795768923 | REVIEW | dylan-2 | heartbeat; lease until 1795783323 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795768984 | INTEGRATED | dylan-2 | merge; smoke and Verify PASS (smoke: full); commit 21deb0ca6c7fb6bf545e6e55a78fdb565dbb31e4; reviewer dylan-5 | Harness: unknown | Model: unknown
