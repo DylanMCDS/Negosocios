@@ -1,6 +1,6 @@
 # HACK-015
 ID: HACK-015
-State: CLAIMED
+State: REVIEW
 Owner: dylan-0
 Branch: feat/hack-015
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-015
@@ -9,8 +9,8 @@ Priority: P0
 Paths: .uak/bin/smoke-project, .uak/bin/.smoke-project.provenance, docs/DEPLOY.md, docs/evidence/
 Depends: HACK-007, HACK-009, HACK-010
 Verify: `bash .uak/bin/smoke-project`
-Lease-Until: 1795769945
-Updated: 1795755545
+Lease-Until: 1795772032
+Updated: 1795757632
 Task-Base: 0f72b8ccfeba4fb34e435b9d6ee2b8718e6ec94a
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/18; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/18
