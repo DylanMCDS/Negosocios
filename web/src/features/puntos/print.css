@@ -1,0 +1,12 @@
+@media print {
+  body[data-print-point] > :not([data-point-print-copy]) { display: none !important; }
+  body[data-print-point] > [data-point-print-copy] {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    padding: 16mm;
+    justify-content: center;
+    background: var(--color-surface);
+  }
+  body[data-print-point] [data-point-qr] { width: 80mm; max-width: none; }
+}
