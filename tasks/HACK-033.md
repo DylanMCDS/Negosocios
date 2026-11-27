@@ -16,7 +16,7 @@ Next: Humano: New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it i
 PR: https://github.com/DylanMCDS/Negosocios/pull/34
 Evidence: Verify (design-lock screens, npm test, build, design-lint, uak lint) exit 0 en a623efa tras merge de main; design-critic VERDICT: SHIP a623efa; menu 8 entradas sin recortes a 1280
 Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5); author dylan-5 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject; author dylan-5 (claude-sonnet-5-5); reviewer dylan-1 (claude-sonnet-5-5) approve; merged-by dylan-5 (claude-sonnet-5-5)
-Events: 14
+Events: 15
 Checkpoints: 1
 Sessions: 7
 Last-Checkpoint: 1795799269
