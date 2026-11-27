@@ -1,6 +1,6 @@
 # HACK-012
 ID: HACK-012
-State: CLAIMED
+State: REVIEW
 Owner: dylan-2
 Branch: feat/hack-012
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-012
@@ -9,10 +9,10 @@ Priority: P1
 Paths: web/src/features/negocio/
 Depends: HACK-005, HACK-006
 Verify: `npm --prefix web test -- --run src/features/negocio && npm --prefix web run build`
-Lease-Until: 1795743499
-Updated: 1795740799
+Lease-Until: 1795755347
+Updated: 1795740947
 Task-Base: 949857e04d10988d3a2d7bbb856cbabe291a0467
-Next: read DESIGN recipe, write tests, red
-PR: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/13; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/13
 Evidence: -
 Thread-Read: 56
