@@ -14,7 +14,7 @@ it("nav_has_no_pagar_and_starts_with_inicio", () => {
     const labels = within(nav).getAllByRole("button").map((b) => b.textContent?.trim());
     expect(labels[0]).toBe("Inicio");
     expect(labels).not.toContain("Pagar");
-    expect(labels).toEqual(["Inicio", "Cobrar", "Cierre", "Negocio", "Voz"]);
+    expect(labels).toEqual(["Inicio", "Cobrar", "Cierre", "Negocio", "Voz", "Explorar"]);
   }
 });
 
