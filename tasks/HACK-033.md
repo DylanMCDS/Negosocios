@@ -1,6 +1,6 @@
 # HACK-033
 ID: HACK-033
-State: CLAIMED
+State: REVIEW
 Owner: dylan-5
 Branch: feat/hack-033
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-033
@@ -9,14 +9,15 @@ Priority: P0
 Paths: web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/public/design-lock/, web/index.html
 Depends: HACK-022
 Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/uak lint`
-Lease-Until: 1795791766
-Updated: 1795789066
+Lease-Until: 1795812449
+Updated: 1795798049
 Task-Base: f28a5352e73165d9d539db0cadf797c09779138c
-Next: read spec, write tests, red
-PR: -
-Evidence: -
-Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5)
-Events: 5
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/34; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/34
+Evidence: design-critic SHIP 5aab746 (inicio, cobrar, cobrar-pagado, cierre at 390 and 1280 in web/public/design-lock/screens + .uak-shots/HACK-033); build exit 0; design-lint PASS; uak lint LINT_OK; web tests 66/67: only negocio/nav.test.tsx fails (menu list lacks Aliados, outside Paths, on main already; msg #172). Direction chosen by the human: 'la direccion 1' (decision recorded).
+Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5); author dylan-5 (unknown)
+Events: 6
 Checkpoints: 0
 Sessions: 4
 Last-Checkpoint: 0
+Task-Tip: 5aab7469582e646cc0e42428eb1fd89b48eb6833
