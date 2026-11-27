@@ -120,7 +120,7 @@ function MobileBar({ menu, active, onSelect }: Props) {
         )}
       >
         {hero ? (
-          <span className={cx("grid size-11 place-items-center rounded-full bg-accent text-accent-ink", on && "ring-2 ring-accent ring-offset-2")}>
+          <span className={cx("mt-1 grid size-9 place-items-center rounded-full", on ? "bg-tint text-accent ring-2 ring-accent" : "bg-accent text-accent-ink")}>
             <Icon size={24} aria-hidden="true" />
           </span>
         ) : (
@@ -131,7 +131,7 @@ function MobileBar({ menu, active, onSelect }: Props) {
     );
   };
   return (
-    <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-10 border-t border-hairline bg-surface shadow-bar md:hidden">
+    <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-20 border-t border-hairline bg-surface shadow-bar md:hidden">
       {open && (
         <div role="dialog" aria-label="Más opciones" className="absolute inset-x-0 bottom-full border-t border-hairline bg-surface p-3 shadow-bar">
           <ul className="grid grid-cols-2 gap-2">
