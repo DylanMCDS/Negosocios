@@ -27,3 +27,4 @@
 - 1795737815 | REVIEW | dylan-1 | review; approve; SHA 7c349db998558c2a706320f4485d89b88bf0d58e; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795737822 | REVIEW | dylan-3 | heartbeat; lease until 1795752222 | Harness: codex | Model: gpt-6.1-sol
 - 1795737859 | REVIEW | dylan-3 | heartbeat; lease until 1795752259 | Harness: codex | Model: gpt-6.1-sol
+- 1795737893 | REVIEW | dylan-3 | pending decision HACK-002-1795737893; option: Request review on bcabc41 through done because merge gate rejects carried approval; Why: AGENTS says main merge needs no new review; gate reports MERGE_WAIT stale SHA after clean automatic merge | Harness: codex | Model: gpt-6.1-sol
