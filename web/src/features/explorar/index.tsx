@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, NavigationArrow } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
-import { Button, Chip, PageHeader, PageLayout, SectionHeader, Surface } from "../../lib/ui";
+import { Button, Chip, PageHeader, PageLayout, Surface } from "../../lib/ui";
 
 // Demo tianguis (CDMX centro): where the map opens and the list is measured from until the person shares a location.
 const DEMO_CENTER = { lat: 19.432, lng: -99.133 };
@@ -144,7 +144,6 @@ export default function Explorar() {
         aside={
           <div className="flex flex-col gap-6">
             <Surface className="flex flex-col gap-4">
-              <SectionHeader title="Filtros" size="sm" />
               <div className="flex flex-wrap gap-2">
                 {categories.map((c) => (
                   <button key={c} type="button" aria-pressed={category === c} className={pill(category === c)} onClick={() => setCategory(category === c ? null : c)}>
@@ -152,11 +151,25 @@ export default function Explorar() {
                   </button>
                 ))}
               </div>
-              <label className="flex items-center gap-3"><input type="checkbox" className="size-6 accent-accent" checked={openNow} onChange={(e) => setOpenNow(e.target.checked)} />Abierto ahora</label>
-              <label className="flex items-center gap-3"><input type="checkbox" className="size-6 accent-accent" checked={allied} onChange={(e) => setAllied(e.target.checked)} />Con promoción de aliado</label>
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-[length:var(--text-s)]">
+                <label className="flex items-center gap-2"><input type="checkbox" className="size-5 accent-accent" checked={openNow} onChange={(e) => setOpenNow(e.target.checked)} />Abierto ahora</label>
+                <label className="flex items-center gap-2"><input type="checkbox" className="size-5 accent-accent" checked={allied} onChange={(e) => setAllied(e.target.checked)} />Con promoción de aliado</label>
+              </div>
               <Button variant="secondary" size="sm" onClick={locate}><NavigationArrow size={20} aria-hidden="true" />Cerca de mí</Button>
               {note && <p className="text-ink-2">{note}</p>}
             </Surface>
+            {current && (
+              <Surface className="flex flex-col gap-3">
+                <h2 className="font-display text-[length:var(--text-l)]">{current.name}</h2>
+                <p className="text-ink-2">{current.category} · {current.zone}</p>
+                <p>{current.verified && current.verification_text ? `Verificado: ${current.verification_text}` : "Sin verificar"}</p>
+                <p>{rep && rep.rating !== null ? `${rep.rating.toFixed(1)} de 5 · ${rep.reviews_count} reseñas` : "Aún sin reseñas"}</p>
+                {rep && rep.endorsements > 0 && <p>{`Recomendado por ${rep.endorsements} ${rep.endorsements === 1 ? "aliado" : "aliados"}`}</p>}
+                <ul>{DAYS.filter(([k]) => current.schedule[k]).map(([k, label]) => <li key={k}>{`${label} ${current.schedule[k].open} a ${current.schedule[k].close}`}</li>)}</ul>
+                <a className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4" href={`/?negocio=${encodeURIComponent(current.business_id)}#negocio`}>Paga aquí con CoDi</a>
+                {current.demo_data && <p className="text-[length:var(--text-s)] text-ink-2">Datos de ejemplo</p>}
+              </Surface>
+            )}
             {failed && <p role="alert">No pudimos cargar los negocios. Intenta de nuevo.</p>}
             {items && visible.length === 0 && !failed && <p className="text-ink-2">No hay negocios con esos filtros.</p>}
             <ul className="flex flex-col divide-y divide-hairline">
@@ -170,23 +183,11 @@ export default function Explorar() {
                 </li>
               ))}
             </ul>
-            {current && (
-              <Surface className="flex flex-col gap-3">
-                <h2 className="font-display text-[length:var(--text-l)]">{current.name}</h2>
-                <p className="text-ink-2">{current.category} · {current.zone}</p>
-                <p>{current.verified && current.verification_text ? `Verificado: ${current.verification_text}` : "Sin verificar"}</p>
-                <p>{rep && rep.rating !== null ? `${rep.rating.toFixed(1)} de 5 · ${rep.reviews_count} reseñas` : "Aún sin reseñas"}</p>
-                {rep && rep.endorsements > 0 && <p>{`Recomendado por ${rep.endorsements} ${rep.endorsements === 1 ? "aliado" : "aliados"}`}</p>}
-                <ul>{DAYS.filter(([k]) => current.schedule[k]).map(([k, label]) => <li key={k}>{`${label} ${current.schedule[k].open} a ${current.schedule[k].close}`}</li>)}</ul>
-                <a className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4" href={`/?negocio=${encodeURIComponent(current.business_id)}#negocio`}>Paga aquí con CoDi</a>
-                {current.demo_data && <p className="text-[length:var(--text-s)] text-ink-2">Datos de ejemplo</p>}
-              </Surface>
-            )}
           </div>
         }
       >
         <div className="flex flex-col gap-3">
-          <div ref={mapEl} className="min-h-[420px] w-full overflow-hidden rounded-lg border border-line bg-tint" aria-label="Mapa de negocios cercanos" />
+          <div ref={mapEl} className="min-h-[560px] w-full overflow-hidden rounded-lg border border-line bg-tint" aria-label="Mapa de negocios cercanos" />
           {mapState === "failed" && <p className="text-ink-2">El mapa no está disponible: usa la lista.</p>}
           {mapState === "no-tiles" && <p className="text-ink-2">No pudimos cargar el mapa: usa la lista.</p>}
         </div>
