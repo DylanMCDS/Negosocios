@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import QRCode from "qrcode";
-import { Printer, WarningCircle } from "@phosphor-icons/react";
+import { CheckCircle, Printer, WarningCircle } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui";
@@ -9,7 +9,7 @@ import { BUSINESS_CHANGED, DEMO_BUSINESS_NAME, listMyBusinesses, setActiveBusine
 import { clabeComplete, clabeError } from "./clabe";
 
 const field =
-  "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:tracking-tighter placeholder:text-ink-2";
+  "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:tracking-tighter placeholder:font-normal placeholder:text-ink-2";
 
 const publicId = () => new URLSearchParams(window.location.search).get("negocio");
 const profileUrl = (id: string) => `${window.location.origin}/?negocio=${encodeURIComponent(id)}#negocio`;
@@ -177,18 +177,21 @@ function MisPuestos({ activeId, onNew }: { activeId: string | null; onNew: () =>
   return (
     <Surface className="mx-auto mt-6 flex w-full max-w-xl flex-col gap-4">
       <h2 className="font-display text-[length:var(--text-l)]">Mis puestos</h2>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col divide-y divide-hairline">
         {rows.map((r) => {
           const on = r.id === activeId;
           return (
-            <li key={r.id ?? "demo"} className="flex min-h-14 items-center justify-between gap-3 rounded-md bg-tint px-4">
-              <span className="min-w-0 break-words">{r.name}</span>
+            <li key={r.id ?? "demo"} className="flex min-h-14 items-center justify-between gap-3 py-2">
+              <span className={on ? "flex min-w-0 items-center gap-2 break-words font-display" : "min-w-0 break-words text-ink-2"}>
+                {on && <CheckCircle size={20} weight="fill" aria-hidden="true" className="shrink-0 text-ok-ink" />}
+                {r.name}
+              </span>
               {on ? <Chip tone="ok">Activo</Chip> : <Button size="sm" variant="secondary" onClick={() => setActiveBusiness(r.id)}>Cambiar</Button>}
             </li>
           );
         })}
       </ul>
-      <Button onClick={onNew}>+ Dar de alta otro puesto</Button>
+      <Button variant="secondary" onClick={onNew}>+ Dar de alta otro puesto</Button>
     </Surface>
   );
 }

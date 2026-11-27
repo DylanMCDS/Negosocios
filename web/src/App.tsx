@@ -71,7 +71,7 @@ export default function App() {
         />
       }
     >
-      {view.id !== "pagar" && <ActiveBusiness />}
+      {view.id !== "pagar" && view.id !== "negocio" && <ActiveBusiness />}
       {Screen ? <Screen /> : <Soon title={view.label} />}
     </AppShell>
   );
