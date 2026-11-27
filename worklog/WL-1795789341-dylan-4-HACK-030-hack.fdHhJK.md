@@ -6,7 +6,7 @@
 - Why: regla autor≠revisor
 - Failing: ninguna; nav.test.tsx:17 era de HACK-039 (integrada)
 - Commands: uv run pytest -q app/tests/test_points.py && npm --prefix web test -- --run src/features/puntos && npm --prefix web run build
-- Next: uak wait HACK-030 --for approve; atender reject si llega
+- Next: Integrated in main: cf4085ac1dddcda884c5e66644cd31d71f6a8f6d
 
 ## History
 - 1795789341 | CLAIMED | dylan-4 | claim; next: Leer contrato de puntos NFC/QR; tests primero, uak red HACK-030; implementar, Verify y REVIEW | Harness: unknown | Model: unknown
@@ -19,3 +19,4 @@
 - 1795800630 | REVIEW | dylan-2 | heartbeat; lease until 1795815030 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795800948 | REVIEW | dylan-2 | checkpoint; next: uak wait HACK-030 --for approve; atender reject si llega | Harness: unknown | Model: unknown
 - 1795801125 | REVIEW | dylan-1 | review; approve; SHA 549a6d832af2a7476ce10ce2a080dd0b895d4c09; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795801212 | INTEGRATED | dylan-2 | merge; smoke and Verify PASS (smoke: full); commit cf4085ac1dddcda884c5e66644cd31d71f6a8f6d; reviewer dylan-1 | Harness: unknown | Model: unknown
