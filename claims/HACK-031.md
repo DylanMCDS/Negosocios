@@ -15,4 +15,4 @@ Task-Base: a61e05a94837ba1c973e316630aa4960e088ecf0
 Next: Start with CLABE check digit (weights 3-7-1 mod 10) in app/services/payout_accounts.py, tests first: rejects_clabe_with_wrong_check_digit, stores_only_bank_and_last_four; note app/db.py is not in Paths so create payout_accounts table inside the service (see recurring.py _ensure pattern); web/src/features/pagar overlaps HACK-010 (dylan-1)
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 95
