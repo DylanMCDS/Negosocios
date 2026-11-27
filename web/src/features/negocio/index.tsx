@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import QRCode from "qrcode";
-import { MapPin, Printer } from "@phosphor-icons/react";
+import { Printer } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business } from "../../lib/types";
-import { Button, Chip, PageHeader, PageLayout, Surface } from "../../lib/ui";
+import { Button, PageHeader, PageLayout, Surface } from "../../lib/ui";
 import { getBusinessId, saveBusinessId } from "./businessId";
 
 const field =
@@ -21,7 +21,7 @@ function FixedQr({ value }: { value: string }) {
       viewBox={`-2 -2 ${size + 4} ${size + 4}`}
       role="img"
       aria-label="QR fijo del puesto"
-      className="aspect-square w-full max-w-[420px] fill-ink"
+      className="aspect-square w-full max-w-[480px] fill-ink"
       shapeRendering="crispEdges"
     >
       {cells.map(([x, y]) => (
@@ -93,18 +93,12 @@ function Perfil({ business, owner }: { business: Business; owner: boolean }) {
         </Surface>
       }
     >
-      <div className="flex flex-col gap-2">
-        <h2 className="font-display text-[length:var(--text-xl)]">{business.name}</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <Chip size="sm">{business.category}</Chip>
-          <span className="flex items-center gap-1 text-ink-2"><MapPin size={20} aria-hidden="true" />{business.zone}</span>
-        </div>
-        {business.temporary_location && <p className="text-ink-2">Hoy: {business.temporary_location}</p>}
-      </div>
       {owner && (
-        <div className="flex flex-col items-start gap-4 rounded-lg bg-tint p-6">
-          <FixedQr value={profileUrl(business.id)} />
-          <Button variant="secondary" size="sm" onClick={() => window.print()}>
+        <div className="flex flex-col items-center gap-6 rounded-lg bg-tint p-6">
+          <div className="w-full max-w-[480px] rounded-md bg-surface p-4">
+            <FixedQr value={profileUrl(business.id)} />
+          </div>
+          <Button onClick={() => window.print()}>
             <Printer size={20} aria-hidden="true" />
             Imprimir
           </Button>
@@ -125,10 +119,12 @@ export default function Negocio() {
     if (lookup) api<Business>(`/businesses/${encodeURIComponent(lookup)}`).then(setBusiness, () => setFailed(true));
   }, [lookup]);
 
-  const title = business ? "Mi puesto" : "Alta de tu puesto";
+  const lead = business
+    ? [business.category, business.zone, business.temporary_location && `Hoy: ${business.temporary_location}`].filter(Boolean).join(" · ")
+    : "Tres datos y listo.";
   return (
     <>
-      <PageHeader title={viewId ? "Perfil del puesto" : title} lead={business ? undefined : "Tres datos y listo."} />
+      <PageHeader title={business ? business.name : "Alta de tu puesto"} lead={lead} />
       {failed && <p role="alert">No encontramos ese puesto.</p>}
       {business ? (
         <Perfil business={business} owner={!viewId && business.id === ownId} />
