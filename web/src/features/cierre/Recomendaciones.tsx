@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CalendarCheck, Lightbulb } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
-import { Button, Chip, SectionHeader } from "../../lib/ui";
+import { Button, Chip, DataBadge, SectionHeader } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
 
 interface Rec {
@@ -20,6 +20,7 @@ interface Commitment {
   daily_reserve_cents: number;
 }
 interface Data {
+  demo_data?: boolean;
   recommendations: Rec[];
   commitments: Commitment[];
 }
@@ -61,7 +62,7 @@ export default function Recomendaciones({ businessId }: { businessId: string }) 
   return (
     <>
       <section className="flex flex-col gap-2">
-        <SectionHeader title="Recomendaciones" size="sm" />
+        <SectionHeader title="Recomendaciones" size="sm" action={data.demo_data ? <DataBadge /> : undefined} />
         <ul className="flex flex-col divide-y divide-hairline">
           {data.recommendations.map((r) => (
             <li key={`${r.kind}-${r.key ?? r.text}`} className="flex flex-col gap-2 py-3">

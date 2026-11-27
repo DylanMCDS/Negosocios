@@ -138,3 +138,29 @@ def test_demo_history_endpoint_loads_labeled_history_once(conn):
     got = client.get("/api/recommendations", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
     assert any(r["kind"] == "recurring_proposal" and r["period"] == "monthly" for r in got["recommendations"])
     assert client.post("/api/recommendations/demo-history", params={"business_id": "nadie"}).status_code == 404
+
+
+def test_future_expenses_do_not_count_toward_the_reference_date(conn):
+    for i, day in enumerate(["2026-10-01", "2026-11-01", "2026-12-01"]):
+        _expense(conn, f"f{i}", "Renta del local", 120000, day)
+    out = recurring.recommendations(conn, "rosa", TODAY)
+    assert _by_kind(out, "recurring_proposal") == []  # only two payments exist as of 2026-11-26
+
+
+def test_demo_provenance_is_reported(conn):
+    recurring.seed_history(conn, "rosa", TODAY)
+    out = recurring.recommendations(conn, "rosa", TODAY)
+    assert out["demo_data"] is True
+    assert all(r["demo_data"] is True for r in out["recommendations"] if r["kind"] != "best_margin")
+    real = connect(conn.execute("PRAGMA database_list").fetchone()[2])
+    real.execute("DELETE FROM expenses")
+    for i, day in enumerate(["2026-09-01", "2026-10-01", "2026-11-01"]):
+        real.execute(
+            "INSERT INTO expenses (id, business_id, amount_cents, category, date, description) VALUES (?, 'rosa', 120000, 'Puesto', ?, 'Renta del local')",
+            (f"r{i}", day),
+        )
+    real.commit()
+    real.close()
+    mine = recurring.recommendations(conn, "rosa", TODAY)
+    assert mine["demo_data"] is False
+    assert mine["recommendations"][0]["demo_data"] is False

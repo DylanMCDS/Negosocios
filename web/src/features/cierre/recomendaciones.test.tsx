@@ -68,6 +68,20 @@ describe("Recomendaciones", () => {
     expect(JSON.parse(calls.find((c) => c.method === "POST")!.body!).decision).toBe("dismiss");
   });
 
+  it("labels_recommendations_built_from_demo_data", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ ...before, demo_data: true }), { status: 200 })));
+    render(<Recomendaciones businessId="rosa" />);
+    await screen.findByText(/reserva \$240 diarios/);
+    expect(screen.getAllByText(/datos de ejemplo/i).length).toBeGreaterThan(0);
+  });
+
+  it("shows_no_demo_label_for_real_data", async () => {
+    mockApi();
+    render(<Recomendaciones businessId="rosa" />);
+    await screen.findByText(/reserva \$240 diarios/);
+    expect(screen.queryByText(/datos de ejemplo/i)).not.toBeInTheDocument();
+  });
+
   it("renders_nothing_when_the_response_has_an_unexpected_shape", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ currency: "MXN" }), { status: 200 })));
     const { container } = render(<Recomendaciones businessId="rosa" />);

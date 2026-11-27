@@ -78,10 +78,11 @@ def _next_due(last: date, period: str) -> date:
     return last + timedelta(days=next(n for p, _, _, n in PERIODS if p == period))
 
 
-def _groups(conn: sqlite3.Connection, business_id: str) -> dict[str, list[dict]]:
+def _groups(conn: sqlite3.Connection, business_id: str, today: date) -> dict[str, list[dict]]:
     rows = conn.execute(
-        "SELECT id, amount_cents, date, description, category FROM expenses WHERE business_id = ? ORDER BY date, id",
-        (business_id,),
+        "SELECT id, amount_cents, date, description, category, demo_data FROM expenses"
+        " WHERE business_id = ? AND date <= ? ORDER BY date, id",  # nothing after the reference date counts
+        (business_id, today.isoformat()),
     ).fetchall()
     groups: dict[str, list[dict]] = {}
     for r in rows:
@@ -92,6 +93,10 @@ def _groups(conn: sqlite3.Connection, business_id: str) -> dict[str, list[dict]]
 
 def _used(items: list[dict]) -> list[dict]:
     return [{"id": i["id"], "date": i["date"], "amount_cents": i["amount_cents"]} for i in items]
+
+
+def _demo(items: list[dict]) -> bool:
+    return any(i["demo_data"] for i in items)
 
 
 def _proposals(groups: dict[str, list[dict]], today: date) -> list[dict]:
@@ -117,7 +122,7 @@ def _proposals(groups: dict[str, list[dict]], today: date) -> list[dict]:
             "kind": "recurring_proposal", "key": label, "label": label, "period": period,
             "amount_cents": amount, "next_due": due.isoformat(), "days_until": until,
             "daily_reserve_cents": reserve, "occurrences": len(items), "text": text,
-            "data_used": _used(items), "missing_data": [],
+            "data_used": _used(items), "missing_data": [], "demo_data": _demo(items),
         })
     return sorted(out, key=lambda p: (p["next_due"], p["key"]))
 
@@ -134,7 +139,7 @@ def _growth(groups: dict[str, list[dict]], today: date) -> list[dict]:
                 "kind": "growing_expense", "label": label, "change_pct": pct,
                 "period": "últimos 7 días vs. los 7 anteriores",
                 "text": f"El gasto en {label} subió {pct} % vs. la semana pasada",
-                "data_used": _used(prev + last), "missing_data": [],
+                "data_used": _used(prev + last), "missing_data": [], "demo_data": _demo(prev + last),
             })
     return out
 
@@ -143,7 +148,7 @@ def recommendations(conn: sqlite3.Connection, business_id: str, today: date | No
     """Read-only on data: proposals are computed, never stored until the owner decides."""
     today = _today(today)
     _ensure(conn)
-    groups = _groups(conn, business_id)
+    groups = _groups(conn, business_id, today)
     decided = {r["key"]: r for r in conn.execute("SELECT * FROM recurring_decisions WHERE business_id = ?", (business_id,))}
     proposals = [p for p in _proposals(groups, today) if p["key"] not in decided]
     commitments = []
@@ -163,9 +168,10 @@ def recommendations(conn: sqlite3.Connection, business_id: str, today: date | No
         "text": "Para decirte qué producto te deja mejor margen necesito el precio y el costo de cada producto.",
         "data_used": [{"fuente": "gastos registrados", "cantidad": total}],
         "missing_data": ["precio por producto", "costo variable por producto"],
+        "demo_data": any(_demo(v) for v in groups.values()),
     }
     return {
-        "business_id": business_id, "as_of": today.isoformat(),
+        "business_id": business_id, "as_of": today.isoformat(), "demo_data": margin["demo_data"],
         "recommendations": [*proposals, *_growth(groups, today), margin], "commitments": commitments,
     }
 
