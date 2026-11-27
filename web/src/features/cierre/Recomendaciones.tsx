@@ -27,6 +27,7 @@ interface Data {
 const valid = (d: unknown): d is Data =>
   typeof d === "object" && d !== null && Array.isArray((d as Data).recommendations) && Array.isArray((d as Data).commitments);
 
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 const when = (n: number) => (n < 0 ? `Venció hace ${-n} días` : n === 0 ? "Hoy" : `En ${n} ${n === 1 ? "día" : "días"}`);
 
 export default function Recomendaciones({ businessId }: { businessId: string }) {
@@ -55,6 +56,8 @@ export default function Recomendaciones({ businessId }: { businessId: string }) 
   }
 
   if (!data) return null;
+  // One filled primary per view: only the first pending proposal gets it.
+  const firstKey = data.recommendations.find((r) => r.kind === "recurring_proposal")?.key;
   return (
     <>
       <section className="flex flex-col gap-2">
@@ -71,8 +74,8 @@ export default function Recomendaciones({ businessId }: { businessId: string }) 
               )}
               {r.kind === "recurring_proposal" && r.key && (
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => decide(r.key!, "confirm")}>Confirmar</Button>
-                  <Button size="sm" variant="secondary" onClick={() => decide(r.key!, "dismiss")}>Descartar</Button>
+                  <Button size="sm" variant={r.key === firstKey ? "primary" : "secondary"} onClick={() => decide(r.key!, "confirm")}>Confirmar</Button>
+                  <Button size="sm" variant="ghost" onClick={() => decide(r.key!, "dismiss")}>Descartar</Button>
                 </div>
               )}
             </li>
@@ -89,7 +92,7 @@ export default function Recomendaciones({ businessId }: { businessId: string }) 
             {data.commitments.map((c) => (
               <li key={c.key} className="flex min-h-14 items-center gap-4 py-2">
                 <CalendarCheck size={28} aria-hidden="true" />
-                <p className="flex-1 font-semibold">{c.label}</p>
+                <p className="flex-1 font-semibold">{cap(c.label)}</p>
                 <p className="font-display">{mxn(c.amount_cents)}</p>
                 <Chip size="sm">{when(c.days_until)}</Chip>
               </li>
