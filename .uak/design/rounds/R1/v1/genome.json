@@ -1,0 +1,44 @@
+{
+  "id": "R1-v1",
+  "round": "R1",
+  "variant": 1,
+  "seed": 59194,
+  "screen": "landing",
+  "genes": {
+    "type": "rounded",
+    "scale": "bold",
+    "color": "ink + one accent",
+    "layout": "product screen first",
+    "components": "soft",
+    "imagery": "type only",
+    "motion": "still",
+    "voice": "numbers first",
+    "stage": "real video with a live overlay"
+  },
+  "recipe": "motionsites",
+  "why": {
+    "type": "spread",
+    "scale": "spread",
+    "color": "spread · project colors #EDE6FF #1B1030 #5B4F73",
+    "layout": "spread",
+    "components": "spread",
+    "imagery": "spread · needs none",
+    "motion": "spread",
+    "voice": "spread",
+    "stage": "spread"
+  },
+  "ground": "light",
+  "creativity": 3,
+  "composition": "frame",
+  "motif": {
+    "family": "typographic poster",
+    "text": "the word \"Pagado\" set at poster scale in money green, as the stamp a puesto's customer waits to see."
+  },
+  "fonts": {
+    "display": "Fredoka",
+    "display_weights": "600",
+    "body": "Mukta",
+    "body_weights": "400;600",
+    "url": "https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Mukta:wght@400;600&display=swap"
+  }
+}

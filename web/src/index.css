@@ -1,33 +1,35 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Commissioner:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Mukta:wght@400;600&display=swap");
 @import "tailwindcss";
 
-/* Design lock: direction R1-v1 "Mono-led". Tokens only; screens never type a color. */
+/* Design lock v2: direction R1-v1 "Puesto de tianguis" (Fredoka + Mukta, green for money). Tokens only; screens never type a color. */
 :root {
   --bg: #f8f5ff;
   --surface: #ffffff;
   --tint: #ede6ff;
   --text: #1b1030;
   --text-2: #5b4f73;
-  --line: #1b1030;
+  --line: #8d80ab; /* control borders and dividers that need 3:1; never near-black */
   --hairline: #d9cff0;
   --accent: #7e14ff;
   --accent-hover: #863bff;
   --accent-ink: #ffffff;
+  --money: #0b7a47; /* paid / money in: the success color */
   --sky: #47bfff;
-  --ok: #d3f1df;
-  --ok-ink: #0a4a29;
+  --ok: #d9f2e3;
+  --ok-ink: #0a5a33;
   --warn: #ffe7b0;
   --warn-ink: #5a3800;
   --bad: #ffd6da;
   --bad-ink: #7a0c1c;
   --disabled: #e7e1f3;
   --disabled-ink: #5e5475;
-  --shadow: 0 1px 2px rgb(27 16 48 / 0.06), 0 8px 24px rgb(27 16 48 / 0.08);
+  --shadow: 0 1px 2px rgb(27 16 48 / 0.05), 0 10px 30px rgb(27 16 48 / 0.08);
+  --shadow-bar: 0 -6px 24px rgb(27 16 48 / 0.08);
 }
 
 @theme {
-  --font-display: "DM Mono", ui-monospace, monospace;
-  --font-sans: "Commissioner", system-ui, sans-serif;
+  --font-display: "Fredoka", system-ui, sans-serif;
+  --font-sans: "Mukta", system-ui, sans-serif;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-tint: var(--tint);
@@ -38,6 +40,7 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-ink: var(--accent-ink);
+  --color-money: var(--money);
   --color-sky: var(--sky);
   --color-ok: var(--ok);
   --color-ok-ink: var(--ok-ink);
@@ -48,16 +51,17 @@
   --color-disabled: var(--disabled);
   --color-disabled-ink: var(--disabled-ink);
   --shadow-lift: var(--shadow);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  /* Type scale: 14 / 18 / 24 / 32 / 48 / 72 */
-  --text-s: 0.875rem;
+  --shadow-bar: var(--shadow-bar);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  /* Type scale (ratio >= 1.25): 16 / 18 / 24 / 32 / 44 / 64. Text is never below 16 px except the 14 px nav labels. */
+  --text-s: 1rem;
   --text-body: 1.125rem;
   --text-l: 1.5rem;
   --text-xl: 2rem;
-  --text-2xl: 3rem;
-  --text-hero: 4.5rem;
+  --text-2xl: 2.75rem;
+  --text-hero: 4rem;
 }
 
 html, body { background: var(--bg); color: var(--text); }
@@ -68,7 +72,7 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
-h1, h2, h3, .font-display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; }
+h1, h2, h3, .font-display { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

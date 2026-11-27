@@ -14,7 +14,7 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost"; size?: Size }) {
   const look = {
     primary: "bg-accent text-accent-ink hover:bg-accent-hover disabled:bg-disabled disabled:text-disabled-ink",
-    secondary: "bg-surface text-ink border border-line hover:bg-tint disabled:text-disabled-ink disabled:border-hairline",
+    secondary: "bg-tint text-accent hover:bg-hairline disabled:bg-disabled disabled:text-disabled-ink",
     ghost: "bg-transparent text-ink hover:bg-tint disabled:text-disabled-ink",
   }[variant];
   const dims = size === "sm" ? "h-11 px-4 text-[length:var(--text-s)]" : "h-14 px-6 text-[length:var(--text-body)]";
@@ -22,7 +22,7 @@ export function Button({
     <button
       {...rest}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-md font-display font-medium transition-colors cursor-pointer disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 rounded-full font-display transition-colors cursor-pointer disabled:cursor-not-allowed",
         look,
         dims,
         className,
@@ -44,7 +44,7 @@ export function Surface({
   children: ReactNode;
 }) {
   return (
-    <Tag className={cx("rounded-lg border border-hairline bg-surface shadow-lift", size === "sm" ? "p-4" : "p-6 md:p-8", className)}>
+    <Tag className={cx("rounded-lg bg-surface shadow-lift", size === "sm" ? "p-4" : "p-6 md:p-8", className)}>
       {children}
     </Tag>
   );
@@ -68,7 +68,7 @@ export function Chip({
   return (
     <span
       className={cx(
-        "inline-flex items-center rounded-full font-display font-medium",
+        "inline-flex items-center rounded-full font-display",
         look,
         size === "sm" ? "h-7 px-3 text-[length:var(--text-s)]" : "h-9 px-4 text-[length:var(--text-body)]",
       )}
@@ -98,7 +98,7 @@ export function Stat({
   return (
     <div className="flex flex-col gap-1">
       <p className="text-[length:var(--text-s)] text-ink-2">{label}</p>
-      <p className={cx("font-display font-medium leading-none tracking-tight", big)}>
+      <p className={cx("font-display leading-none tracking-tight", big)}>
         {value}
         {unit && <span className="ml-2 text-[length:var(--text-s)] text-ink-2">{unit}</span>}
       </p>
@@ -109,7 +109,7 @@ export function Stat({
 
 export function SectionHeader({ title, action, size = "md" }: { title: string; action?: ReactNode; size?: Size }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-line pb-3">
+    <div className="flex items-center justify-between gap-4 border-b border-hairline pb-3">
       <h2 className={size === "sm" ? "text-[length:var(--text-body)]" : "text-[length:var(--text-l)]"}>{title}</h2>
       {action}
     </div>
@@ -133,7 +133,7 @@ export function DataBadge({ size = "sm" }: { size?: Size }) {
 
 export function PageHeader({ title, lead, action }: { title: string; lead?: string; action?: ReactNode }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
+    <header className="flex flex-wrap items-end justify-between gap-4 border-b border-hairline pb-6">
       <div className="flex max-w-[28ch] flex-col gap-2 md:max-w-none">
         <h1 className="text-[length:var(--text-xl)] leading-tight md:text-[length:var(--text-2xl)]">{title}</h1>
         {lead && <p className="max-w-[48ch] text-ink-2">{lead}</p>}
@@ -163,10 +163,10 @@ export interface NavItem {
 export function NavBar({ items, active, onSelect }: { items: NavItem[]; active: string; onSelect: (id: string) => void }) {
   return (
     <>
-      <nav aria-label="Principal" className="sticky top-0 z-10 hidden border-b border-line bg-bg md:block">
+      <nav aria-label="Principal" className="sticky top-0 z-10 hidden border-b border-hairline bg-bg md:block">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
           <a href="#landing" className="font-display text-[length:var(--text-l)] text-accent">negosocios</a>
-          <ul className="flex gap-1 rounded-full border border-line bg-surface p-1">
+          <ul className="flex gap-1 rounded-full bg-surface p-1 shadow-lift">
             {items.map((item) => (
               <li key={item.id}>
                 <button
@@ -186,7 +186,7 @@ export function NavBar({ items, active, onSelect }: { items: NavItem[]; active: 
           </ul>
         </div>
       </nav>
-      <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface md:hidden">
+      <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-10 border-t border-hairline bg-surface shadow-bar md:hidden">
         <ul className="grid" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
           {items.map((item) => (
             <li key={item.id}>
@@ -195,8 +195,8 @@ export function NavBar({ items, active, onSelect }: { items: NavItem[]; active: 
                 aria-current={item.id === active ? "page" : undefined}
                 onClick={() => onSelect(item.id)}
                 className={cx(
-                  "flex h-16 w-full cursor-pointer flex-col items-center justify-center gap-0.5 font-display text-[length:var(--text-s)]",
-                  item.id === active ? "bg-accent text-accent-ink" : "text-ink",
+                  "flex h-16 w-full cursor-pointer flex-col items-center justify-center gap-0.5 font-display text-[0.875rem]",
+                  item.id === active ? "bg-tint text-accent" : "text-ink-2",
                 )}
               >
                 {item.icon}
