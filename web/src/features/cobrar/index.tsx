@@ -264,9 +264,9 @@ export default function Cobrar() {
         lead={showOrder ? "Muestra el QR. Tu cliente paga con su celular." : "Escribe el importe y cobra."} />
       {/* Mobile: amount on top, keypad under it, Cobrar fixed above the bottom nav (bottom-16 = nav height). pb leaves room for both. */}
       <div data-cobrar-page className="grid gap-6 py-6 pb-28 md:gap-8 md:py-8 md:pb-0 lg:grid-cols-[minmax(0,1fr)_400px]">
-        <div className="flex min-w-0 flex-col gap-6">
+        <div className={showOrder ? "flex min-w-0 flex-col gap-6 lg:contents" : "flex min-w-0 flex-col gap-6"}>
               {!showOrder && waiting.length > 0 && (
-                <Surface className="flex flex-col gap-2 p-3" aria-live="polite">
+                <div className="flex flex-col gap-1 rounded-lg border border-line bg-surface p-3" aria-live="polite">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-display text-[length:var(--text-s)]">{waiting.length === 1 ? "Tienes 1 cobro pendiente" : `Tienes ${waiting.length} cobros pendientes`}</p>
                     <a className="inline-flex min-h-11 shrink-0 items-center text-[length:var(--text-s)] text-ink-2 underline" href="#cierre">Ir a Cierre</a>
@@ -278,9 +278,9 @@ export default function Cobrar() {
                       </Button>
                     ))}
                   </div>
-                </Surface>
+                </div>
               )}
-          <Surface className={showOrder ? "order-2 flex flex-col gap-4 lg:order-1" : "flex flex-col gap-4"}>
+          <Surface className={showOrder ? "order-2 flex flex-col gap-4 lg:order-none lg:col-start-2 lg:row-start-1" : "flex flex-col gap-4"}>
             <Stat label="Importe" value={order ? pesos(order.amount_cents) : formatTyping(digits)} unit="MXN" hero />
             {showOrder && (
               <>
@@ -292,14 +292,14 @@ export default function Cobrar() {
             )}
           </Surface>
           {showOrder && order.qr_string ? (
-            <div className="order-1 relative flex justify-center rounded-lg lg:order-2 border border-line bg-tint p-3 md:p-12">
+            <div className="order-1 relative flex justify-center rounded-lg lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1 border border-line bg-tint p-3 md:p-12">
               <QrCubes value={order.qr_string} dim={phase === "paid"} />
             </div>
           ) : (
             keypad
           )}
         </div>
-        <aside className="flex min-w-0 flex-col gap-6">
+        <aside className={showOrder ? "flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-2" : "flex min-w-0 flex-col gap-6"}>
           {showOrder ? (
             <>
               {phase === "pending" && (
