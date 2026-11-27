@@ -26,3 +26,4 @@
 - 1795737722 | REVIEW | scheduler | deadline decision HACK-002-1795736001; option: Pause edits until one session owns this worktree; Why: Another session created app/tests/test_schemas.py and schema/db stubs during read-only reconnaissance; concurrent-writer warning confirmed
 - 1795737815 | REVIEW | dylan-1 | review; approve; SHA 7c349db998558c2a706320f4485d89b88bf0d58e; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795737822 | REVIEW | dylan-3 | heartbeat; lease until 1795752222 | Harness: codex | Model: gpt-6.1-sol
+- 1795737859 | REVIEW | dylan-3 | heartbeat; lease until 1795752259 | Harness: codex | Model: gpt-6.1-sol
