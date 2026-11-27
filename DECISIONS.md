@@ -46,3 +46,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795758579 | HACK-031 | Released due to critical plan pace (72% of 5h used); task is large (service+router+orders.py+pey bankAccountId+UI negocio/pagar+docs) | Why: Avoid blocking the task while I cannot finish it
 - 1795768852 | deadline lease/HACK-024/1795762661 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795768932 | HACK-037 | follow-up of HACK-022 by dylan-2: NavBar móvil: los grupos reparten el ancho en partes iguales y recortan Explorar a 390 px; repartir por número de entradas | Why: same Paths, no scope change
+- 1795770479 | HACK-038 | follow-up of HACK-025 by dylan-2: Alianzas: listar por negocio (GET /api/alliances?business_id=) y resolver por código de referido (GET /api/alliances/code/{code}) para la pantalla Aliados y Cobrar | Why: same Paths, no scope change

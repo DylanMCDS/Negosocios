@@ -281,3 +281,15 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Acceptance:**
   - NavBar móvil: los grupos reparten el ancho en partes iguales y recortan Explorar a 390 px; repartir por número de entradas
 - **Verify:** `npm --prefix web test -- --run src/test/nav.test.tsx && npm --prefix web run build`
+
+## HACK-038 · Alianzas: listar por negocio (GET /api/alliances?business_id=) y resolver por código de referido (GET /api/alliances/code/{code}) para la pantalla Aliados y Cobrar (follow-up of HACK-025)
+
+- **Type:** follow-up
+- **Priority:** P1
+- **Depends on:** HACK-025
+- **Follow-up of:** HACK-025
+- **Paths:** app/services/alliances.py, app/routers/alliances.py, app/services/reviews.py, app/routers/reviews.py, app/tests/test_alliances.py, app/tests/test_reviews.py
+- **Freeze-Allowed:** no
+- **Acceptance:**
+  - Alianzas: listar por negocio (GET /api/alliances?business_id=) y resolver por código de referido (GET /api/alliances/code/{code}) para la pantalla Aliados y Cobrar
+- **Verify:** `uv run pytest -q app/tests/test_alliances.py app/tests/test_reviews.py`
