@@ -127,3 +127,14 @@ def test_endpoints_propose_then_confirm(conn, monkeypatch):
     again = client.get("/api/recommendations", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
     assert [c["key"] for c in again["commitments"]] == [rent["key"]]
     assert client.get("/api/recommendations", params={"business_id": "nadie"}).status_code == 404
+
+
+def test_demo_history_endpoint_loads_labeled_history_once(conn):
+    client = TestClient(create_app(web_dist=None))
+    first = client.post("/api/recommendations/demo-history", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
+    assert first["demo_data"] is True and first["inserted"] > 0
+    second = client.post("/api/recommendations/demo-history", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
+    assert second["inserted"] == 0
+    got = client.get("/api/recommendations", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
+    assert any(r["kind"] == "recurring_proposal" and r["period"] == "monthly" for r in got["recommendations"])
+    assert client.post("/api/recommendations/demo-history", params={"business_id": "nadie"}).status_code == 404

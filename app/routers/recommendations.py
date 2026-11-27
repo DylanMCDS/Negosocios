@@ -31,3 +31,11 @@ def decide(body: Decision, conn: Conn, as_of: AsOf = None) -> dict:
     if not recurring.decide(conn, body.business_id, body.key, body.decision, as_of):
         raise HTTPException(404, "propuesta no encontrada")
     return recurring.recommendations(conn, body.business_id, as_of)
+
+
+@router.post("/api/recommendations/demo-history")
+def load_demo_history(business_id: str, conn: Conn, as_of: AsOf = None) -> dict:
+    """Loads the labeled demo expense history (demo_data). Idempotent. Real data is never touched."""
+    if not expenses_svc.business_exists(conn, business_id):
+        raise HTTPException(404, "negocio no encontrado")
+    return {"demo_data": True, "inserted": recurring.seed_history(conn, business_id, as_of)}
