@@ -76,11 +76,11 @@ export function MenuBar({ menu, active, onSelect }: Props) {
     <>
       <nav aria-label="Principal" className="sticky top-0 z-10 hidden border-b border-hairline bg-bg md:block">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-8">
-          <a href="#landing" className="font-display text-[length:var(--text-l)] text-accent">negosocios</a>
-          <div className="flex items-center gap-3 rounded-full bg-surface p-1 shadow-lift">
+          <a href="#landing" className="shrink-0 font-display text-[length:var(--text-l)] text-accent">negosocios</a>
+          <div className="flex min-w-0 items-center gap-3 overflow-x-auto rounded-full bg-surface p-1 shadow-lift">
             {menu.inicio.map((e) => button(e, false))}
             {groups.map((g) => (
-              <div key={g.key} role="group" aria-label={g.label} className="flex items-center gap-1 border-l border-hairline pl-3">
+              <div key={g.key} role="group" aria-label={g.label} className="flex shrink-0 items-center gap-1 border-l border-hairline pl-3">
                 <span aria-hidden="true" className="px-1 text-[length:var(--text-s)] text-ink-2">{g.label}</span>
                 {menu[g.key].map((e) => button(e, false))}
               </div>

@@ -43,7 +43,7 @@ Disabled: muted lilac fill `--disabled` with `--disabled-ink` text, never the ac
 ## Screens: one recipe and one hero each
 | Screen | Recipe (skill `product-ui` §2) | Hero |
 |---|---|---|
-| Inicio | `landing-story` | "Pagado en menos de 3 s" con la pantalla real de Cobrar en un marco de celular, bajo el toldo |
+| Inicio | `landing-story` | "Pagado al momento" con la pantalla real de Cobrar en un marco de celular, bajo el toldo |
 | Cobrar | flow | el QR CoDi grande sobre fondo tint, con el importe "100 MXN" y el estado Pendiente a Pagado (verde) |
 | Pagar | flow | el importe y el receptor ("Pagas a") antes del botón "Pagar 100 MXN" |
 | Cierre | dashboard | utilidad estimada en 44 px (64 en escritorio), con ventas y gastos debajo y lista de cobros |

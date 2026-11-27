@@ -2,8 +2,9 @@ import { CheckCircle } from "@phosphor-icons/react";
 import { Button, Chip, Surface } from "..";
 
 /* Locked "Inicio" (direction R1-v1, tianguis): the hero is the real Cobrar screen turning "Pagado".
-   The real landing (features/landing) copies this composition. Copy comes from IDEA.md §1, §2, §4;
-   "< 3 s" is the wow target stated there and is still to validate before the pitch. */
+   The real landing (features/landing) copies this composition. Copy comes from IDEA.md §1, §2, §4.
+   "< 3 s" is the wow TARGET stated in IDEA.md, not a measurement: it is labeled as a target and
+   must stay that way until it is measured with a real payment. */
 
 // Tianguis awning: lilac and purple stripes with a scalloped edge. Pure CSS, no image.
 const toldo = {
@@ -34,7 +35,7 @@ export default function Inicio() {
             Doña Rosa · puesto de tacos
           </span>
           <h1 className="text-[length:var(--text-2xl)] leading-[1.04] md:text-[length:var(--text-hero)]">
-            <span className="text-money">Pagado</span> en menos de 3&nbsp;s.
+            <span className="text-money">Pagado</span> al momento.
           </h1>
           <p className="max-w-[30ch] text-ink-2">Tu cliente paga con su celular y tu puesto recibe la confirmación verificada.</p>
           <div className="flex flex-wrap gap-3 pt-1">
@@ -71,7 +72,7 @@ export default function Inicio() {
       <div className="mx-auto max-w-6xl px-4 pb-10 md:px-8">
         <dl className="grid grid-cols-3 divide-x divide-hairline border-y border-hairline py-5">
           {[
-            ["< 3 s", "del pago al aviso en el puesto"],
+            ["Meta: < 3 s", "del pago al aviso en el puesto, aún sin medir"],
             ["$0", "de comisión en operaciones CoDi"],
             ["6", "pasos, del alta al cierre del día"],
           ].map(([figure, caption]) => (
