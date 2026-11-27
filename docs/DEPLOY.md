@@ -16,7 +16,7 @@
 - Cobro CoDi real de **$1.00 MXN** creado desde la pantalla Cobrar (`POST /api/orders` → `POST https://api.pey.mx/codi/qr`).
 - Pagado desde una app bancaria con CoDi; pey envió `codi.qr.payment_received` al webhook; la orden pasó a **"Pagado $1.00"** en Cobrar sin intervención manual.
 - Captura de la pantalla Cobrar en producción con **"Pagado $1.00"**: [`docs/evidence/cobro-real-pagado.png`](evidence/cobro-real-pagado.png).
-- Log de webhook de pey (`codi.qr.payment_received`, respuesta 200): `docs/evidence/pey-webhook-log.png` (pendiente de agregar).
+- Log de webhook de pey en portal.pey.mx (entrega con respuesta **200**, `webhook-id` `msg_8390ab6caef111e8e90fea126…`, 26 nov 2026): [`docs/evidence/pey-webhook-log.png`](evidence/pey-webhook-log.png).
 - El comprobante bancario no se publica en el repo porque contiene nombres y números de cuenta; Dylan lo conserva para la entrega.
 
 ## Lecciones del primer cobro
