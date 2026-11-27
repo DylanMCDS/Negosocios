@@ -26,7 +26,7 @@ function PointQr({ value, label }: { value: string; label: string }) {
   const cells: Array<[number, number]> = [];
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (data[y * size + x]) cells.push([x, y]);
   return <svg data-point-qr viewBox={`-4 -4 ${size + 8} ${size + 8}`} role="img" aria-label={`QR del punto ${label}`}
-    className="aspect-square w-full max-w-[240px] fill-ink" shapeRendering="crispEdges">
+    className="aspect-square w-full max-w-[360px] fill-ink" shapeRendering="crispEdges">
     {cells.map(([x, y]) => <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" />)}
   </svg>;
 }
@@ -167,7 +167,7 @@ function ManagePoints() {
               {(data.business.demo_data || selected.demo_data) && <DataBadge />}
               <Chip tone={selected.active ? "neutral" : "bad"}>{selected.active ? KIND[selected.kind] : "Revocado"}</Chip>
             </div>
-            {selected.active ? <PointQr value={url} label={selected.label} /> : <p>Este punto ya no está activo</p>}
+            {selected.active ? <div className="flex w-full justify-center rounded-lg bg-tint p-4 print:bg-transparent print:p-0"><PointQr value={url} label={selected.label} /></div> : <p>Este punto ya no está activo</p>}
             <p className="hidden break-all print:block">{url}</p>
           </div>
           {selected.active && <>
