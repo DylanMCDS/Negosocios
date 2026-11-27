@@ -9,8 +9,8 @@ Priority: P1
 Paths: app/services/voice_parse.py, app/routers/voice.py, app/tests/test_voice.py
 Depends: HACK-008
 Verify: `uv run pytest -q app/tests/test_voice.py`
-Lease-Until: 1795742025
-Updated: 1795739325
+Lease-Until: 1795742057
+Updated: 1795739357
 Task-Base: 660b7843143357bdcf8cc79c408332148f4f386d
 Next: tabla de frases de ejemplo en `app/tests/test_voice.py` y `uak red HACK-017`.
 PR: -
