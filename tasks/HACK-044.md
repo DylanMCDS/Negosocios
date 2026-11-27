@@ -15,9 +15,9 @@ Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
 Next: uak next y luego HACK-046 según instrucción del humano
 PR: https://github.com/DylanMCDS/Negosocios/pull/39
 Evidence: RED_OK rosa mismatch; npm --prefix web test -- --run src/features/voz:15 passed; npm --prefix web run build exit0; bash .uak/bin/design-lint PASS; bash .uak/bin/smoke PRODUCT_PASS exit0; Playwright reduced-motion PASS stop delayed result/cancel/8s timeout/denied/save active business/closing350; shots1280x720+390x844; design-critic SHIP b1f4bf4; advisor GO · red at 3e7339c: AssertionError: expected [ { business_id: 'rosa', …(5) } ] to deeply equal [ ObjectContaining{…} ]
-Participants: author dylan-3 (unknown)
-Events: 5
+Participants: author dylan-3 (unknown); reviewer dylan-1 (unknown) approve
+Events: 6
 Checkpoints: 3
-Sessions: 1
+Sessions: 2
 Last-Checkpoint: 1795819805
 Task-Tip: b1f4bf4e368eb9c49e39bf3db7b48740350da85d
