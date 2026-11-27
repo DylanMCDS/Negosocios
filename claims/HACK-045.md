@@ -12,7 +12,7 @@ Verify: `uv run pytest -q app/tests/test_points_custom.py app/tests/test_points.
 Lease-Until: 1795822515
 Updated: 1795819815
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Final critic SHIP; uak done HACK-045 --pr PR41; then uak next and HACK040 review if offered
+Next: Apply option: Actualizar aserción Elige tu cuenta a Elige tu cobro, autorizado por Dylan en conversación: te autorizo
 PR: -
 Evidence: -
 Thread-Read: 223
