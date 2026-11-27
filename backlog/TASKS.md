@@ -269,3 +269,15 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** populates_network_once_on_startup, does_not_overwrite_user_created_business, alliance_discounts_respect_max_discount, reviews_only_on_paid_orders, all_seeded_records_are_demo_data, no_full_clabe_or_phone_in_fixtures
 - **Verify:** `uv run pytest -q app/tests/test_populate.py && bash .uak/bin/smoke-project`
 - **Next step:** escribir `app/fixtures/population/businesses.json` con 5 negocios y el test de idempotencia (rojo).
+
+## HACK-037 · NavBar móvil: los grupos reparten el ancho en partes iguales y recortan Explorar a 390 px; repartir por número de entradas (follow-up of HACK-022)
+
+- **Type:** follow-up
+- **Priority:** P1
+- **Depends on:** HACK-022
+- **Follow-up of:** HACK-022
+- **Paths:** web/src/App.tsx, web/src/lib/ui/NavBar.tsx, web/src/features/landing/nav.ts, web/src/features/cobrar/nav.ts, web/src/features/cierre/nav.ts, web/src/features/negocio/nav.ts, web/src/features/voz/nav.ts, web/src/features/pagar/nav.ts, web/src/test/nav.test.tsx
+- **Freeze-Allowed:** no
+- **Acceptance:**
+  - NavBar móvil: los grupos reparten el ancho en partes iguales y recortan Explorar a 390 px; repartir por número de entradas
+- **Verify:** `npm --prefix web test -- --run src/test/nav.test.tsx && npm --prefix web run build`
