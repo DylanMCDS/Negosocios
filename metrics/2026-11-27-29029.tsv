@@ -8,6 +8,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -662,3 +663,43 @@
 1795741277	hook-status	-	0	-	0	dylan-5	claude-code
 1795741277	hook-heartbeat	HACK-013	0	-	5000	dylan-5	claude-code
 1795741339	board	-	0	-	1000	-	claude-code
+1795741337	next	-	0	-	2000	dylan-1	claude-code
+1795741340	hook-inbox	-	0	-	1000	dylan-1	claude-code
+1795741341	next	-	0	-	0	dylan-1	claude-code
+1795741349	hook-inbox	-	0	-	3000	dylan-1	claude-code
+1795741357	next	-	0	-	2000	dylan-2	claude-code
+1795741359	inbox	-	0	-	2000	dylan-2	claude-code
+1795741362	hook-inbox	-	0	-	2000	dylan-2	claude-code
+1795741363	review	HACK-013	0	-	7000	dylan-2	claude-code
+1795741375	status	HACK-013	0	-	1000	dylan-2	claude-code
+1795741374	hook-inbox	-	0	-	2000	dylan-2	claude-code
+1795741376	hook-pr-sync	HACK-004	0	-	3000	dylan-2	claude-code
+1795741379	hook-status	-	0	-	1000	dylan-2	claude-code
+1795741380	hook-pr-sync	HACK-012	0	-	3000	dylan-2	claude-code
+1795741383	hook-pr-sync	HACK-018	0	-	3000	dylan-2	claude-code
+1795741378	inbox	-	0	-	8000	dylan-2	claude-code
+1795741387	hook-inbox	-	0	-	2000	dylan-2	claude-code
+1795741411	review	HACK-013	0	-	5000	dylan-2	claude-code
+1795741420	hook-inbox	-	0	-	1000	dylan-2	claude-code
+1795741430	wait	-	0	-	154000	dylan-5	claude-code
+1795741432	hook-inbox	-	0	-	2000	dylan-5	claude-code
+1795741438	review	HACK-012	0	-	6000	dylan-5	claude-code
+1795741444	inbox	-	0	-	6000	dylan-5	claude-code
+1795741474	merge	HACK-013	0	-	29000	dylan-5	claude-code
+1795741480	hook-inbox	-	0	-	2000	dylan-5	claude-code
+1795741482	next	-	0	-	2000	dylan-5	claude-code
+1795741634	next	-	0	-	2000	dylan-1	claude-code
+1795741636	hook-heartbeat	HACK-001	0	-	2000	dylan-1	claude-code
+1795741636	hook-pr-sync	HACK-001	0	-	2000	dylan-1	claude-code
+1795741638	hook-status	-	0	-	0	dylan-1	claude-code
+1795741638	hook-status	-	0	-	1000	dylan-1	claude-code
+1795741638	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795741636	hook-inbox	-	0	-	4000	dylan-1	claude-code
+1795741642	next	-	0	-	0	dylan-2	claude-code
+1795741642	inbox	-	0	-	5000	dylan-2	claude-code
+1795741648	hook-inbox	-	0	-	3000	dylan-2	claude-code
+1795741667	merge	HACK-012	0	-	30000	dylan-2	claude-code
+1795741683	inbox	-	0	-	5000	dylan-2	claude-code
+1795741689	hook-pr-sync	HACK-004	0	-	1000	dylan-2	claude-code
+1795741691	hook-status	-	0	-	1000	dylan-2	claude-code
+1795741689	hook-inbox	-	0	-	2000	dylan-2	claude-code
