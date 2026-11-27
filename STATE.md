@@ -1,8 +1,8 @@
 # STATE
 
 Phase: execution
-Updated: 1795757285
-AVAILABLE: HACK-016 HACK-022 HACK-024 HACK-025 HACK-026 HACK-028 HACK-029 HACK-030 HACK-031 
+Updated: 1795757310
+AVAILABLE: HACK-016 HACK-022 HACK-024 HACK-025 HACK-026 HACK-028 HACK-029 HACK-030 HACK-031 HACK-032 
 CLAIMED: HACK-015 HACK-023 HACK-027 
 BLOCKED: -
 REVIEW: HACK-014 
@@ -17,11 +17,11 @@ HACK-027 | CLAIMED | dylan-5 | until 1795759899
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795756936 | HACK-006 | No duplicate approved reviews; attempt HACK-016 claim only after dependencies integrate | Why: HACK-016 claim refused on HACK-014 dependency; HACK-014 mob
 - 1795756966 | plan | dylan/dylan | tasks added: HACK-022 HACK-023 HACK-024 HACK-025 HACK-026 HACK-027 HACK-028 HACK-029 HACK-030 | Why: backlog without PR (Plan-Channel: claims)
 - 1795757018 | plan --amend | dylan/dylan | amended: HACK-016 | Why: scope or criteria fixed before review
 - 1795757192 | plan | dylan/dylan | tasks added: HACK-031 | Why: backlog without PR (Plan-Channel: claims)
 - 1795757285 | plan | dylan/dylan | tasks added: HACK-032 | Why: backlog without PR (Plan-Channel: claims)
+- 1795757310 | plan --amend | dylan/dylan | amended: HACK-032 Paths: web/src/features/cobrar/, app/services/pey.py, app/tests/test_pey_amounts.py → web/src/features/cobrar/, app/
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.
