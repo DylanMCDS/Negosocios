@@ -9,8 +9,8 @@ Priority: P1
 Paths: app/services/payout_accounts.py, app/routers/payout_accounts.py, app/services/orders.py, app/tests/test_payout_accounts.py, web/src/features/negocio/, web/src/features/pagar/, docs/PEY.md
 Depends: HACK-023
 Verify: `uv run pytest -q app/tests/test_payout_accounts.py app/tests/test_orders.py && npm --prefix web test -- --run src/features/negocio src/features/pagar && npm --prefix web run build`
-Lease-Until: 1795784396
-Updated: 1795769996
+Lease-Until: 1795784766
+Updated: 1795770366
 Task-Base: a61e05a94837ba1c973e316630aa4960e088ecf0
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/28; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/28
