@@ -69,3 +69,16 @@ Append-only; the last section of an ID replaces its section in the backlog. Why:
 - **Test-First:** no (documentos de entrega)
 - **Verify:** `test $(wc -w < docs/SUBMISSION.md) -le 1600 && grep -qi 'pey' docs/SUBMISSION.md && test -s docs/DEMO.md`
 - **Next step:** `/uak-demo`.
+## HACK-035 · Auditoría de UX móvil y pulido de todos los flujos
+
+- **Type:** feature
+- **Priority:** P0
+- **Estimate:** 90 min
+- **Rubric / Spec:** C4, C2 · pedido de Dylan 2026-11-26: la UX es lo más importante; la mayoría usará celular
+- **Depends on:** HACK-033, HACK-024, HACK-026, HACK-027, HACK-031
+- **Paths:** web/src/features/cobrar/, web/src/features/pagar/, web/src/features/cierre/, web/src/features/negocio/, web/src/features/voz/, web/src/features/explorar/, web/src/features/aliados/, docs/UX-AUDIT.md, web/src/lib/ui/, web/src/App.tsx, web/src/features/puntos/, web/src/test/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Recorrer en un celular simulado (390×844, skill `webapp-testing`) cada flujo y registrar en `docs/UX-AUDIT.md` pasos/toques, problemas y arreglo: (1) cobrar $35.50 hasta ver "Pagado", (2) cliente abre `/pagar/<id>`, ve a quién paga y su comprobante, (3) cierre del día y simular promoción, (4) dictar un gasto y confirmarlo, (5) dar de alta el puesto, (6) encontrar un negocio en Explorar, (7) aplicar descuento de aliado al cobrar., Arreglos mínimos esperados: en Cobrar el importe va **arriba** del teclado y el botón Cobrar queda fijo al alcance del pulgar; cobrar toma ≤ 3 toques tras teclear el importe; "Pagado" se ve a pantalla completa con sonido/vibración; teclados nativos correctos (`inputmode="decimal"` en montos, `tel` en teléfonos); nada queda oculto bajo la barra inferior ni el teclado del celular; botones ≥ 44 px; textos en lenguaje del comerciante., Capturas antes/después a 390 de cada flujo en el PR; veredicto `VERDICT: SHIP` del design-critic. · Barra inferior móvil (decisión de Dylan 2026-11-27): 5 entradas Inicio · Cobrar (centro, destacada) · Cierre · Explorar · Más; "Más" abre Negocio, Aliados, Puntos NFC/QR y Voz; cada celda ≥ 44 px, sin texto cortado a 390 px; escritorio puede mostrar todas.
+- **Tests:** cobrar_amount_is_above_keypad, cobrar_action_is_fixed_in_thumb_zone, amount_inputs_use_decimal_keyboard, no_content_hidden_behind_bottom_nav
+- **Verify:** `npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/design-lint && test -s docs/UX-AUDIT.md`
+- **Next step:** recorrer el flujo 1 a 390 px con Playwright y anotar cada toque.
