@@ -70,4 +70,29 @@ describe("Voz", () => {
     expect(screen.getByLabelText(/lo que dijiste/i)).toBeInTheDocument();
     expect(screen.getByText(/tu navegador no entiende voz/i)).toBeInTheDocument();
   });
+
+  it("parses_amount_and_item_from_spanish_phrase", async () => {
+    fetchMock.mockImplementation(() => json(parsed));
+    render(<Voz />);
+    await say("gasté 350 en tortillas");
+    expect(JSON.parse(calls("/api/expenses/parse")[0][1].body)).toEqual({ text: "gasté 350 en tortillas" });
+    expect(screen.getByLabelText(/importe/i)).toHaveValue("350.00");
+    expect(screen.getByLabelText(/descripción/i)).toHaveValue("tortillas");
+  });
+
+  it("parses_amount_written_with_pesos_word", async () => {
+    fetchMock.mockImplementation(() => json({ ...parsed, amount_cents: 20000, category: "servicios", description: "gas" }));
+    render(<Voz />);
+    await say("gasté doscientos pesos en gas");
+    expect(screen.getByLabelText(/importe/i)).toHaveValue("200.00");
+    expect(screen.getByLabelText(/categoría/i)).toHaveValue("servicios");
+  });
+
+  it("flags_ambiguous_amount", async () => {
+    fetchMock.mockImplementation(() => json({ amount_cents: null, category: "otros", description: "", ambiguous: true }));
+    render(<Voz />);
+    await say("gasté 350 y 200");
+    expect(screen.getByText(/corrige el importe/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/importe/i)).toHaveValue("");
+  });
 });
