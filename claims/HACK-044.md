@@ -9,10 +9,10 @@ Priority: P0
 Paths: web/src/features/voz/
 Depends: HACK-031
 Verify: `npm --prefix web test -- --run src/features/voz && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795821821
-Updated: 1795819121
+Lease-Until: 1795822057
+Updated: 1795819357
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Escribir y ejecutar expense_is_saved_to_active_business en rojo
+Next: Completar browser y critic, commit y push, PR y done hasta REVIEW
 PR: -
 Evidence: -
 Thread-Read: 0
