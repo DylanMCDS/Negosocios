@@ -1,7 +1,5 @@
-# Integration queue
-Task: HACK-005
-State: PENDING
+ID: HACK-005
+State: WAITING
 Owner: dylan-1
-Task-Tip: e25b95f379a558a937b77582d14d01e2dad6b310
-PR: https://github.com/DylanMCDS/Negosocios/pull/7
-Updated: 1795739262
+Queued: 1795739475
+Reason: Waiting for queue
