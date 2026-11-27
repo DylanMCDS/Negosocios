@@ -1,13 +1,14 @@
 # worklog/WL-1795738103-dylan-1-HACK-005-hack.ZRsvQC.md · HACK-005
 
 ## Live summary
-- Done: claimed HACK-005; design round R1 (4 landing variants, seed 59194) created; v1 builder running
-- Decision: build variants one at a time (pace critical, parallel cap 1)
-- Why: plan pace critical
-- Failing: none
-- Commands: uak design shoot R1; uak design pick R1 --k 2
-- Next: build v2,v3,v4 sequentially, then design shoot R1, show captures to Dylan for pick
+- Done: R1 built (v1-v4), shot (playwright 1.65.0 in scratch venv: PATH=<scratchpad>/pw/bin), Dylan picked v1 mono-led (DM Mono+Commissioner, brand duo #863BFF/#EDE6FF/#7E14FF/#47BFFF, light ground, hairline)
+- Decision: final direction = R1 v1; no breeding round (pace critical, user chose explicitly)
+- Why: Dylan picked v1 by looking at captures
+- Failing: v1 QA: canvas backing store 350px drawn at 701 at 390 (use devicePixelRatio); 10 font sizes vs limit 6; #000 literal in canvas sampler
+- Commands: PATH=<scratch>/pw/bin:$PATH bash .uak/bin/uak design shoot R1; uak lint
+- Next: fill web/DESIGN.md from .uak/templates/DESIGN.template.md with v1 genome; tokens in web/src/index.css; UI kit web/src/lib/ui; App.tsx AppShell; 3 locked screens (Cobrar, Pagar, Cierre) captured 1280+390 to web/public/design-lock/screens; design-critic; uak decision; stop gallery: uak design-gallery --round R1 --stop
 
 ## History
 - 1795738103 | CLAIMED | dylan-1 | claim; next: /uak-design-lock: direcciones con capturas, Dylan elige | Harness: unknown | Model: unknown
 - 1795738173 | CLAIMED | dylan-1 | checkpoint; next: build v2,v3,v4 sequentially, then design shoot R1, show captures to Dylan for pick | Harness: unknown | Model: unknown
+- 1795738815 | CLAIMED | dylan-1 | checkpoint; next: fill web/DESIGN.md from .uak/templates/DESIGN.template.md with v1 genome; tokens in web/src/index.css; UI kit web/src/lib/ui; App.tsx AppShell; 3 locked screens (Cobrar, Pagar, Cierre) captured 1280+390 to web/public/design-lock/screens; design-critic; uak decision; stop gallery: uak design-gallery --round R1 --stop | Harness: unknown | Model: unknown
