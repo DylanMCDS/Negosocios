@@ -1,9 +1,8 @@
 ID: HACK-014
-SHA: 0575969f4177f3c329460ef9db6e5c9ab275919b
-Reviewer: dylan-4
+SHA: 837f456a2ca39730d408be7e47c3019b1aaf1c7e
+Reviewer: dylan-2
 Owner: dylan-1
-Verdict: reject
-Reviewed: 1795757078
-Eligible-Via: role:dylan-4
+Verdict: approve
+Reviewed: 1795757317
+Eligible-Via: role:dylan-2
 Command: uak review
-Rejected-By: dylan-4
