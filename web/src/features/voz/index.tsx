@@ -187,7 +187,7 @@ export default function Voz() {
           <span>Descripción</span>
           <input className={field} value={description} onChange={(e) => setDescription(e.target.value)} />
         </label>
-        <div className="sticky bottom-20 flex flex-wrap gap-2 bg-surface py-2">
+        <div className="flex flex-wrap gap-2 bg-surface py-2">
           <Button onClick={save} disabled={!canSave}>
             {phase === "busy" ? "Guardando…" : "Confirmar y guardar"}
           </Button>
@@ -197,11 +197,8 @@ export default function Voz() {
     </Surface>
   ) : undefined;
 
-  return (
-    <>
-      <PageHeader title="Gastos por voz" lead="Di tu gasto y confírmalo antes de guardar." />
-      <PageLayout aside={confirm}>
-        <Surface>
+  const capture = (
+    <Surface>
           <div className="flex flex-col gap-4">
             {Speech ? (
               <div className="flex flex-col items-start gap-4">
@@ -228,6 +225,13 @@ export default function Voz() {
             </div>}
           </div>
         </Surface>
+  );
+
+  return (
+    <>
+      <PageHeader title="Gastos por voz" lead="Di tu gasto y confírmalo antes de guardar." />
+      <PageLayout aside={proposed ? capture : undefined}>
+        {proposed ? confirm : capture}
         {phase === "saved" && (
           <p role="status" className="flex items-center gap-2">
             <CheckCircle size={24} aria-hidden="true" /> Gasto guardado.
