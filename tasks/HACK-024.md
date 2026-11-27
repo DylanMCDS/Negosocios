@@ -9,15 +9,18 @@ Priority: P0
 Paths: web/src/features/explorar/, web/package.json, web/package-lock.json
 Depends: HACK-022, HACK-023
 Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build`
-Lease-Until: 1795783528
-Updated: 1795769128
+Lease-Until: 1795785294
+Updated: 1795770894
 Task-Base: a4bca459625f6958311de173616e6763085ca117
 Next: Humano: Shared resource/CI needs a human: web/package-lock.json
 PR: https://github.com/DylanMCDS/Negosocios/pull/27
 Evidence: npm --prefix web test -- --run src/features/explorar: 4 passed; build exit 0; lint 0 errors; design-critic SHIP 107f507; red at a4bca45 (stub); screenshots 1280/390 with real OSM tiles · red at a4bca45: exit 1 (no assertion line recognized: the reviewer reads the log)
-Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown)
-Events: 4
+Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown); author dylan-2 (claude-sonnet-5-5)
+Events: 5
 Checkpoints: 0
-Sessions: 2
+Sessions: 3
 Last-Checkpoint: 0
 Task-Tip: 107f5070991328ea171db61039db66094092ce09
+Progress: 10 commit(s) since the claim · last: afbf8b1 test(menu): la lista del menú incluye Explorar (HACK-024) (20 minutes ago) · 0 uncommitted tracked file(s) · at 1795770894
+Progress-Head: afbf8b1/4294967295
+Progress-Changed: 1795770894
