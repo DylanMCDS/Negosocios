@@ -15,4 +15,4 @@ Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
 Next: test rojo de proposal_to_demo_business_is_auto_accepted en app/tests/test_alliances_demo_accept.py
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 210
