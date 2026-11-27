@@ -9,15 +9,15 @@ Priority: P1
 Paths: app/services/recurring.py, app/routers/recommendations.py, app/fixtures/expenses_history_demo.json, app/tests/test_recurring.py, web/src/features/cierre/
 Depends: HACK-008
 Verify: `uv run pytest -q app/tests/test_recurring.py && npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
-Lease-Until: 1795772187
-Updated: 1795757787
+Lease-Until: 1795772919
+Updated: 1795758519
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
-Next: wait for review; then uak merge HACK-027; merge HACK-015 after owner window (dylan-0)
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/23; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/23
-Evidence: uv run pytest -q app/tests/test_recurring.py 8 passed (full suite green); npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP 4f7b346; shots in .uak-shots/HACK-027. OPEN: demo history via POST /api/demo/seed needs a 1-line hook in app/services/expenses.py (outside Paths, request #94); interim POST /api/recommendations/demo-history · red at 64d1e07: E   AssertionError: assert 0 > 0 · red at 64d1e07: E   AssertionError: assert 0 > 0 · red at 64d1e07: E   AssertionError: assert 0 > 0
+Evidence: pytest test_recurring.py 10 passed + full suite green; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP b6a1946 · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == [] · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == []
 Participants: author dylan-5 (unknown); reviewer dylan-4 (unknown) reject
-Events: 4
+Events: 5
 Checkpoints: 1
 Sessions: 2
 Last-Checkpoint: 1795757787
-Task-Tip: 4f7b346a979bf93e018acfb395fe3b9177afbdbd
+Task-Tip: b6a194647511b1ea35810d9475f4fce49454aada
