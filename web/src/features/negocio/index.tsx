@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { Printer } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business } from "../../lib/types";
-import { Button, PageHeader, PageLayout, Surface } from "../../lib/ui";
+import { Button, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui";
 import { getBusinessId, saveBusinessId } from "./businessId";
 
 const field =
@@ -88,8 +88,18 @@ function Perfil({ business, owner }: { business: Business; owner: boolean }) {
     <PageLayout
       aside={
         <Surface className="flex flex-col gap-4">
-          <p className="font-display text-[length:var(--text-l)]">Paga aquí con CoDi</p>
+          <a href="#cobrar" className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4">
+            Paga aquí con CoDi
+          </a>
           <p className="text-ink-2">Abre tu app del banco, elige CoDi y escanea el QR del puesto.</p>
+          {business.demo_data ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <p>Horario: lunes a sábado, 9:00 a 18:00</p>
+              <DataBadge />
+            </div>
+          ) : (
+            <p className="text-ink-2">Horario: aún no registrado</p>
+          )}
         </Surface>
       }
     >

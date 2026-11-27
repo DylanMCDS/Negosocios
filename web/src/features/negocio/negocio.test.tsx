@@ -66,3 +66,29 @@ describe("Alta del puesto", () => {
     expect(screen.queryByLabelText("Nombre del puesto")).not.toBeInTheDocument();
   });
 });
+
+describe("Horario del perfil público", () => {
+  const publicProfile = async (b: Business) => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(b), { status: 200 })));
+    window.history.replaceState(null, "", "/?negocio=b-123");
+    render(<Negocio />);
+    await screen.findByRole("heading", { name: b.name });
+  };
+
+  it("labels_example_hours_for_demo_businesses", async () => {
+    await publicProfile({ ...business, demo_data: true });
+    expect(screen.getByText(/Horario:.*9:00/)).toBeInTheDocument();
+    expect(screen.getByText("Datos de ejemplo")).toBeInTheDocument();
+  });
+
+  it("says_hours_are_not_registered_for_real_businesses", async () => {
+    await publicProfile(business);
+    expect(screen.getByText("Horario: aún no registrado")).toBeInTheDocument();
+    expect(screen.queryByText("Datos de ejemplo")).not.toBeInTheDocument();
+  });
+
+  it("pay_here_is_a_link_to_the_cobrar_screen", async () => {
+    await publicProfile(business);
+    expect(screen.getByRole("link", { name: "Paga aquí con CoDi" })).toHaveAttribute("href", "#cobrar");
+  });
+});
