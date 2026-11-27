@@ -1,0 +1,11 @@
+[
+  {"business_id":"rosa","name":"Tacos de Doña Rosa","category":"Tacos","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.432,"lng":-99.133,"schedule":{"mon":{"open":"08:00","close":"18:00"},"sat":{"open":"08:00","close":"18:00"}}}},
+  {"business_id":"network-fonda","name":"Fonda El Comal (demo)","category":"Fonda","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.433,"lng":-99.133,"schedule":{"mon":{"open":"09:00","close":"18:00"}}}},
+  {"business_id":"network-papeleria","name":"Papelería Cuaderno (demo)","category":"Papelería","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.431,"lng":-99.134,"schedule":{"mon":{"open":"08:00","close":"20:00"}}}},
+  {"business_id":"network-barberia","name":"Barbería La Esquina (demo)","category":"Barbería","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.434,"lng":-99.132,"schedule":{"mon":{"open":"10:00","close":"20:00"}}}},
+  {"business_id":"network-fruteria","name":"Frutería La Canasta (demo)","category":"Frutería","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.431,"lng":-99.132,"schedule":{"mon":{"open":"07:00","close":"17:00"}}}},
+  {"business_id":"network-abarrotes","name":"Abarrotes El Barrio (demo)","category":"Abarrotes","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.435,"lng":-99.135,"schedule":{"mon":{"open":"07:00","close":"22:00"}}}},
+  {"business_id":"network-panaderia","name":"Panadería La Masa (demo)","category":"Panadería","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.43,"lng":-99.135,"schedule":{"mon":{"open":"06:00","close":"21:00"}}}},
+  {"business_id":"network-cafe","name":"Café de la Plaza (demo)","category":"Café","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.433,"lng":-99.136,"schedule":{"mon":{"open":"08:00","close":"19:00"}}}},
+  {"business_id":"network-flores","name":"Flores del Día (demo)","category":"Florería","zone":"Tianguis de ejemplo, CDMX","demo_data":true,"profile":{"lat":19.43,"lng":-99.13,"schedule":{"mon":{"open":"08:00","close":"18:00"}}}}
+]
