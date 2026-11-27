@@ -23,3 +23,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795740479 | HACK-009 | stop here: pace critical (5h 69%) | Why: limit
 - 1795740515 | HACK-018 | follow-up of HACK-011 by dylan-2: Cierre: la línea Cuenta mezcla pesos y % (200 − (100+50) = 25 %); mostrar 200 − 150 = 50 (25 % del precio) y tomar business_id del alta | Why: same Paths, no scope change
 - 1795742561 | plan | dylan/dylan | tasks added: HACK-019 | Why: backlog without PR (Plan-Channel: claims)
+- 1795742821 | plan | dylan/dylan | tasks added: HACK-020 | Why: backlog without PR (Plan-Channel: claims)

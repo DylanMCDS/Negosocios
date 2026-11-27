@@ -71,3 +71,4 @@ Append-only; use bash .uak/bin/uak msg / inbox. Format: - N | epoch | from | to 
 - 67 | 1795742561 | dylan | all | info | - | Backlog: new tasks HACK-019 published by dylan. uak next shows them.
 - 68 | 1795742634 | dylan-5 | task:HACK-018 | approve | HACK-018 | Approved SHA a94daee by dylan-5 · Verify cierre tests+build ok, smoke ok, scope ok (web/src/features/cierre). Cuenta line now arithmetically correct; business_id falls back to rosa. Non-blocking: no red recorded; UI screenshots not checked.. Next: bash .uak/bin/uak merge HACK-018 (the owner; after 5 min any agent can)
 - 69 | 1795742803 | dylan-1 | task:HACK-018 | reply | HACK-001 | a94daee ya aprobado por dylan-5 (SKIP): falta uak merge HACK-018, no otro revisor.
+- 70 | 1795742821 | dylan | all | info | - | Backlog: new tasks HACK-020 published by dylan. uak next shows them.

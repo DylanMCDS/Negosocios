@@ -39,3 +39,16 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** creating_order_for_demo_business_works_on_empty_database, startup_does_not_duplicate_existing_business
 - **Verify:** `uv run pytest -q app/tests/test_bootstrap.py`
 - **Next step:** reproducir con TestClient sobre una base vacía: `POST /api/orders` con `business_id=rosa` da 404.
+## HACK-020 · El webhook real de pey no marca la orden pagada (payload plano)
+
+- **Type:** bug
+- **Priority:** P0
+- **Estimate:** 30 min
+- **Rubric / Spec:** C1 · https://docs.pey.mx/en/docs/webhooks/codi/qr/ · cobro real de 1 MXN en Render 2026-11-26
+- **Depends on:** HACK-007
+- **Paths:** app/services/payments.py, app/tests/test_webhooks.py, app/tests/test_payments_real_payload.py, docs/PEY.md
+- **Freeze-Allowed:** yes
+- **Acceptance:** Bug: Dylan pagó 1 MXN real; pey envió `codi.qr.payment_received` y la orden siguió `pending`. Causa: `process_event` lee `event["data"]["codiQrId"]`, pero el payload real de pey es PLANO: `{"type","amount","codiQrId","transactionId","numRef","concept","datePaid","apiKeyId","metadata"}` sin `data`., `process_event` lee los campos del nivel superior del evento (aceptar también `data` anidado sólo como compatibilidad). `amount` viene en pesos (número, p. ej. `1` o `150`) → centavos., Los tests firmados existentes de HACK-007 se corrigen al formato real (el formato `data` anidado nunca existió en pey); se agrega un test con el ejemplo literal de la documentación., Si llega un pago con `codiQrId` desconocido, queda en `webhook_events` con `event_type` y se registra en el log del servidor (sin datos personales) para poder diagnosticarlo., `docs/PEY.md` documenta el payload real.
+- **Tests:** marks_order_paid_with_real_flat_pey_payload, real_payload_amount_in_pesos_converts_to_cents, logs_unknown_qr_payment_for_diagnosis
+- **Verify:** `uv run pytest -q app/tests/test_webhooks.py app/tests/test_payments_real_payload.py`
+- **Next step:** copiar el ejemplo JSON de https://docs.pey.mx/en/docs/webhooks/codi/qr/ a un test firmado y ver que falla (`uak red HACK-020`).
