@@ -6,12 +6,15 @@ muestran correlación observada (compras pagadas con un código de alianza), no 
 import secrets
 import sqlite3
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import ROUND_FLOOR, Decimal
 
 from fastapi import HTTPException
 
 from app.services import finance
+
+# A proposal to a demo business (businesses.demo_data = 1) is accepted by itself after this many seconds.
+DEMO_ACCEPT_SECONDS = 3
 
 NOTE = "Estimación basada en una correlación observada entre la alianza y compras pagadas; no demuestra causalidad."
 
@@ -53,6 +56,21 @@ def _view(row: sqlite3.Row) -> dict:
     return dict(row)
 
 
+def settle_demo_proposals(conn) -> None:
+    """A proposal to a demo business accepts itself after DEMO_ACCEPT_SECONDS so the whole flow can be walked through.
+    Real businesses are never touched: they keep asking for acceptance."""
+    cutoff = (datetime.now(UTC) - timedelta(seconds=DEMO_ACCEPT_SECONDS)).isoformat()
+    conn.execute(
+        "UPDATE alliances SET status = 'active' WHERE status = 'proposal' AND created_at <= ? AND business_b IN"
+        " (SELECT id FROM businesses WHERE demo_data = 1)", (cutoff,))
+    conn.commit()
+
+
+def _is_demo(conn, row: sqlite3.Row) -> bool:
+    found = conn.execute("SELECT demo_data FROM businesses WHERE id = ?", (row["business_b"],)).fetchone()
+    return bool(found and found["demo_data"])
+
+
 def propose(conn, data: dict) -> dict:
     a, b, giver = data["business_a"], data["business_b"], data["giver"]
     if a == b:
@@ -86,7 +104,8 @@ def propose(conn, data: dict) -> dict:
         " :business_b, :giver, :discount_pct, :price_cents, :variable_cost_cents, :min_contribution_cents,"
         " :budget_cents, :max_uses, :referral_code, :created_at)", row)
     conn.commit()
-    return _view(_get(conn, row["id"]))
+    created = _get(conn, row["id"])
+    return {**_view(created), "demo": _is_demo(conn, created)}
 
 
 def _discount_cents(amount_cents: int, pct) -> int:
@@ -120,6 +139,7 @@ def _identities(conn, giver: str, ref: str) -> tuple[str, set[str]]:
 
 def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
     """Reserva el beneficio una sola vez por orden; presupuesto y usos se descuentan en la misma transacción."""
+    settle_demo_proposals(conn)
     conn.execute("BEGIN IMMEDIATE")
     try:
         row = _get(conn, alliance_id)
@@ -196,19 +216,21 @@ def list_for(conn, business_id: str) -> list[dict]:
     """Alianzas de un negocio, con el socio y su papel (quien da el descuento o quien refiere)."""
     if conn.execute("SELECT 1 FROM businesses WHERE id = ?", (business_id,)).fetchone() is None:
         raise HTTPException(404, "Negocio no encontrado")
+    settle_demo_proposals(conn)
     rows = conn.execute(
         "SELECT * FROM alliances WHERE business_a = ? OR business_b = ? ORDER BY created_at DESC",
         (business_id, business_id)).fetchall()
     items = []
     for row in rows:
         partner = row["business_b"] if row["business_a"] == business_id else row["business_a"]
-        items.append({**_view(row), "partner_id": partner, "partner_name": _business_name(conn, partner),
+        items.append({**_view(row), "demo": _is_demo(conn, row), "partner_id": partner, "partner_name": _business_name(conn, partner),
                       "role": "giver" if row["giver"] == business_id else "referrer"})
     return items
 
 
 def by_code(conn, code: str) -> dict:
     """Lo mínimo que Cobrar necesita para aplicar un código; costos y contribución mínima no se exponen."""
+    settle_demo_proposals(conn)
     row = conn.execute("SELECT * FROM alliances WHERE referral_code = ?", (code.upper(),)).fetchone()
     if row is None:
         raise HTTPException(404, "Código de referido no encontrado")
