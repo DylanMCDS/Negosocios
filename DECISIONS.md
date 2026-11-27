@@ -20,3 +20,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795738868 | HACK-006 | Explicit independent reviewer dylan-2; identity dylan-3 reused by wt new | Why: Author cannot review own implementation; exact shared API contract followed
 - 1795739302 | plan | dylan/dylan | tasks added: HACK-017 | Why: backlog without PR (Plan-Channel: claims)
 - 1795740099 | deadline decision/HACK-005-1795739182/1795740082 | BLOCKED_OTHER_TASK | Option: Direction v1 (mono-led, DM Mono + Commissioner, brand duo); Why: Dylan eligió v1 mirando las capturas de R1; sin ronda de cruce por ritmo critical; no money, accounts, publishing or scope expansion.
+- 1795740479 | HACK-009 | stop here: pace critical (5h 69%) | Why: limit
