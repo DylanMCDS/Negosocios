@@ -42,7 +42,8 @@ describe("Menú por features", () => {
       "../features/explorar/nav.ts": mod({ label: "Explorar", icon: MapPin, order: 1, group: "clientes" }),
     });
     render(<MenuBar menu={menu} active="cobrar" onSelect={onSelect} />);
-    for (const nav of screen.getAllByRole("navigation", { name: "Principal" })) {
+    const desktop = screen.getAllByRole("navigation", { name: "Principal" }).filter((n) => !n.className.includes("fixed"));
+    for (const nav of desktop) {
       const buttons = within(nav).getAllByRole("button").map((b) => b.textContent?.trim());
       expect(buttons).toEqual(["Inicio", "Cobrar", "Explorar"]);
       expect(within(nav).getByRole("group", { name: "Mi negocio" })).toContainElement(within(nav).getByRole("button", { name: "Cobrar" }));
@@ -54,17 +55,33 @@ describe("Menú por features", () => {
 });
 
 describe("Barra móvil", () => {
-  it("mobile_groups_share_width_by_entry_count", () => {
-    const menu = buildMenu({
-      "../features/landing/nav.ts": mod({ label: "Inicio", icon: House, order: 0, group: "inicio" }),
-      "../features/cobrar/nav.ts": mod({ label: "Cobrar", icon: QrCode, order: 1, group: "negocio" }),
-      "../features/cierre/nav.ts": mod({ label: "Cierre", icon: QrCode, order: 2, group: "negocio" }),
-      "../features/explorar/nav.ts": mod({ label: "Explorar", icon: MapPin, order: 1, group: "clientes" }),
-    });
-    render(<MenuBar menu={menu} active="cobrar" onSelect={() => undefined} />);
-    const mobile = screen.getAllByRole("navigation", { name: "Principal" }).find((n) => n.className.includes("fixed"))!;
-    const grow = (name: string) => within(mobile).getByRole("group", { name }).style.flexGrow;
-    // Equal shares would give the single "Clientes" entry as much width as two "Mi negocio" entries and clip its label.
-    expect([grow("Mi negocio"), grow("Clientes")]).toEqual(["2", "1"]);
+  const full = buildMenu({
+    "../features/inicio/nav.ts": mod({ label: "Inicio", icon: House, order: 0, group: "inicio" }),
+    "../features/cobrar/nav.ts": mod({ label: "Cobrar", icon: QrCode, order: 1, group: "negocio" }),
+    "../features/cierre/nav.ts": mod({ label: "Cierre", icon: QrCode, order: 2, group: "negocio" }),
+    "../features/aliados/nav.ts": mod({ label: "Aliados", icon: QrCode, order: 3, group: "negocio" }),
+    "../features/negocio/nav.ts": mod({ label: "Negocio", icon: QrCode, order: 4, group: "negocio" }),
+    "../features/voz/nav.ts": mod({ label: "Voz", icon: QrCode, order: 5, group: "negocio" }),
+    "../features/puntos/nav.ts": mod({ label: "Puntos NFC/QR", icon: MapPin, order: 6, group: "negocio" }),
+    "../features/explorar/nav.ts": mod({ label: "Explorar", icon: MapPin, order: 1, group: "clientes" }),
+    "../features/pagar/nav.ts": mod({ label: "Pagar", icon: Wallet, order: 9, group: "clientes", hidden: true }),
+  });
+  const bar = () => screen.getAllByRole("navigation", { name: "Principal" }).find((n) => n.className.includes("fixed"))!;
+
+  it("mobile_bar_has_five_entries_with_cobrar_in_centre", () => {
+    render(<MenuBar menu={full} active="cobrar" onSelect={() => undefined} />);
+    const labels = within(bar()).getAllByRole("button").map((b) => b.textContent?.trim());
+    expect(labels).toEqual(["Inicio", "Cierre", "Cobrar", "Explorar", "Más"]);
+  });
+
+  it("mobile_more_opens_the_rest", () => {
+    const onSelect = vi.fn();
+    render(<MenuBar menu={full} active="cobrar" onSelect={onSelect} />);
+    expect(within(bar()).queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(within(bar()).getByRole("button", { name: "Más" }));
+    const sheet = within(bar()).getByRole("dialog", { name: "Más opciones" });
+    expect(within(sheet).getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Aliados", "Negocio", "Voz", "Puntos NFC/QR"]);
+    fireEvent.click(within(sheet).getByRole("button", { name: "Voz" }));
+    expect(onSelect).toHaveBeenCalledWith("voz");
   });
 });

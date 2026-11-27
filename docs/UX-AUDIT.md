@@ -31,6 +31,12 @@ Se midió: elementos tocables < 44 px de alto, contenido tapado por la barra inf
 | 6 | Encontrar un negocio en Explorar | Filtros + mapa | Casillas "Abierto ahora" y "Con promoción de aliado" de 20 px. Botones +/− del mapa (Leaflet) de 30 px. | Etiquetas de ≥ 44 px. **Pendiente:** los botones +/− del mapa son de Leaflet; no se tocaron. |
 | 7 | Descuento de aliado al cobrar | Escribir código + Aplicar + Cobrar | Con el nuevo diseño el campo de código y el desglose quedan bajo el teclado, y Cobrar sigue fijo y a la vista. No se recorrió con una alianza real (API simulada sin alianzas). | Código en mayúsculas (`autoCapitalize`). Sin más cambios. |
 
+## Barra inferior (decisión de Dylan, 2026-11-27)
+
+Con 7 o más entradas, a 390 px «Pagar» quedaba cortado. Ahora son 5: Inicio · Cierre · **Cobrar** (al centro, destacada) · Explorar · Más. «Más» abre una hoja con Aliados, Negocio, Voz y Puntos NFC/QR (y cualquier otra pantalla visible). Cobrar quedó al centro de la barra para el pulgar; si se prefiere el orden literal Inicio · Cobrar · Cierre · Explorar · Más, es un cambio de una línea en `MAIN_IDS`/orden de `MobileBar` (`web/src/lib/ui/NavBar.tsx`). Captura: `after-8-mas-abierto.png`.
+
+Nota de medición: la tabla de arriba mide el `<input>` de las casillas (20–24 px); la etiqueta que las envuelve ya es de ≥ 44 px y es lo que se toca.
+
 ## Teclados nativos
 
 - Montos (Cierre, Voz, Aliados, Dividir): `inputmode="decimal"`, ya estaba.

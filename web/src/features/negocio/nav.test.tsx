@@ -15,6 +15,11 @@ it("nav_has_no_pagar_and_starts_with_inicio", () => {
     expect(labels[0]).toBe("Inicio");
     expect(labels).not.toContain("Pagar");
     // Orden base conservado; las features nuevas (p. ej. Aliados) pueden aparecer sin romper la prueba.
+    if (nav.className.includes("fixed")) {
+      // Barra móvil (decisión de Dylan): 5 entradas, Cobrar al centro; Negocio y Voz viven en "Más".
+      expect(labels).toEqual(["Inicio", "Cierre", "Cobrar", "Explorar", "Más"]);
+      continue;
+    }
     const base = ["Inicio", "Cobrar", "Cierre", "Negocio", "Voz", "Explorar"];
     expect(labels.filter((l) => base.includes(l as string))).toEqual(base);
   }
