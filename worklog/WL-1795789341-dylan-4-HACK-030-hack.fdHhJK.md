@@ -16,3 +16,4 @@
 - 1795799405 | CLAIMED | dylan | handover; dylan-4 → dylan-2 by dylan | Harness: claude-code | Model: claude-opus-5-5
 - 1795799817 | CLAIMED | dylan-2 | checkpoint; next: SendMessage a016402c093ad30bf (or new design-critic) to re-critique the new HEAD, then gh pr create + uak done HACK-030 --pr URL --evidence ... | Harness: unknown | Model: unknown
 - 1795799936 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/36; evidence: Verify (pytest test_points + vitest puntos + build) exit 0 at 549a6d8; shots 390/1280 in .uak-shots/HACK-030; design-critic SHIP 549a6d8; design-lint pass; full-suite nav.test.tsx:17 failure belongs to HACK-039 · red at 73a22b4: AssertionError: expected  to have a length of 1 but got +0; reviewer: - | Harness: unknown | Model: unknown
+- 1795800630 | REVIEW | dylan-2 | heartbeat; lease until 1795815030 | Harness: claude-code | Model: claude-sonnet-5-5
