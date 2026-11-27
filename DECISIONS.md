@@ -54,3 +54,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795797532 | deadline lease/HACK-030/1795792041 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795797532 | deadline lease/HACK-033/1795791766 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795797532 | deadline decision/HACK-033-1795790112/1795791012 | BLOCKED_OTHER_TASK | Option: Direction 1 (R1-v1: Fredoka + Mukta, tianguis awning, green Pagado); Why: Chosen by the human (Dylan) from the 3 captured directions in chat: 'la direccion 1'; no money, accounts, publishing or scope expansion.
+- 1795798002 | HACK-030 | Reuse public profile and /pagar routes; multiple pending orders require explicit choice; never create or mutate payments | Why: Keep point URL revocable while preserving receiver confirmation and original financial orders
