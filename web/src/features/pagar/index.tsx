@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { CheckCircle, Clock, ShieldCheck } from "@phosphor-icons/react";
-import { Chip, PageHeader, Stat, Surface } from "../../lib/ui";
+import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
 import { api } from "../../lib/api";
 import type { Business, Order, Payment } from "../../lib/types";
 
@@ -46,25 +46,27 @@ export default function Pagar() {
   const [missing, setMissing] = useState(false);
 
   const status = order?.status;
+  const [checking, setChecking] = useState(false);
+  const load = async () => {
+    if (!orderId) return;
+    try {
+      const res = await api<{ order: Order; business: Business }>(`/orders/${orderId}`);
+      setOrder(res.order);
+      setBusiness(res.business);
+    } catch {
+      if (!order) setMissing(true);
+    }
+  };
+  const recheck = async () => {
+    setChecking(true);
+    await load();
+    setChecking(false);
+  };
   useEffect(() => {
     if (!orderId || status === "paid" || status === "expired" || status === "failed") return;
-    let alive = true;
-    const load = async () => {
-      try {
-        const res = await api<{ order: Order; business: Business }>(`/orders/${orderId}`);
-        if (!alive) return;
-        setOrder(res.order);
-        setBusiness(res.business);
-      } catch {
-        if (alive && !order) setMissing(true);
-      }
-    };
     void load();
-    const timer = setInterval(load, POLL_MS);
-    return () => {
-      alive = false;
-      clearInterval(timer);
-    };
+    const timer = setInterval(() => void load(), POLL_MS);
+    return () => clearInterval(timer);
     // order is read only to avoid flagging a transient poll error as "not found"
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, status]);
@@ -103,9 +105,17 @@ export default function Pagar() {
           title={order.status === "expired" ? "Este cobro expiró" : "Este cobro no se pudo completar"}
           lead="No se hizo ningún cargo. Pide otro cobro al comerciante."
         />
-        <Surface className="flex flex-col gap-2">
-          <p className="font-display text-[length:var(--text-xl)] leading-tight">{business.name}</p>
-          <p className="text-ink-2">{pesos(order.amount_cents)}</p>
+        <Surface className="flex flex-col gap-6">
+          <Chip tone="warn">
+            <Clock size={20} className="mr-2" aria-hidden="true" />
+            Vencido
+          </Chip>
+          <div>
+            <p className="text-[length:var(--text-s)] text-ink-2">Ibas a pagar a</p>
+            <p className="font-display text-[length:var(--text-xl)] leading-tight">{business.name}</p>
+          </div>
+          <Stat label="Importe" value={pesos(order.amount_cents)} unit="MXN" hero />
+          <p className="text-ink-2">{order.concept}</p>
         </Surface>
       </div>
     );
@@ -138,30 +148,37 @@ export default function Pagar() {
   }
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-8 py-2">
+    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
       <PageHeader title="Confirma tu pago" lead="Revisa a quién pagas y cuánto. Escanea el QR con tu app bancaria." />
-      <Surface className="flex flex-col gap-6">
-        <div>
-          <p className="text-[length:var(--text-s)] text-ink-2">Pagas a</p>
-          <p className="font-display text-[length:var(--text-xl)] leading-tight">{business.name}</p>
-          <p className="text-ink-2">{business.zone}</p>
-        </div>
-        <Stat label="Importe" value={pesos(order.amount_cents)} unit="MXN" hero />
-        <p>{order.concept}</p>
-        <Chip tone="ok">
-          <ShieldCheck size={20} className="mr-2" aria-hidden="true" />
-          Sin comisión con CoDi
-        </Chip>
-      </Surface>
-      {order.qr_string && (
-        <div className="flex justify-center rounded-lg border border-line bg-tint p-6">
-          <QrCubes value={order.qr_string} />
-        </div>
-      )}
-      <p className="flex items-center gap-2 text-ink-2">
-        <Clock size={20} aria-hidden="true" />
-        Esperando tu pago…
-      </p>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Surface className="flex flex-col gap-6">
+          <div>
+            <p className="text-[length:var(--text-s)] text-ink-2">Pagas a</p>
+            <p className="font-display text-[length:var(--text-xl)] leading-tight">{business.name}</p>
+            <p className="text-ink-2">{business.zone}</p>
+          </div>
+          <Stat label="Importe" value={pesos(order.amount_cents)} unit="MXN" hero />
+          <p>{order.concept}</p>
+          <Chip tone="ok">
+            <ShieldCheck size={20} className="mr-2" aria-hidden="true" />
+            Sin comisión con CoDi
+          </Chip>
+          <div className="flex flex-col gap-2">
+            <Button onClick={() => void recheck()} disabled={checking}>
+              Ya pagué: revisar
+            </Button>
+            <p className="flex items-center gap-2 text-ink-2" aria-live="polite">
+              <Clock size={20} aria-hidden="true" />
+              Esperando tu pago…
+            </p>
+          </div>
+        </Surface>
+        {order.qr_string && (
+          <div className="flex items-center justify-center rounded-lg border border-line bg-tint p-6">
+            <QrCubes value={order.qr_string} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
