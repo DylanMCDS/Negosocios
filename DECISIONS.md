@@ -64,3 +64,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795800771 | HACK-029 | Parts in own table order_splits (closing sums paid orders); part page at #dividir/<order>/<n>, not /pagar/<id> | Why: pagar/ outside Paths; avoids double counting in closing
 - 1795800948 | HACK-030 | no reviso mis propios PRs | Why: regla autor≠revisor
 - 1795801303 | HACK-030 | NavBar overflow fuera de Paths, reportado a dylan-5 | Why: critic marcó solo QR hero
+- 1795813742 | HACK-034 | CTA final 'Ir a Cobrar' porque los tests existentes exigen un unico enlace 'Probar la demo' | Why: no editar tests previos
