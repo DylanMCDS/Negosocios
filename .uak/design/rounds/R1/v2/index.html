@@ -1,0 +1,258 @@
+<!-- motif: the striped lona awning (toldo) of a tianguis puesto, carried as the hero object and as a scalloped edge on every section -->
+<!-- subject world: puesto de tacos en tianguis; toldo de lona rayada; monedas de peso (MXN); comprobante "Pagado 100 MXN"; sticker NFC / QR del punto; cierre del día -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Negosocios</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Karla:wght@400;600&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+:root{
+  --ink:#1B1030;      /* ground */
+  --violet:#7E14FF;   /* brand action */
+  --lilac:#EDE6FF;   /* light surface */
+  --mist:#D9CFF0;    /* secondary text on dark */
+  --slate:#5B4F73;   /* secondary text on light */
+  --green:#16A34A;   /* money / pagado */
+  --green-ink:#0B5B2A;
+  --green-soft:#DDF5E5;
+  --card:#fff;
+  --shadow:0 10px 30px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.18);
+  --display:'M PLUS Rounded 1c',system-ui,sans-serif;
+  --body:'Karla',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--lilac);font:400 17px/1.5 var(--body);font-variant-numeric:tabular-nums;padding-bottom:88px;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.num{font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums}
+a{color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+/* toldo: stripes + scalloped edge */
+.toldo{height:44px;background:repeating-linear-gradient(90deg,var(--violet) 0 36px,var(--lilac) 36px 72px);position:relative}
+.toldo::after{content:"";position:absolute;left:0;right:0;top:100%;height:16px;
+  background:repeating-linear-gradient(90deg,var(--violet) 0 36px,var(--lilac) 36px 72px);
+  -webkit-mask:radial-gradient(circle at 18px 0,#000 17px,transparent 18px) 0 0/36px 18px repeat-x;
+  mask:radial-gradient(circle at 18px 0,#000 17px,transparent 18px) 0 0/36px 18px repeat-x}
+nav.top{display:flex;align-items:center;justify-content:space-between;padding:36px 0 8px}
+.brand{font:700 22px var(--display);text-decoration:none}
+.brand span{color:var(--green);}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--lilac);color:var(--ink);font:600 16px var(--body);text-decoration:none}
+/* hero */
+.hero{display:grid;gap:8px;padding:12px 0 40px}
+.stage{position:relative;height:250px;border-radius:24px;background:#2A1750;overflow:hidden;box-shadow:var(--shadow)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage .still{position:absolute;inset:0;display:grid;place-items:center}
+.stage .chip{position:absolute;left:14px;bottom:14px;display:inline-flex;gap:8px;align-items:center;background:var(--card);color:var(--green-ink);border-radius:999px;padding:8px 14px;font:700 17px var(--display);box-shadow:var(--shadow)}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--green)}
+h1{font-size:40px;line-height:1.08;letter-spacing:-.01em;margin-top:20px}
+h1 em{font-style:normal;color:#5FE08A}
+.lead{color:var(--mist);margin:14px 0 0;max-width:34ch}
+.bignum{display:flex;align-items:baseline;gap:10px;margin-top:22px}
+.bignum .num{font-size:56px;line-height:1}
+.bignum small{color:var(--mist);font-size:16px;max-width:20ch;line-height:1.3}
+/* fixed bottom action */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:9;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(27,16,48,.94);border-top:1px solid rgba(217,207,240,.18);display:flex;gap:12px;align-items:center}
+.dock .info{flex:1;font-size:16px;line-height:1.25;color:var(--mist)}
+.dock .info b{display:block;color:#fff;font-family:var(--display);font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;border-radius:16px;background:var(--violet);color:#fff;font:700 17px var(--display);text-decoration:none;box-shadow:0 6px 16px rgba(126,20,255,.45)}
+.btn:active{transform:scale(.98)}
+/* sections */
+section{padding:44px 0}
+h2{font-size:30px;line-height:1.15;margin-bottom:8px}
+.sub{color:var(--mist);margin-bottom:22px}
+.cards{display:grid;gap:14px}
+.card{background:var(--card);color:var(--ink);border-radius:20px;padding:20px;box-shadow:var(--shadow);border:1px solid rgba(27,16,48,.06)}
+.card .num{font-size:44px;line-height:1;color:var(--violet)}
+.card .num.g{color:var(--green)}
+.card p{color:var(--slate);margin-top:8px}
+.card .k{font:600 16px var(--body);color:var(--ink);margin-top:6px}
+.proof a{color:var(--violet);font-weight:600}
+/* product */
+.shot{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:center}
+.phone{justify-self:center;width:100%;max-width:390px;height:520px;border-radius:28px;overflow:hidden;background:#F8F5FF;box-shadow:var(--shadow);position:relative}
+.phone img{display:block;width:100%;max-width:390px;height:auto;object-fit:cover;object-position:top}
+.phone::after{content:"";position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,#F8F5FF)}
+.recibo{background:var(--green-soft);color:var(--green-ink);border-radius:16px;padding:14px 16px;font:700 22px var(--display);margin-top:16px;display:flex;justify-content:space-between;align-items:center}
+.recibo small{font:600 16px var(--body)}
+/* steps */
+ol{list-style:none;padding:0;display:grid;gap:12px;counter-reset:s}
+ol li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;background:var(--card);color:var(--ink);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+ol li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--lilac);color:var(--violet);font:700 20px var(--display)}
+ol li b{display:block;font:700 18px var(--display)}
+ol li span{color:var(--slate);font-size:16px}
+ol li.wow::before{background:var(--green);color:#fff}
+.people{display:grid;gap:12px}
+.person{border-top:1px solid rgba(217,207,240,.25);padding-top:14px}
+.person b{font-family:var(--display);font-size:19px;display:block}
+.person span{color:var(--mist)}
+footer{padding:36px 0 24px;color:var(--mist);font-size:16px}
+/* entrance */
+.rise{opacity:0;transform:translateY(14px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+.rise.d1{animation-delay:.12s}.rise.d2{animation-delay:.24s}.rise.d3{animation-delay:.36s}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.rise{animation:none;opacity:1;transform:none}html{scroll-behavior:auto}}
+/* desktop */
+@media (min-width:900px){
+  body{padding-bottom:0}
+  .wrap{padding:0 32px}
+  .hero{grid-template-columns:1fr 1.15fr;gap:56px;align-items:center;padding:24px 0 72px;min-height:560px}
+  .hero .copy{order:1}.stage{order:2;height:480px}
+  h1{font-size:56px;margin-top:0}
+  .lead{font-size:18px}
+  .dock{position:static;background:none;border:0;padding:24px 0 0;display:flex;gap:20px;justify-content:flex-start}
+  .dock .info{flex:0 1 auto}
+  .cards.three{grid-template-columns:repeat(3,1fr)}
+  .shot{grid-template-columns:420px minmax(0,1fr);gap:64px}
+  ol{grid-template-columns:repeat(3,1fr)}
+  .people{grid-template-columns:repeat(2,1fr);gap:20px 40px}
+  h2{font-size:36px}
+  section{padding:64px 0}
+}
+</style>
+</head>
+<body>
+<div class="toldo" aria-hidden="true"></div>
+<div class="wrap">
+  <nav class="top"><a class="brand" href="#">Nego<span>socios</span></a><a class="pill" href="#como">Cómo funciona</a></nav>
+
+  <header class="hero">
+    <div class="copy">
+      <h1 class="rise">Cobra con QR. <em>Sabe que llegó.</em></h1>
+      <p class="lead rise d1">El cliente paga desde su celular y tu puesto recibe la confirmación verificada. El cierre del día se actualiza solo.</p>
+      <div class="bignum rise d2"><span class="num">&lt; 3 s</span><small>del pago a la confirmación en tu teléfono</small></div>
+      <div class="dock rise d3" id="dock">
+        <div class="info"><b>Tu puesto, listo hoy</b>Nombre, giro y zona</div>
+        <a class="btn" href="#como">Dar de alta mi puesto</a>
+      </div>
+    </div>
+    <div class="stage rise d1" id="stage" role="img" aria-label="Toldo rayado de un puesto de tianguis donde caen monedas y aparece Pagado 100 MXN">
+      <svg class="still" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><pattern id="st" width="64" height="10" patternUnits="userSpaceOnUse"><rect width="32" height="10" fill="#7E14FF"/><rect x="32" width="32" height="10" fill="#EDE6FF"/></pattern></defs>
+        <rect width="400" height="250" fill="#2A1750"/>
+        <path d="M40 40h320l24 70H16z" fill="url(#st)"/>
+        <g fill="#7E14FF"><circle cx="56" cy="110" r="16" fill="#7E14FF"/><circle cx="88" cy="110" r="16" fill="#EDE6FF"/><circle cx="120" cy="110" r="16"/><circle cx="152" cy="110" r="16" fill="#EDE6FF"/><circle cx="184" cy="110" r="16"/><circle cx="216" cy="110" r="16" fill="#EDE6FF"/><circle cx="248" cy="110" r="16"/><circle cx="280" cy="110" r="16" fill="#EDE6FF"/><circle cx="312" cy="110" r="16"/><circle cx="344" cy="110" r="16" fill="#EDE6FF"/></g>
+        <rect x="70" y="190" width="260" height="14" rx="7" fill="#5B4F73"/>
+        <circle cx="200" cy="165" r="14" fill="#E8C26A"/>
+      </svg>
+      <canvas id="gl"></canvas>
+      <div class="chip"><i></i>Pagado 100 MXN</div>
+    </div>
+  </header>
+</div>
+
+<main>
+<section class="proof"><div class="wrap">
+  <h2>Primero los números</h2>
+  <p class="sub">Lo que sí podemos decirte hoy.</p>
+  <div class="cards three">
+    <div class="card"><div class="num g">&lt; 3 s</div><div class="k">Confirmación verificada</div><p>El cliente paga y el puesto recibe el aviso. El cierre del día se actualiza solo.</p></div>
+    <div class="card"><div class="num">0 %</div><div class="k">Comisión en CoDi</div><p>Las operaciones CoDi no cobran comisión. Requiere internet y cuenta bancaria. <a href="https://www.codi.org.mx/secundarias/preguntas_frecuentes.html">Fuente: CoDi</a></p></div>
+    <div class="card"><div class="num">6</div><div class="k">Pasos, del alta a la promoción</div><p>No es sólo un QR de cobro: es cobro verificable, finanzas explicadas y una red de comercios locales.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap shot">
+  <div class="phone"><img src="cobrar-pagado-390.png" width="390" height="1031" alt="Pantalla real de Negosocios: Pagado 100 MXN, orden de tacos"></div>
+  <div>
+    <h2>Doña Rosa cobra sus tacos y ve esto</h2>
+    <p class="sub">Receptor, importe y beneficio antes de pagar. Después, comprobante para los dos.</p>
+    <div class="recibo"><span>Pagado 100 MXN</span><small>Orden de tacos</small></div>
+  </div>
+</div></section>
+
+<section id="como"><div class="wrap">
+  <h2>Del puesto al cierre en seis pasos</h2>
+  <p class="sub">Cobras, dictas tus gastos y sabes cuánto ganaste.</p>
+  <ol>
+    <li><div><b>Da de alta tu puesto</b><span>Nombre, giro y zona. Recibes tu perfil público y el QR del punto.</span></div></li>
+    <li><div><b>Crea un cobro</b><span>Importe y concepto. QR dinámico, estado "pendiente".</span></div></li>
+    <li class="wow"><div><b>El cliente paga</b><span>Escanea el QR o toca el sticker NFC. Tu teléfono suena: "Pagado 100 MXN".</span></div></li>
+    <li><div><b>Dicta un gasto</b><span>"Gasté 350 en tortillas." Confirma o corrige importe, categoría y fecha.</span></div></li>
+    <li><div><b>Abre el cierre del día</b><span>Ventas, gastos, utilidad estimada, pendientes y datos faltantes.</span></div></li>
+    <li><div><b>Simula una promoción</b><span>El descuento máximo que conserva tu contribución mínima, con la fórmula a la vista.</span></div></li>
+  </ol>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Para quien vende y para quien paga</h2>
+    <div class="people">
+    <div class="person"><b>Doña Rosa, tacos en el tianguis</b><span>Cobrar rápido y saber que el pago llegó.</span></div>
+    <div class="person"><b>Luis, sin efectivo</b><span>Encontrar dónde pagar con el celular y ver a quién paga.</span></div>
+    <div class="person"><b>Doña Rosa, al cerrar</b><span>Registrar gastos sin escribir y saber cuánto ganó.</span></div>
+    <div class="person"><b>Doña Rosa, planeando</b><span>Saber qué promoción puede pagar sin perder.</span></div>
+  </div>
+</div></section>
+</main>
+<div class="wrap"><footer>Negosocios · cobro verificable, finanzas explicadas, comercios locales.</footer></div>
+
+<script type="module">
+import * as THREE from 'three';
+const stage=document.getElementById('stage'),cv=document.getElementById('gl');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let ok=true,renderer;
+try{
+  renderer=new THREE.WebGLRenderer({canvas:cv,antialias:false,alpha:true,powerPreference:'low-power'});
+}catch(e){ok=false}
+if(ok){
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(32,1,.1,50);cam.position.set(0,2.2,9);cam.lookAt(0,.4,0);
+  scene.add(new THREE.AmbientLight(0xffffff,.9));
+  const dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(3,6,5);scene.add(dl);
+  // toldo: alternating stripes, tilted
+  const aw=new THREE.Group();
+  const mv=new THREE.MeshLambertMaterial({color:0x7E14FF}),ml=new THREE.MeshLambertMaterial({color:0xEDE6FF});
+  const N=10,w=.6;
+  for(let i=0;i<N;i++){
+    const s=new THREE.Mesh(new THREE.BoxGeometry(w,.12,2.4),i%2?ml:mv);
+    s.position.x=(i-(N-1)/2)*w;aw.add(s);
+    const f=new THREE.Mesh(new THREE.CylinderGeometry(w/2,w/2,.12,16,1,false,0,Math.PI),i%2?ml:mv);
+    f.rotation.set(Math.PI/2,0,0);f.rotation.z=Math.PI/2;f.position.set((i-(N-1)/2)*w,0,1.2);
+    f.rotation.set(Math.PI/2,Math.PI/2,0);aw.add(f);
+  }
+  aw.position.set(0,1.9,0);aw.rotation.x=.38;scene.add(aw);
+  // mostrador
+  const bar=new THREE.Mesh(new THREE.BoxGeometry(5.4,.25,1.4),new THREE.MeshLambertMaterial({color:0x5B4F73}));
+  bar.position.set(0,-1.5,.4);scene.add(bar);
+  // monedas: one InstancedMesh
+  const C=36;
+  const coin=new THREE.InstancedMesh(new THREE.CylinderGeometry(.22,.22,.05,18),new THREE.MeshLambertMaterial({color:0xE8C26A}),C);
+  scene.add(coin);
+  const seed=[];for(let i=0;i<C;i++)seed.push({x:(Math.random()-.5)*4,p:Math.random(),r:Math.random()*6,s:.7+Math.random()*.5});
+  const paid=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.07,24),new THREE.MeshLambertMaterial({color:0x16A34A}));
+  paid.rotation.x=Math.PI/2.4;scene.add(paid);
+  const m=new THREE.Object3D();
+  function frame(t){
+    const T=t/1000;
+    for(let i=0;i<C;i++){
+      const d=seed[i],k=((T*.12*d.s)+d.p)%1;
+      m.position.set(d.x*(1-k*.6),3.6-k*5.0,.6+Math.sin(d.r)*.5);
+      m.rotation.set(T*2+d.r,0,T*1.4+d.r);m.updateMatrix();coin.setMatrixAt(i,m.matrix);
+    }
+    coin.instanceMatrix.needsUpdate=true;
+    const c=(T%12)/12;paid.position.set(0,-1.12+Math.sin(c*Math.PI*2)*.08,1.3);paid.rotation.z=T*.8;
+    aw.rotation.x=.38+Math.sin(T*.5)*.015;
+    renderer.render(scene,cam);
+  }
+  function size(){const r=stage.getBoundingClientRect();renderer.setSize(r.width,r.height,false);cam.aspect=r.width/r.height;cam.fov=r.width/r.height<1.2?44:32;cam.updateProjectionMatrix()}
+  size();addEventListener('resize',size);
+  frame(2500);
+  cv.previousElementSibling.style.display='none';
+  if(!reduce){
+    let vis=true,onscreen=true,last=0,slow=0,n=0;
+    new IntersectionObserver(e=>{onscreen=e[0].isIntersecting}).observe(stage);
+    document.addEventListener('visibilitychange',()=>{vis=!document.hidden});
+    (function loop(t){
+      requestAnimationFrame(loop);
+      if(!vis||!onscreen||t-last<33)return;
+      slow+=t-last;n++;last=t;
+      if(n>=30){if(slow/n>40)renderer.setPixelRatio(1);slow=0;n=0}
+      frame(t);
+    })(0);
+  }
+}
+</script>
+</body>
+</html>

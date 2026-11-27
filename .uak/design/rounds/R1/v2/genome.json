@@ -1,0 +1,44 @@
+{
+  "id": "R1-v2",
+  "round": "R1",
+  "variant": 2,
+  "seed": 59194,
+  "screen": "landing",
+  "genes": {
+    "type": "rounded",
+    "scale": "restrained",
+    "color": "saturated field",
+    "layout": "editorial column",
+    "components": "hairline",
+    "imagery": "illustration",
+    "motion": "entrance",
+    "voice": "numbers first",
+    "stage": "three.js scene"
+  },
+  "recipe": "landing-story",
+  "why": {
+    "type": "spread",
+    "scale": "spread",
+    "color": "spread · project colors #EDE6FF #1B1030 #5B4F73",
+    "layout": "spread",
+    "components": "spread",
+    "imagery": "spread · project has: web/public/favicon.svg, web/public/icons.svg",
+    "motion": "prior 0.77",
+    "voice": "spread",
+    "stage": "spread"
+  },
+  "ground": "dark",
+  "creativity": 3,
+  "composition": "copy left, stage right",
+  "motif": {
+    "family": "craft or pattern of the place",
+    "text": "the striped lona awning (toldo) of a tianguis puesto, carried as the hero object and as a scalloped edge on every section"
+  },
+  "fonts": {
+    "display": "M PLUS Rounded 1c",
+    "display_weights": "700",
+    "body": "Karla",
+    "body_weights": "400;600",
+    "url": "https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Karla:wght@400;600&display=swap"
+  }
+}

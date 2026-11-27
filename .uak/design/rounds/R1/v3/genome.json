@@ -1,0 +1,43 @@
+{
+  "id": "R1-v3",
+  "round": "R1",
+  "variant": 3,
+  "seed": 59194,
+  "screen": "landing",
+  "genes": {
+    "type": "geometric",
+    "scale": "standard",
+    "color": "light paper",
+    "layout": "scroll story",
+    "components": "solid blocks",
+    "imagery": "3D cut-out",
+    "motion": "pointer",
+    "voice": "plain",
+    "stage": "canvas 2D generative"
+  },
+  "recipe": "frontend-design",
+  "why": {
+    "type": "wildcard",
+    "scale": "wildcard",
+    "color": "wildcard · project colors #EDE6FF #1B1030 #5B4F73",
+    "layout": "wildcard",
+    "components": "wildcard",
+    "imagery": "wildcard · no material for it",
+    "motion": "wildcard",
+    "voice": "wildcard",
+    "stage": "wildcard"
+  },
+  "ground": "light",
+  "creativity": 3,
+  "composition": "diagonal",
+  "motif": {
+    "family": "signage"
+  },
+  "fonts": {
+    "display": "Plus Jakarta Sans",
+    "display_weights": "800",
+    "body": "Open Sans",
+    "body_weights": "400;600",
+    "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Open+Sans:wght@400;600&display=swap"
+  }
+}

@@ -58,8 +58,8 @@ export function MenuBar({ menu, active, onSelect }: Props) {
         className={
           mobile
             ? cx(
-                "flex h-16 min-w-[60px] flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 font-display text-[length:var(--text-s)]",
-                on ? "bg-accent text-accent-ink" : "text-ink",
+                "flex h-16 min-w-[60px] flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 font-display text-[0.875rem]",
+                on ? "bg-tint text-accent" : "text-ink-2",
               )
             : cx(
                 "inline-flex h-11 cursor-pointer items-center gap-2 rounded-full px-4 font-display text-[length:var(--text-s)]",
@@ -74,10 +74,10 @@ export function MenuBar({ menu, active, onSelect }: Props) {
   };
   return (
     <>
-      <nav aria-label="Principal" className="sticky top-0 z-10 hidden border-b border-line bg-bg md:block">
+      <nav aria-label="Principal" className="sticky top-0 z-10 hidden border-b border-hairline bg-bg md:block">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-8">
           <a href="#landing" className="font-display text-[length:var(--text-l)] text-accent">negosocios</a>
-          <div className="flex items-center gap-3 rounded-full border border-line bg-surface p-1">
+          <div className="flex items-center gap-3 rounded-full bg-surface p-1 shadow-lift">
             {menu.inicio.map((e) => button(e, false))}
             {groups.map((g) => (
               <div key={g.key} role="group" aria-label={g.label} className="flex items-center gap-1 border-l border-hairline pl-3">
@@ -88,7 +88,7 @@ export function MenuBar({ menu, active, onSelect }: Props) {
           </div>
         </div>
       </nav>
-      <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface md:hidden">
+      <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-10 border-t border-hairline bg-surface shadow-bar md:hidden">
         <div className="flex overflow-x-auto">
           {menu.inicio.map((e) => button(e, true))}
           {groups.map((g) => (

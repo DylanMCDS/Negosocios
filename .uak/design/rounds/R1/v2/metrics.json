@@ -1,0 +1,16 @@
+{
+  "variant": "v2",
+  "family": "three.js",
+  "started": 1795789422,
+  "first_page": null,
+  "done": null,
+  "wall_seconds": null,
+  "passes": 0,
+  "load_start": 3.6,
+  "load_end": null,
+  "tokens": {
+    "value": null,
+    "source": null,
+    "reason": "not reported: the builder runs `bash .uak/bin/uak design done R1 v2 --tokens N` with its usage; `uak tokens` cannot tell one variant's subagent from another's"
+  }
+}

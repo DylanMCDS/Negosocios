@@ -1,0 +1,196 @@
+<!-- motif: a painted enamel price sign on a tianguis puesto wall: every section is a sign board with a hairline inner frame and a pesos price tag -->
+<!-- Subject world: puesto de tacos en tianguis; letrero de precios y pesos (MXN); sticker QR / NFC del puesto; comal y tortillas (gasto "350 en tortillas"); cierre del dia. Used visually: the price sign "Tacos · 100 MXN" and the QR that turns into "Pagado". -->
+<!-- Imagery: real product capture cobrar-pagado-390.png shown at native size (390 wide) as a cut-out phone. -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Negosocios</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Open+Sans:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#fff; --lilac:#EDE6FF; --line:#D9CFF0; --ink:#1B1030; --muted:#5B4F73;
+  --brand:#7E14FF; --paid:#0B6B34; --paid-bg:#DDF4E4;
+  --display:"Plus Jakarta Sans",system-ui,sans-serif; --body:"Open Sans",system-ui,sans-serif;
+  --shadow:0 1px 2px rgba(27,16,48,.06),0 8px 24px rgba(27,16,48,.08);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:#FBF9FF;color:var(--ink);font:400 17px/1.5 var(--body);font-variant-numeric:tabular-nums;padding-bottom:84px;-webkit-text-size-adjust:100%}
+h1,h2,h3,.num{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.08}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+.top{display:flex;align-items:center;justify-content:space-between;height:56px}
+.brand{font:800 20px var(--display);color:var(--ink);text-decoration:none}
+.brand i{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--brand);margin-right:8px}
+.tag{font:600 14px var(--body);color:var(--paid);background:var(--paid-bg);padding:6px 12px;border-radius:99px}
+/* hero */
+.hero{padding:8px 0 32px}
+.hero h1{font-size:40px;max-width:11ch}
+.hero h1 span{display:block}
+.hero h1 .b{color:var(--brand)}
+.hero p.sub{color:var(--muted);margin:14px 0 20px;max-width:30ch}
+.stage{position:relative;background:var(--paper);border-radius:24px;box-shadow:var(--shadow);padding:16px;margin-top:8px}
+.sign{background:var(--brand);color:#fff;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:relative;transform:rotate(-2deg);transition:transform .2s;box-shadow:var(--shadow)}
+.sign::after{content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.45);border-radius:11px;pointer-events:none}
+.sign b{font:800 20px var(--display)}
+.sign .price{font:800 32px var(--display);line-height:1}
+.sign .price small{font:600 15px var(--body);margin-left:4px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:1/1;margin:18px auto 0;max-width:300px}
+.status{display:flex;justify-content:center;margin-top:12px}
+.pill{font:600 17px var(--body);padding:10px 18px;border-radius:99px;background:var(--lilac);color:var(--ink);min-height:44px;display:flex;align-items:center;transition:background .3s,color .3s}
+.pill.ok{background:var(--paid-bg);color:var(--paid)}
+.cta{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(255,255,255,.96);box-shadow:0 -6px 20px rgba(27,16,48,.1);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.cta a,.btn{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:14px;background:var(--brand);color:#fff;font:800 17px var(--display);text-decoration:none;max-width:480px;margin:0 auto;padding:0 20px}
+.btn.alt{background:var(--lilac);color:var(--ink)}
+/* sections */
+section{padding:36px 0}
+.eyebrow{display:inline-block;font:600 14px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+h2{font-size:30px;margin-bottom:12px;max-width:18ch}
+.lead{color:var(--muted);max-width:44ch;margin-bottom:20px}
+.card{background:var(--paper);border-radius:20px;box-shadow:var(--shadow);padding:20px}
+.grid{display:grid;gap:14px}
+.step{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
+.step .n{width:44px;height:44px;border-radius:12px;background:var(--lilac);color:var(--brand);display:grid;place-items:center;font:800 20px var(--display)}
+.step h3{font-size:19px;margin-bottom:4px}
+.step p{color:var(--muted);font-size:16px}
+.step.wow .n{background:var(--paid-bg);color:var(--paid)}
+.step.wow{outline:1px solid var(--paid);outline-offset:-1px}
+.money{color:var(--paid)}
+.wowbox{display:grid;gap:20px;align-items:center}
+.wowbox .big{font-size:44px;color:var(--paid)}
+.phone{justify-self:center;max-width:300px;width:100%;filter:drop-shadow(0 16px 24px rgba(27,16,48,.18));border-radius:24px;height:auto}
+.who h3{font-size:19px;margin-bottom:6px}
+.who p{color:var(--muted);font-size:16px}
+.who .card{border-top:4px solid var(--lilac)}
+.who .card:first-child,.who .card:nth-child(3){border-top-color:var(--paid)}
+.vs{background:var(--ink);color:#fff;border-radius:24px;padding:24px}
+.vs h2{max-width:22ch}
+.vs p{color:#D9CFF0;max-width:52ch}
+.vs ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+.vs li{padding-left:28px;position:relative;font-weight:600}
+.vs li::before{content:"";position:absolute;left:0;top:7px;width:14px;height:8px;border-left:3px solid #6FD79B;border-bottom:3px solid #6FD79B;transform:rotate(-45deg)}
+.proof{margin-top:20px;font-size:16px;color:var(--muted)}
+.proof a{color:var(--brand);font-weight:600}
+footer{padding:12px 0 28px;color:var(--muted);font-size:16px}
+@media (min-width:900px){
+  body{padding-bottom:0}
+  .cta{position:static;background:none;box-shadow:none;padding:0}
+  .cta a{display:inline-flex;margin:0;min-width:260px}
+  .hero{padding:32px 0 56px}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  .hero h1{font-size:68px;max-width:none}
+  .hero h1 span:nth-child(2){margin-left:48px}
+  .hero h1 span:nth-child(3){margin-left:96px}
+  .hero p.sub{font-size:18px;max-width:34ch}
+  .stage{padding:24px}
+  .sign b{font-size:24px}.sign .price{font-size:40px}
+  canvas{max-width:340px}
+  h2{font-size:42px}
+  .grid.steps{grid-template-columns:repeat(3,1fr)}
+  .grid.who{grid-template-columns:repeat(4,1fr)}
+  .wowbox{grid-template-columns:1fr 300px;gap:56px}
+  .wowbox .big{font-size:72px}
+  .vs{padding:48px}
+  .tag{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="wrap top"><a class="brand" href="#"><i></i>Negosocios</a><span class="tag">Sin comisión con CoDi</span></header>
+
+<main>
+<div class="hero"><div class="wrap">
+  <div>
+    <h1><span>Cobra en tu</span> <span class="b">puesto,</span> <span>sabe que llegó.</span></h1>
+    <p class="sub">El cliente paga con su celular y en menos de 3 s tú ves “Pagado”.</p>
+    <div class="cta"><a href="#como">Ver cómo cobra Doña Rosa</a></div>
+  </div>
+  <div class="stage" id="stage">
+    <div class="sign" id="sign"><b>Tacos de Doña Rosa</b><span class="price"><span class="num" id="amt">100</span><small>MXN</small></span></div>
+    <canvas id="cv" width="600" height="600" role="img" aria-label="Un QR de cobro que se convierte en una palomita verde de pagado"></canvas>
+    <div class="status"><span class="pill" id="pill">Pendiente</span></div>
+  </div>
+</div></div>
+
+<section id="wow"><div class="wrap wowbox">
+  <div>
+    <span class="eyebrow">El momento clave</span>
+    <h2>Suena tu teléfono: <span class="money">Pagado 100 MXN</span></h2>
+    <p class="lead">El cliente paga desde su celular y en menos de 3 s el puesto recibe la confirmación verificada. El cierre del día se actualiza solo.</p>
+  </div>
+  <img class="phone" src="cobrar-pagado-390.png" width="390" height="1031" alt="Pantalla real de Negosocios: Cobrar, Pagado 100 MXN, orden de tacos" loading="lazy" style="max-width:300px;height:auto">
+</div></section>
+
+<section id="como"><div class="wrap">
+  <span class="eyebrow">Cómo funciona</span>
+  <h2>Del puesto al cierre en seis pasos</h2>
+  <div class="grid steps">
+    <div class="card step"><div class="n">1</div><div><h3>Da de alta tu puesto</h3><p>Nombre, giro y zona. Obtienes perfil público y el QR de tu punto.</p></div></div>
+    <div class="card step"><div class="n">2</div><div><h3>Crea un cobro</h3><p>Importe y concepto. Sale un QR de la orden, en estado “pendiente”.</p></div></div>
+    <div class="card step wow"><div class="n">3</div><div><h3>El cliente escanea y paga</h3><p>Ve receptor, importe y beneficio antes de pagar. Tú recibes “Pagado 100 MXN” y ambos tienen comprobante.</p></div></div>
+    <div class="card step"><div class="n">4</div><div><h3>Dicta tus gastos</h3><p>“Gasté 350 en tortillas”: importe, categoría y fecha listos para confirmar o corregir.</p></div></div>
+    <div class="card step"><div class="n">5</div><div><h3>Abre el cierre del día</h3><p>Ventas, gastos, utilidad estimada, pendientes y diferencias, con los datos faltantes señalados.</p></div></div>
+    <div class="card step"><div class="n">6</div><div><h3>Simula una promoción</h3><p>Descuento máximo que conserva tu contribución mínima, con la fórmula explicada y tope de presupuesto.</p></div></div>
+  </div>
+</div></section>
+
+<section id="quien"><div class="wrap">
+  <span class="eyebrow">Para quién</span>
+  <h2>Hecho para quien vende y quien paga</h2>
+  <div class="grid who">
+    <div class="card"><h3>Doña Rosa, en el tianguis</h3><p>Cobrar rápido y saber que el pago llegó.</p></div>
+    <div class="card"><h3>Luis, sin efectivo</h3><p>Encontrar dónde pagar con el celular y ver a quién paga.</p></div>
+    <div class="card"><h3>Doña Rosa, al cerrar</h3><p>Registrar gastos sin escribir y saber cuánto ganó.</p></div>
+    <div class="card"><h3>Doña Rosa, planeando</h3><p>Saber qué promoción puede pagar sin perder.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap"><div class="vs">
+  <span class="eyebrow" style="color:#C9A8FF">Más que un QR de cobro</span>
+  <h2>Cobro, cuentas claras y barrio</h2>
+  <p>Junta tres cosas en un solo lugar:</p>
+  <ul><li>Cobro verificable</li><li>Finanzas explicadas: cálculos con reglas, no inventados por la IA</li><li>Red de comercios locales con promociones que respetan una contribución mínima</li></ul>
+</div>
+<p class="proof">CoDi requiere internet y cuenta bancaria; operaciones sin comisión. Fuente: <a href="https://www.codi.org.mx/secundarias/preguntas_frecuentes.html">codi.org.mx</a></p>
+</div></section>
+</main>
+<footer class="wrap">Negosocios</footer>
+
+<script>
+(function(){
+  var cv=document.getElementById('cv'),c=cv.getContext('2d'),pill=document.getElementById('pill'),sign=document.getElementById('sign');
+  var N=11,S=600,cell=S/N,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var seed=7;function r(){seed=(seed*16807)%2147483647;return seed/2147483647}
+  var cells=[];for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+    var f=(x<3&&y<3)||(x>7&&y<3)||(x<3&&y>7);
+    cells.push({x:x,y:y,on:f||r()>.48,f:f,d:Math.hypot(x-5,y-5)});}
+  var check=[[2,5],[3,6],[4,7],[5,6],[6,5],[7,4],[8,3]];
+  function isCheck(x,y){for(var i=0;i<check.length;i++)if(check[i][0]==x&&check[i][1]==y)return true;return false}
+  function draw(t){ // t: 0..1 over the 12 s cycle
+    c.clearRect(0,0,S,S);
+    var scan=t<.55?Math.min(1,Math.max(0,(t-.15)/.35)):1; // sweep
+    var paid=t>=.55&&t<.93, k=paid?Math.min(1,(t-.55)/.08):0;
+    for(var i=0;i<cells.length;i++){var q=cells[i],px=q.x*cell+4,py=q.y*cell+4,w=cell-8,col,sc=1;
+      var ch=isCheck(q.x,q.y);
+      if(paid&&k>0){ if(ch){col='#0B6B34';sc=1;}else{col='#EDE6FF';sc=q.on?.0+1:0; if(!q.on)sc=0;} 
+        if(!ch&&q.on){col='#DDF4E4';sc=1-.35*k;}
+      }else{ if(!q.on)continue; col=q.f?'#1B1030':'#7E14FF'; if(t>=.93){sc=1;} }
+      if(!sc)continue;var o=(w-w*sc)/2;
+      c.fillStyle=col;c.beginPath();if(c.roundRect)c.roundRect(px+o,py+o,w*sc,w*sc,8);else c.rect(px+o,py+o,w*sc,w*sc);c.fill();}
+    if(!paid&&t>.15&&t<.55){var yy=scan*S;c.fillStyle='#1B1030';c.fillRect(0,yy-2,S,4);}
+    pill.textContent=paid?'Pagado 100 MXN':(t>.15&&t<.55?'Escaneando…':'Pendiente');
+    pill.classList.toggle('ok',paid);
+  }
+  if(reduce){draw(.7);return}
+  var start=performance.now(),last=0,vis=true;
+  document.addEventListener('visibilitychange',function(){vis=!document.hidden});
+  function loop(n){requestAnimationFrame(loop);if(!vis||n-last<33)return;last=n;draw(((n-start)/12000)%1)}
+  requestAnimationFrame(loop);
+  var st=document.getElementById('stage');
+  st.addEventListener('pointermove',function(e){var b=st.getBoundingClientRect();var dx=(e.clientX-b.left)/b.width-.5;sign.style.transform='rotate('+(-2+dx*3)+'deg)'});
+})();
+</script>
+</body>
+</html>
