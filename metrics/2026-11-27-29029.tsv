@@ -42,6 +42,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -3730,3 +3731,37 @@
 1795801758	hook-next	-	0	-	17000	dylan-2	claude-code
 1795801776	hook-inbox	-	0	-	8000	dylan-2	claude-code
 1795806440	board	-	0	-	1000	-	claude-code
+1795813588	board	-	0	-	2000	-	claude-code
+1795813267	next	-	0	-	3000	dylan-1	claude-code
+1795813271	hook-heartbeat	HACK-039	0	-	3000	dylan-1	claude-code
+1795813274	hook-status	-	0	-	0	dylan-1	claude-code
+1795813271	hook-pr-sync	HACK-039	0	-	4000	dylan-1	claude-code
+1795813275	hook-status	-	0	-	0	dylan-1	claude-code
+1795813271	hook-inbox	-	0	-	5000	dylan-1	claude-code
+1795813275	hook-inbox	-	0	-	3000	dylan-1	claude-code
+1795813285	next	-	0	-	0	dylan-2	claude-code
+1795813285	status	HACK-034	0	-	1000	dylan-2	claude-code
+1795813286	hook-heartbeat	HACK-030	0	-	3000	dylan-2	claude-code
+1795813286	hook-pr-sync	HACK-030	0	-	4000	dylan-2	claude-code
+1795813286	hook-inbox	-	0	-	6000	dylan-2	claude-code
+1795813289	hook-status	-	0	-	4000	dylan-2	claude-code
+1795813294	status	HACK-035	0	-	0	dylan-1	claude-code
+1795813293	hook-inbox	-	0	-	3000	dylan-2	claude-code
+1795813290	hook-status	-	0	-	6000	dylan-2	claude-code
+1795813296	hook-inbox	-	0	-	3000	dylan-1	claude-code
+1795813301	claim	HACK-035	0	-	5000	dylan-1	claude-code
+1795813306	inbox	-	0	-	3000	dylan-1	claude-code
+1795813316	hook-inbox	-	0	-	3000	dylan-1	claude-code
+1795813588	board	-	0	-	1000	-	claude-code
+1795813346	status	HACK-035	0	-	3000	dylan-1	claude-code
+1795813588	red	HACK-035	0	-	15000	dylan-1	claude-code
+1795813588	board	-	0	-	2000	-	claude-code
+1795813448	claim	HACK-034	0	-	6000	dylan-2	claude-code
+1795813454	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795813454	inbox	-	0	-	5000	dylan-2	claude-code
+1795813460	hook-inbox	-	0	-	4000	dylan-2	claude-code
+1795813528	status	HACK-034	0	-	4000	dylan-2	claude-code
+1795813588	red	HACK-034	0	-	6000	dylan-2	claude-code
+1795813588	board	-	0	-	1000	-	claude-code
+1795813576	hook-pr-sync	HACK-039	0	-	3000	dylan-1	claude-code
+1795813579	hook-status	-	0	-	4000	dylan-1	claude-code
