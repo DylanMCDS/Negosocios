@@ -27,6 +27,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -2903,3 +2904,29 @@
 1795786929	merge	HACK-024	3	-	18000	dylan-5	claude-code
 1795786947	hook-inbox	-	0	-	5000	dylan-5	claude-code
 1795786950	wait	HACK-024	4	-	540000	dylan-5	claude-code
+1795787490	hook-inbox	-	0	-	5000	dylan-5	claude-code
+1795787489	hook-pr-sync	HACK-017	0	-	7000	dylan-5	claude-code
+1795787496	hook-status	-	0	-	3000	dylan-5	claude-code
+1795787509	merge	HACK-024	0	-	27000	dylan-5	claude-code
+1795787524	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795787528	msg	-	0	-	6000	dylan-5	claude-code
+1795787534	status	HACK-034	0	-	0	dylan-5	claude-code
+1795787537	status	HACK-035	0	-	0	dylan-5	claude-code
+1795787543	claim	HACK-035	3	dependency-pending	4000	dylan-5	claude-code
+1795787548	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795787553	claim	HACK-029	0	-	5000	dylan-5	claude-code
+1795787558	inbox	-	0	-	3000	dylan-5	claude-code
+1795787561	status	HACK-033	0	-	0	dylan-5	claude-code
+1795787564	status	HACK-029	0	-	0	dylan-5	claude-code
+1795787572	hook-inbox	-	0	-	4000	dylan-5	claude-code
+1795788472	red	HACK-029	0	-	1000	dylan-5	claude-code
+1795788472	red	HACK-029	0	-	9000	dylan-5	claude-code
+1795787773	hook-heartbeat	HACK-017	0	-	4000	dylan-5	claude-code
+1795787794	hook-pr-sync	HACK-017	0	-	4000	dylan-5	claude-code
+1795787798	hook-status	-	0	-	4000	dylan-5	claude-code
+1795787837	next	-	0	-	4000	dylan-5	claude-code
+1795787893	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795787894	hook-inbox	-	0	-	5000	dylan-5	claude-code
+1795787919	done	HACK-029	0	-	10000	dylan-5	claude-code
+1795787929	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795787932	wait	HACK-029	4	-	540000	dylan-5	claude-code
