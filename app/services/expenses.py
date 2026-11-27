@@ -68,8 +68,7 @@ def simulate(price: int, variable_cost: int, min_contribution: int, budget: int)
     pct = result["max_discount_pct"]
     uses = None
     if result["ok"] and pct and pct > 0:
-        discount_per_use = price * pct / 100
-        uses = int(budget // discount_per_use)
+        uses = budget // (price - variable_cost - min_contribution)  # exact integer centavos
     elif result["ok"]:
         result = {"ok": False, "max_discount_pct": None, "message": "no hay margen para descontar"}
     return {**result, "formula": FORMULA, "budget_cents": budget, "max_uses": uses, "currency": "MXN"}
@@ -84,9 +83,9 @@ def seed_demo(conn: sqlite3.Connection) -> dict:
     for o in d["orders"]:
         conn.execute(
             "INSERT OR IGNORE INTO orders (id, business_id, amount_cents, currency, concept, status, idempotency_key,"
-            " codi_qr_id, qr_string, created_at, paid_at, demo_data) VALUES (:id, :business_id, :amount_cents, :currency,"
-            " :concept, :status, :idempotency_key, :codi_qr_id, :qr_string, :created_at, :paid_at, 1)",
-            {"codi_qr_id": None, "qr_string": None, "paid_at": None, **o})
+            " codi_qr_id, qr_string, created_at, expires_at, paid_at, demo_data) VALUES (:id, :business_id, :amount_cents, :currency,"
+            " :concept, :status, :idempotency_key, :codi_qr_id, :qr_string, :created_at, :expires_at, :paid_at, 1)",
+            {"codi_qr_id": None, "qr_string": None, "expires_at": None, "paid_at": None, **o})
     for p in d["payments"]:
         conn.execute(
             "INSERT OR IGNORE INTO webhook_events (webhook_id, order_id, event_type) VALUES (?, ?, 'codi.qr.payment_received')",

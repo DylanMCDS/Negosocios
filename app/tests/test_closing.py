@@ -91,3 +91,16 @@ def test_seed_loads_demo_day(env):
     count = lambda t: conn.execute(f"SELECT COUNT(*) FROM {t} WHERE demo_data = 1").fetchone()[0]
     assert (count("businesses"), count("orders"), count("payments"), count("expenses")) == (1, 3, 2, 2)
     assert conn.execute("SELECT COUNT(*) FROM webhook_events").fetchone()[0] == 2
+
+
+def test_simulate_uses_are_exact_in_integer_cents(env):
+    client, _ = env
+    body = {"price_cents": 1000, "variable_cost_cents": 839, "min_contribution_cents": 0, "budget_cents": 1610}
+    assert client.post("/api/campaigns/simulate", json=body).json()["max_uses"] == 10
+
+
+def test_seed_keeps_order_expires_at(env):
+    client, conn = env
+    client.post("/api/demo/seed")
+    row = conn.execute("SELECT expires_at FROM orders WHERE id = 'demo-order-3'").fetchone()
+    assert row[0] == "2026-11-26T12:10:00-06:00"
