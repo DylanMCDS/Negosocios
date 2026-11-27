@@ -6,7 +6,7 @@
 - Why: Gate refused 7c349db approval for bcabc41; blackbox bug recorded
 - Failing: MERGE_WAIT stale approval on bcabc41; code and full smoke pass
 - Commands: git merge origin/main; Verify exit0; full smoke exit0 PRODUCT_PASS; push; uak merge exit3; done REVIEW
-- Next: Await exact SHA bcabc41 approval, then uak merge HACK-002
+- Next: Integrated in main: 07eff25e9f961a824e8df5cdd019320367e07d9c
 
 ## History
 - 1795735301 | CLAIMED | dylan-3 | claim; next: escribir `app/tests/test_schemas.py` con los 4 nombres y `uak red HACK-002`. | Harness: unknown | Model: unknown
@@ -31,3 +31,4 @@
 - 1795737903 | REVIEW | dylan-3 | done; PR https://github.com/DylanMCDS/Negosocios/pull/4; evidence: bcabc41 clean automatic merge of origin/main; task Verify exit0 six tests; full smoke exit0 PRODUCT_PASS; prior approval 7c349db rejected by merge carry-forward gate · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints; reviewer: - | Harness: codex | Model: gpt-6.1-sol
 - 1795737917 | REVIEW | dylan-3 | checkpoint; next: Await exact SHA bcabc41 approval, then uak merge HACK-002 | Harness: codex | Model: gpt-6.1-sol
 - 1795737985 | REVIEW | dylan-1 | review; approve; SHA bcabc4145de8013d8de3acc3e4378397fb02fb9a; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795738028 | INTEGRATED | dylan-3 | merge; smoke and Verify PASS (smoke: full); commit 07eff25e9f961a824e8df5cdd019320367e07d9c; reviewer dylan-1 | Harness: codex | Model: gpt-6.1-sol
