@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { CheckCircle, Minus, Plus } from "@phosphor-icons/react";
+import { CheckCircle, Minus, Plus, QrCode } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business, Closing, Order } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, Stat, Surface } from "../../lib/ui";
@@ -219,9 +219,15 @@ function PartsView({ orderId, split, demo }: { orderId: string; split: Split; de
           <ul className="flex flex-col divide-y divide-hairline">
             {split.parts.map((p) => (
               <li key={p.idx} className="flex min-h-16 items-center gap-4 py-3">
-                {p.status !== "paid" && p.qr_string && p.idx !== hero?.idx ? (
-                  <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="max-w-[88px] shrink-0" />
-                ) : null}
+                <div className="grid size-[88px] shrink-0 place-items-center">
+                  {p.status === "paid" ? (
+                    <CheckCircle size={40} weight="fill" className="text-money" aria-hidden="true" />
+                  ) : p.idx === hero?.idx || !p.qr_string ? (
+                    <QrCode size={40} className="text-accent" aria-hidden="true" />
+                  ) : (
+                    <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="max-w-[88px]" />
+                  )}
+                </div>
                 <p className="flex-1 font-semibold">{`Parte ${p.idx}`}</p>
                 <p className="font-display">{mxn(p.amount_cents)}</p>
                 {p.status === "paid" ? (
@@ -252,24 +258,24 @@ function PartPage({ orderId, idx }: { orderId: string; idx: number }) {
   const paid = part.status === "paid";
   const demo = data.order.demo_data || data.business.demo_data;
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <PageHeader title={paid ? "Pago confirmado" : "Paga tu parte"} lead={`Parte ${idx} de ${split.parts.length}`} action={demo ? <DataBadge /> : undefined} />
-      <Surface className="grid gap-6 md:grid-cols-[1fr_300px] md:items-center">
-        <div className="flex flex-col gap-6">
-          <div>
-            <p className="text-[length:var(--text-s)] text-ink-2">Pagas a</p>
-            <p className="font-display text-[length:var(--text-xl)] leading-tight">{data.business.name}</p>
-          </div>
-          <Stat label="Tu parte" value={mxn(part.amount_cents)} unit="MXN" hero />
-          {paid && <Chip tone="ok"><CheckCircle size={20} className="mr-2" aria-hidden="true" />Pagado</Chip>}
+    <div className="mx-auto grid max-w-5xl gap-8 py-2 md:grid-cols-[1fr_440px] md:items-center">
+      <div className="flex flex-col gap-6">
+        <PageHeader title={paid ? "Pago confirmado" : "Paga tu parte"} lead={`Parte ${idx} de ${split.parts.length}`} action={demo ? <DataBadge /> : undefined} />
+        <div>
+          <p className="text-[length:var(--text-s)] text-ink-2">Pagas a</p>
+          <p className="font-display text-[length:var(--text-xl)] leading-tight">{data.business.name}</p>
         </div>
-        {!paid && part.qr_string && (
-          <div className="flex flex-col items-center gap-3 rounded-lg bg-tint p-4">
-            <QrCubes value={part.qr_string} label={`Código QR de la parte ${idx}`} className="max-w-[260px]" />
-            <p className="text-ink-2" aria-live="polite">Esperando tu pago…</p>
+        <Stat label="Tu parte" value={mxn(part.amount_cents)} unit="MXN" hero />
+        {paid && <Chip tone="ok"><CheckCircle size={20} className="mr-2" aria-hidden="true" />Pagado</Chip>}
+      </div>
+      {!paid && part.qr_string && (
+        <div className="flex flex-col items-center gap-3 rounded-lg bg-tint p-6">
+          <div className="w-full rounded-md bg-surface p-4">
+            <QrCubes value={part.qr_string} label={`Código QR de la parte ${idx}`} className="mx-auto max-w-[360px]" />
           </div>
-        )}
-      </Surface>
+          <p className="text-ink-2" aria-live="polite">Esperando tu pago…</p>
+        </div>
+      )}
     </div>
   );
 }
