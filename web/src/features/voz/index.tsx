@@ -97,69 +97,73 @@ export default function Voz() {
     }
   }
 
+  const confirm = proposed ? (
+    <Surface>
+      <div className="flex flex-col gap-4">
+        {ambiguous && (
+          <Chip>
+            <Warning size={16} aria-hidden="true" /> Corrige el importe: no pudimos leerlo con claridad.
+          </Chip>
+        )}
+        <label className="flex flex-col gap-2">
+          <span className="text-[length:var(--text-s)] text-ink-2">Importe</span>
+          <input
+            className="h-20 w-full rounded-md border border-line bg-surface px-4 font-display text-[length:var(--text-xl)] font-medium text-ink"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-2">
+            <span>Categoría</span>
+            <input className={field} value={category} onChange={(e) => setCategory(e.target.value)} />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span>Fecha</span>
+            <input className={field} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </label>
+        </div>
+        <label className="flex flex-col gap-2">
+          <span>Descripción</span>
+          <input className={field} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </label>
+        <Button onClick={save} disabled={!canSave}>
+          Confirmar y guardar
+        </Button>
+      </div>
+    </Surface>
+  ) : undefined;
+
   return (
-    <PageLayout>
+    <>
       <PageHeader title="Gastos por voz" lead="Di tu gasto y confírmalo antes de guardar." />
-      <div className="flex flex-col gap-6 py-8">
+      <PageLayout aside={confirm}>
         <Surface>
           <div className="flex flex-col gap-4">
             {Speech ? (
-              <Button onClick={dictate} disabled={listening}>
+              <Button variant="secondary" onClick={dictate} disabled={listening}>
                 <Microphone size={24} aria-hidden="true" /> {listening ? "Escuchando…" : "Dictar"}
               </Button>
             ) : (
-              <p className="text-[length:var(--text-s)] text-ink-2">
-                Tu navegador no entiende voz; escribe el gasto.
-              </p>
+              <p className="text-[length:var(--text-s)] text-ink-2">Tu navegador no entiende voz; escribe el gasto.</p>
             )}
             <label className="flex flex-col gap-2">
               <span>Lo que dijiste</span>
               <input className={field} value={text} onChange={(e) => setText(e.target.value)} placeholder="gasté 350 en tortillas" />
             </label>
-            <Button variant="secondary" onClick={interpret} disabled={!text.trim() || phase === "busy"}>
+            <Button onClick={interpret} disabled={!text.trim() || phase === "busy"}>
               Interpretar
             </Button>
           </div>
         </Surface>
-
-        {proposed && (
-          <Surface>
-            <div className="flex flex-col gap-4">
-              {ambiguous && (
-                <Chip>
-                  <Warning size={16} aria-hidden="true" /> Corrige el importe: no pudimos leerlo con claridad.
-                </Chip>
-              )}
-              <label className="flex flex-col gap-2">
-                <span>Importe</span>
-                <input className={field} inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span>Categoría</span>
-                <input className={field} value={category} onChange={(e) => setCategory(e.target.value)} />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span>Descripción</span>
-                <input className={field} value={description} onChange={(e) => setDescription(e.target.value)} />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span>Fecha</span>
-                <input className={field} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-              </label>
-              <Button onClick={save} disabled={!canSave}>
-                Confirmar y guardar
-              </Button>
-            </div>
-          </Surface>
-        )}
-
         {phase === "saved" && (
           <p role="status" className="flex items-center gap-2">
             <CheckCircle size={24} aria-hidden="true" /> Gasto guardado.
           </p>
         )}
         {phase === "failed" && <p role="alert">No se pudo completar. Intenta de nuevo.</p>}
-      </div>
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }
