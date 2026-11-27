@@ -1,0 +1,156 @@
+[
+ {
+  "business_a": "pop-jugos-01",
+  "business_b": "pop-fonda-01",
+  "giver": "pop-fonda-01",
+  "discount_pct": 14.1,
+  "price_cents": 8500,
+  "variable_cost_cents": 4800,
+  "min_contribution_cents": 1700,
+  "budget_cents": 30000,
+  "max_uses": 30
+ },
+ {
+  "business_a": "pop-jugos-01",
+  "business_b": "pop-tacos-01",
+  "giver": "pop-tacos-01",
+  "discount_pct": 16.0,
+  "price_cents": 6000,
+  "variable_cost_cents": 3200,
+  "min_contribution_cents": 1200,
+  "budget_cents": 50000,
+  "max_uses": 30
+ },
+ {
+  "business_a": "pop-reparacion-de-celulares-01",
+  "business_b": "pop-papeleria-01",
+  "giver": "pop-papeleria-01",
+  "discount_pct": 30.0,
+  "price_cents": 2000,
+  "variable_cost_cents": 600,
+  "min_contribution_cents": 400,
+  "budget_cents": 20000,
+  "max_uses": 60
+ },
+ {
+  "business_a": "pop-estetica-02",
+  "business_b": "pop-barberia-01",
+  "giver": "pop-barberia-01",
+  "discount_pct": 36.0,
+  "price_cents": 9000,
+  "variable_cost_cents": 1800,
+  "min_contribution_cents": 1800,
+  "budget_cents": 30000,
+  "max_uses": 60
+ },
+ {
+  "business_a": "pop-tacos-02",
+  "business_b": "pop-tortilleria-01",
+  "giver": "pop-tortilleria-01",
+  "discount_pct": 13.3,
+  "price_cents": 2600,
+  "variable_cost_cents": 1500,
+  "min_contribution_cents": 520,
+  "budget_cents": 20000,
+  "max_uses": 40
+ },
+ {
+  "business_a": "pop-recauderia-02",
+  "business_b": "pop-tortilleria-01",
+  "giver": "pop-tortilleria-01",
+  "discount_pct": 13.3,
+  "price_cents": 2600,
+  "variable_cost_cents": 1500,
+  "min_contribution_cents": 520,
+  "budget_cents": 50000,
+  "max_uses": 40
+ },
+ {
+  "business_a": "pop-jugos-01",
+  "business_b": "pop-fruteria-01",
+  "giver": "pop-fruteria-01",
+  "discount_pct": 7.9,
+  "price_cents": 4500,
+  "variable_cost_cents": 3000,
+  "min_contribution_cents": 900,
+  "budget_cents": 50000,
+  "max_uses": 60
+ },
+ {
+  "business_a": "pop-tortilleria-03",
+  "business_b": "pop-abarrotes-01",
+  "giver": "pop-abarrotes-01",
+  "discount_pct": 3.0,
+  "price_cents": 12000,
+  "variable_cost_cents": 9000,
+  "min_contribution_cents": 2400,
+  "budget_cents": 20000,
+  "max_uses": 60
+ },
+ {
+  "business_a": "pop-fonda-01",
+  "business_b": "pop-tamales-01",
+  "giver": "pop-tamales-01",
+  "discount_pct": 20.7,
+  "price_cents": 2200,
+  "variable_cost_cents": 1000,
+  "min_contribution_cents": 440,
+  "budget_cents": 40000,
+  "max_uses": 40
+ },
+ {
+  "business_a": "pop-estetica-02",
+  "business_b": "pop-flores-01",
+  "giver": "pop-flores-01",
+  "discount_pct": 18.0,
+  "price_cents": 12000,
+  "variable_cost_cents": 6000,
+  "min_contribution_cents": 2400,
+  "budget_cents": 40000,
+  "max_uses": 30
+ },
+ {
+  "business_a": "pop-estetica-01",
+  "business_b": "pop-costurera-01",
+  "giver": "pop-costurera-01",
+  "discount_pct": 43.0,
+  "price_cents": 6000,
+  "variable_cost_cents": 500,
+  "min_contribution_cents": 1200,
+  "budget_cents": 20000,
+  "max_uses": 40
+ },
+ {
+  "business_a": "pop-reparacion-de-celulares-02",
+  "business_b": "pop-cerrajeria-01",
+  "giver": "pop-cerrajeria-01",
+  "discount_pct": 32.5,
+  "price_cents": 3500,
+  "variable_cost_cents": 900,
+  "min_contribution_cents": 700,
+  "budget_cents": 20000,
+  "max_uses": 20
+ },
+ {
+  "business_a": "pop-jugos-01",
+  "business_b": "rosa",
+  "giver": "rosa",
+  "discount_pct": 16.0,
+  "price_cents": 6000,
+  "variable_cost_cents": 3200,
+  "min_contribution_cents": 1200,
+  "budget_cents": 20000,
+  "max_uses": 60
+ },
+ {
+  "business_a": "rosa",
+  "business_b": "pop-tortilleria-01",
+  "giver": "pop-tortilleria-01",
+  "discount_pct": 13.3,
+  "price_cents": 2600,
+  "variable_cost_cents": 1500,
+  "min_contribution_cents": 520,
+  "budget_cents": 30000,
+  "max_uses": 20
+ }
+]

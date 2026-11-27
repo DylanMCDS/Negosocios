@@ -1,0 +1,2115 @@
+[
+ {
+  "id": "pop-tortilleria-01",
+  "name": "Tortillería La Esperanza · Centro Oriente",
+  "category": "Tortillería",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.424,
+  "lng": -99.116,
+  "itinerant": true,
+  "chain": true,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Kilo de tortilla",
+    "price_cents": 2600,
+    "cost_cents": 1500
+   },
+   {
+    "name": "Medio kilo",
+    "price_cents": 1400,
+    "cost_cents": 800
+   },
+   {
+    "name": "Tostadas",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "1234"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-tortilleria-02",
+  "name": "Tortillería La Esperanza · San Juan",
+  "category": "Tortillería",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.435,
+  "lng": -99.145,
+  "itinerant": false,
+  "chain": true,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Kilo de tortilla",
+    "price_cents": 2600,
+    "cost_cents": 1500
+   },
+   {
+    "name": "Medio kilo",
+    "price_cents": 1400,
+    "cost_cents": 800
+   },
+   {
+    "name": "Tostadas",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "9153"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-tortilleria-03",
+  "name": "Tortillería La Esperanza · Regina",
+  "category": "Tortillería",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.43,
+  "lng": -99.142,
+  "itinerant": false,
+  "chain": true,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Kilo de tortilla",
+    "price_cents": 2600,
+    "cost_cents": 1500
+   },
+   {
+    "name": "Medio kilo",
+    "price_cents": 1400,
+    "cost_cents": 800
+   },
+   {
+    "name": "Tostadas",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "7072"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-papeleria-01",
+  "name": "Papelería Pluma Azul · Reforma",
+  "category": "Papelería",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.432,
+  "lng": -99.16,
+  "itinerant": false,
+  "chain": true,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Copias (10)",
+    "price_cents": 2000,
+    "cost_cents": 600
+   },
+   {
+    "name": "Cuaderno",
+    "price_cents": 3800,
+    "cost_cents": 2200
+   },
+   {
+    "name": "Pluma",
+    "price_cents": 800,
+    "cost_cents": 350
+   },
+   {
+    "name": "Impresión",
+    "price_cents": 1000,
+    "cost_cents": 300
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "4991"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-papeleria-02",
+  "name": "Papelería Pluma Azul · Centro Oriente",
+  "category": "Papelería",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.429,
+  "lng": -99.118,
+  "itinerant": true,
+  "chain": true,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Copias (10)",
+    "price_cents": 2000,
+    "cost_cents": 600
+   },
+   {
+    "name": "Cuaderno",
+    "price_cents": 3800,
+    "cost_cents": 2200
+   },
+   {
+    "name": "Pluma",
+    "price_cents": 800,
+    "cost_cents": 350
+   },
+   {
+    "name": "Impresión",
+    "price_cents": 1000,
+    "cost_cents": 300
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "2910"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-abarrotes-01",
+  "name": "Abarrotes Don Pepe · San Juan",
+  "category": "Abarrotes",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.43,
+  "lng": -99.144,
+  "itinerant": false,
+  "chain": true,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Despensa chica",
+    "price_cents": 12000,
+    "cost_cents": 9000
+   },
+   {
+    "name": "Refresco 600 ml",
+    "price_cents": 2000,
+    "cost_cents": 1400
+   },
+   {
+    "name": "Pan de caja",
+    "price_cents": 4200,
+    "cost_cents": 3200
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "0829"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-abarrotes-02",
+  "name": "Abarrotes Don Pepe · Regina",
+  "category": "Abarrotes",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.43,
+  "lng": -99.142,
+  "itinerant": false,
+  "chain": true,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Despensa chica",
+    "price_cents": 12000,
+    "cost_cents": 9000
+   },
+   {
+    "name": "Refresco 600 ml",
+    "price_cents": 2000,
+    "cost_cents": 1400
+   },
+   {
+    "name": "Pan de caja",
+    "price_cents": 4200,
+    "cost_cents": 3200
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "8748"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-abarrotes-03",
+  "name": "Abarrotes Don Pepe · Reforma",
+  "category": "Abarrotes",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.426,
+  "lng": -99.154,
+  "itinerant": false,
+  "chain": true,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Despensa chica",
+    "price_cents": 12000,
+    "cost_cents": 9000
+   },
+   {
+    "name": "Refresco 600 ml",
+    "price_cents": 2000,
+    "cost_cents": 1400
+   },
+   {
+    "name": "Pan de caja",
+    "price_cents": 4200,
+    "cost_cents": 3200
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "6667"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-tacos-01",
+  "name": "Tacos El Compadre",
+  "category": "Tacos",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.428,
+  "lng": -99.116,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Orden de tacos",
+    "price_cents": 6000,
+    "cost_cents": 3200
+   },
+   {
+    "name": "Quesadilla",
+    "price_cents": 4500,
+    "cost_cents": 2200
+   },
+   {
+    "name": "Refresco",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "4586"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-cerrajeria-01",
+  "name": "Cerrajería El Llavero",
+  "category": "Cerrajería",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.432,
+  "lng": -99.142,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Copia de llave",
+    "price_cents": 3500,
+    "cost_cents": 900
+   },
+   {
+    "name": "Apertura",
+    "price_cents": 35000,
+    "cost_cents": 3000
+   },
+   {
+    "name": "Cambio de chapa",
+    "price_cents": 55000,
+    "cost_cents": 28000
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "2505"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-barberia-01",
+  "name": "Barbería El Navajas",
+  "category": "Barbería",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.425,
+  "lng": -99.142,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Corte clásico",
+    "price_cents": 9000,
+    "cost_cents": 1800
+   },
+   {
+    "name": "Barba",
+    "price_cents": 5000,
+    "cost_cents": 900
+   },
+   {
+    "name": "Corte infantil",
+    "price_cents": 7000,
+    "cost_cents": 1500
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "0424"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-reparacion-de-celulares-01",
+  "name": "Celulares Express",
+  "category": "Reparación de celulares",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.432,
+  "lng": -99.157,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Cambio de pantalla",
+    "price_cents": 65000,
+    "cost_cents": 38000
+   },
+   {
+    "name": "Cambio de batería",
+    "price_cents": 38000,
+    "cost_cents": 18000
+   },
+   {
+    "name": "Mica",
+    "price_cents": 8000,
+    "cost_cents": 1500
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "8343"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-costurera-01",
+  "name": "Costura Doña Aurora",
+  "category": "Costurera",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.429,
+  "lng": -99.118,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Arreglo de bastilla",
+    "price_cents": 6000,
+    "cost_cents": 500
+   },
+   {
+    "name": "Cierre nuevo",
+    "price_cents": 9000,
+    "cost_cents": 2500
+   },
+   {
+    "name": "Ajuste de camisa",
+    "price_cents": 8000,
+    "cost_cents": 700
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "6262"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-tortilleria-04",
+  "name": "Tortillería La Esperanza",
+  "category": "Tortillería",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.437,
+  "lng": -99.147,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Kilo de tortilla",
+    "price_cents": 2600,
+    "cost_cents": 1500
+   },
+   {
+    "name": "Medio kilo",
+    "price_cents": 1400,
+    "cost_cents": 800
+   },
+   {
+    "name": "Tostadas",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "4181"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-tortilleria-05",
+  "name": "Tortillería El Maíz",
+  "category": "Tortillería",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.428,
+  "lng": -99.143,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Kilo de tortilla",
+    "price_cents": 2600,
+    "cost_cents": 1500
+   },
+   {
+    "name": "Medio kilo",
+    "price_cents": 1400,
+    "cost_cents": 800
+   },
+   {
+    "name": "Tostadas",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "2100"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-papeleria-03",
+  "name": "Papelería La Tinta",
+  "category": "Papelería",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.426,
+  "lng": -99.154,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Copias (10)",
+    "price_cents": 2000,
+    "cost_cents": 600
+   },
+   {
+    "name": "Cuaderno",
+    "price_cents": 3800,
+    "cost_cents": 2200
+   },
+   {
+    "name": "Pluma",
+    "price_cents": 800,
+    "cost_cents": 350
+   },
+   {
+    "name": "Impresión",
+    "price_cents": 1000,
+    "cost_cents": 300
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "0019"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-papeleria-04",
+  "name": "Papelería Pluma Azul",
+  "category": "Papelería",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.428,
+  "lng": -99.122,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Copias (10)",
+    "price_cents": 2000,
+    "cost_cents": 600
+   },
+   {
+    "name": "Cuaderno",
+    "price_cents": 3800,
+    "cost_cents": 2200
+   },
+   {
+    "name": "Pluma",
+    "price_cents": 800,
+    "cost_cents": 350
+   },
+   {
+    "name": "Impresión",
+    "price_cents": 1000,
+    "cost_cents": 300
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "7938"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-fruteria-01",
+  "name": "Frutería Don Beto",
+  "category": "Frutería",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.434,
+  "lng": -99.145,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Kilo de manzana",
+    "price_cents": 4500,
+    "cost_cents": 3000
+   },
+   {
+    "name": "Kilo de plátano",
+    "price_cents": 2800,
+    "cost_cents": 1700
+   },
+   {
+    "name": "Fruta picada",
+    "price_cents": 3500,
+    "cost_cents": 1600
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "5857"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-recauderia-01",
+  "name": "Recaudería Doña Mary",
+  "category": "Recaudería",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.425,
+  "lng": -99.139,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Kilo de jitomate",
+    "price_cents": 3200,
+    "cost_cents": 2000
+   },
+   {
+    "name": "Manojo de cilantro",
+    "price_cents": 1000,
+    "cost_cents": 500
+   },
+   {
+    "name": "Kilo de chile",
+    "price_cents": 6000,
+    "cost_cents": 3800
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "3776"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-barberia-02",
+  "name": "Barbería Don Memo",
+  "category": "Barbería",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.426,
+  "lng": -99.155,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Corte clásico",
+    "price_cents": 9000,
+    "cost_cents": 1800
+   },
+   {
+    "name": "Barba",
+    "price_cents": 5000,
+    "cost_cents": 900
+   },
+   {
+    "name": "Corte infantil",
+    "price_cents": 7000,
+    "cost_cents": 1500
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "1695"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-fonda-01",
+  "name": "Fonda Doña Chela",
+  "category": "Fonda",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.424,
+  "lng": -99.122,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Comida corrida",
+    "price_cents": 8500,
+    "cost_cents": 4800
+   },
+   {
+    "name": "Caldo de pollo",
+    "price_cents": 6500,
+    "cost_cents": 3400
+   },
+   {
+    "name": "Agua fresca",
+    "price_cents": 2500,
+    "cost_cents": 700
+   },
+   {
+    "name": "Postre",
+    "price_cents": 3500,
+    "cost_cents": 1500
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "9614"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-abarrotes-04",
+  "name": "Abarrotes Don Pepe",
+  "category": "Abarrotes",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.434,
+  "lng": -99.147,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Despensa chica",
+    "price_cents": 12000,
+    "cost_cents": 9000
+   },
+   {
+    "name": "Refresco 600 ml",
+    "price_cents": 2000,
+    "cost_cents": 1400
+   },
+   {
+    "name": "Pan de caja",
+    "price_cents": 4200,
+    "cost_cents": 3200
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "7533"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-flores-01",
+  "name": "Flores La Primavera",
+  "category": "Flores",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.431,
+  "lng": -99.143,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Ramo chico",
+    "price_cents": 12000,
+    "cost_cents": 6000
+   },
+   {
+    "name": "Ramo grande",
+    "price_cents": 25000,
+    "cost_cents": 12000
+   },
+   {
+    "name": "Maceta",
+    "price_cents": 18000,
+    "cost_cents": 8000
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "5452"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-cerrajeria-02",
+  "name": "Cerrajería La Segura",
+  "category": "Cerrajería",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.426,
+  "lng": -99.157,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Copia de llave",
+    "price_cents": 3500,
+    "cost_cents": 900
+   },
+   {
+    "name": "Apertura",
+    "price_cents": 35000,
+    "cost_cents": 3000
+   },
+   {
+    "name": "Cambio de chapa",
+    "price_cents": 55000,
+    "cost_cents": 28000
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "3371"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-tacos-02",
+  "name": "Tacos La Esquina",
+  "category": "Tacos",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.423,
+  "lng": -99.118,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Orden de tacos",
+    "price_cents": 6000,
+    "cost_cents": 3200
+   },
+   {
+    "name": "Quesadilla",
+    "price_cents": 4500,
+    "cost_cents": 2200
+   },
+   {
+    "name": "Refresco",
+    "price_cents": 2200,
+    "cost_cents": 1100
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "1290"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-tamales-01",
+  "name": "Tamales Doña Tere",
+  "category": "Tamales",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.433,
+  "lng": -99.14,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Tamal",
+    "price_cents": 2200,
+    "cost_cents": 1000
+   },
+   {
+    "name": "Atole",
+    "price_cents": 2500,
+    "cost_cents": 900
+   },
+   {
+    "name": "Docena de tamales",
+    "price_cents": 24000,
+    "cost_cents": 11000
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "9209"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-flores-02",
+  "name": "Flores Doña Margarita",
+  "category": "Flores",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.43,
+  "lng": -99.138,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Ramo chico",
+    "price_cents": 12000,
+    "cost_cents": 6000
+   },
+   {
+    "name": "Ramo grande",
+    "price_cents": 25000,
+    "cost_cents": 12000
+   },
+   {
+    "name": "Maceta",
+    "price_cents": 18000,
+    "cost_cents": 8000
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "7128"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-jugos-01",
+  "name": "Jugos La Naranja",
+  "category": "Jugos",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.427,
+  "lng": -99.154,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Jugo grande",
+    "price_cents": 4500,
+    "cost_cents": 1800
+   },
+   {
+    "name": "Licuado",
+    "price_cents": 5500,
+    "cost_cents": 2400
+   },
+   {
+    "name": "Torta",
+    "price_cents": 5800,
+    "cost_cents": 3000
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "5047"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-estetica-01",
+  "name": "Estética Lupita",
+  "category": "Estética",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.429,
+  "lng": -99.116,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Corte y secado",
+    "price_cents": 15000,
+    "cost_cents": 3500
+   },
+   {
+    "name": "Tinte",
+    "price_cents": 35000,
+    "cost_cents": 14000
+   },
+   {
+    "name": "Manicure",
+    "price_cents": 12000,
+    "cost_cents": 3000
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "2966"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-costurera-02",
+  "name": "Arreglos La Aguja",
+  "category": "Costurera",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.433,
+  "lng": -99.142,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Arreglo de bastilla",
+    "price_cents": 6000,
+    "cost_cents": 500
+   },
+   {
+    "name": "Cierre nuevo",
+    "price_cents": 9000,
+    "cost_cents": 2500
+   },
+   {
+    "name": "Ajuste de camisa",
+    "price_cents": 8000,
+    "cost_cents": 700
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "0885"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-fruteria-02",
+  "name": "Frutería La Cosecha",
+  "category": "Frutería",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.429,
+  "lng": -99.14,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "tue": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "wed": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "thu": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "fri": {
+    "open": "10:00",
+    "close": "20:00"
+   },
+   "sat": {
+    "open": "10:00",
+    "close": "20:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Kilo de manzana",
+    "price_cents": 4500,
+    "cost_cents": 3000
+   },
+   {
+    "name": "Kilo de plátano",
+    "price_cents": 2800,
+    "cost_cents": 1700
+   },
+   {
+    "name": "Fruta picada",
+    "price_cents": 3500,
+    "cost_cents": 1600
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "8804"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-estetica-02",
+  "name": "Estética Brillo",
+  "category": "Estética",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.431,
+  "lng": -99.154,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "tue": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "wed": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "thu": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "fri": {
+    "open": "09:00",
+    "close": "19:00"
+   },
+   "sat": {
+    "open": "09:00",
+    "close": "19:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Corte y secado",
+    "price_cents": 15000,
+    "cost_cents": 3500
+   },
+   {
+    "name": "Tinte",
+    "price_cents": 35000,
+    "cost_cents": 14000
+   },
+   {
+    "name": "Manicure",
+    "price_cents": 12000,
+    "cost_cents": 3000
+   }
+  ],
+  "payout": {
+   "bank": "Banorte",
+   "last4": "6723"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-recauderia-02",
+  "name": "Recaudería La Milpa",
+  "category": "Recaudería",
+  "zone": "Tianguis de ejemplo, Centro Oriente",
+  "lat": 19.426,
+  "lng": -99.122,
+  "itinerant": true,
+  "chain": false,
+  "schedule": {
+   "tue": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "15:00"
+   },
+   "sun": {
+    "open": "08:00",
+    "close": "15:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: visita del equipo a su local y comprobante de domicilio",
+  "products": [
+   {
+    "name": "Kilo de jitomate",
+    "price_cents": 3200,
+    "cost_cents": 2000
+   },
+   {
+    "name": "Manojo de cilantro",
+    "price_cents": 1000,
+    "cost_cents": 500
+   },
+   {
+    "name": "Kilo de chile",
+    "price_cents": 6000,
+    "cost_cents": 3800
+   }
+  ],
+  "payout": {
+   "bank": "Santander",
+   "last4": "4642"
+  },
+  "popularity": 1
+ },
+ {
+  "id": "pop-reparacion-de-celulares-02",
+  "name": "Reparación Digital Memo",
+  "category": "Reparación de celulares",
+  "zone": "Mercado de ejemplo, San Juan",
+  "lat": 19.438,
+  "lng": -99.143,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Cambio de pantalla",
+    "price_cents": 65000,
+    "cost_cents": 38000
+   },
+   {
+    "name": "Cambio de batería",
+    "price_cents": 38000,
+    "cost_cents": 18000
+   },
+   {
+    "name": "Mica",
+    "price_cents": 8000,
+    "cost_cents": 1500
+   }
+  ],
+  "payout": {
+   "bank": "HSBC",
+   "last4": "2561"
+  },
+  "popularity": 2
+ },
+ {
+  "id": "pop-abarrotes-05",
+  "name": "Abarrotes La Preferida",
+  "category": "Abarrotes",
+  "zone": "Calle comercial de ejemplo, Regina",
+  "lat": 19.43,
+  "lng": -99.141,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": "Verificado: identificación del dueño y fotografía del puesto",
+  "products": [
+   {
+    "name": "Despensa chica",
+    "price_cents": 12000,
+    "cost_cents": 9000
+   },
+   {
+    "name": "Refresco 600 ml",
+    "price_cents": 2000,
+    "cost_cents": 1400
+   },
+   {
+    "name": "Pan de caja",
+    "price_cents": 4200,
+    "cost_cents": 3200
+   }
+  ],
+  "payout": {
+   "bank": "Banamex",
+   "last4": "0480"
+  },
+  "popularity": 3
+ },
+ {
+  "id": "pop-tamales-02",
+  "name": "Tamales El Güero",
+  "category": "Tamales",
+  "zone": "Corredor de oficinas de ejemplo, Reforma",
+  "lat": 19.429,
+  "lng": -99.16,
+  "itinerant": false,
+  "chain": false,
+  "schedule": {
+   "mon": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "tue": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "wed": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "thu": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "fri": {
+    "open": "08:00",
+    "close": "18:00"
+   },
+   "sat": {
+    "open": "08:00",
+    "close": "18:00"
+   }
+  },
+  "accepts_codi": true,
+  "verification": null,
+  "products": [
+   {
+    "name": "Tamal",
+    "price_cents": 2200,
+    "cost_cents": 1000
+   },
+   {
+    "name": "Atole",
+    "price_cents": 2500,
+    "cost_cents": 900
+   },
+   {
+    "name": "Docena de tamales",
+    "price_cents": 24000,
+    "cost_cents": 11000
+   }
+  ],
+  "payout": {
+   "bank": "BBVA",
+   "last4": "8399"
+  },
+  "popularity": 2
+ }
+]
