@@ -69,3 +69,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795814108 | allow | dylan | test change: HACK-035 | Why: Barra movil 5+Mas (decision de Dylan): los tests del menu deben reflejar las nuevas entradas
 - 1795818913 | plan | dylan/dylan | tasks added: HACK-040 HACK-041 HACK-042 HACK-043 HACK-044 HACK-045 HACK-046 | Why: backlog without PR (Plan-Channel: claims)
 - 1795819108 | HACK-043 | Auto-aceptar de forma perezosa al listar/consultar codigo tras DEMO_ACCEPT_SECONDS=3, sin cambiar esquema; demo = business_b.demo_data | Why: evita job en segundo plano y migracion
+- 1795819311 | HACK-041 | pendientes por ids en localStorage + GET /orders/{id}; sin resaltar dígito nuevo | Why: no hay endpoint de lista de órdenes
