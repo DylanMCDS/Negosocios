@@ -98,3 +98,43 @@ def test_order_marks_settlement_simulated_without_real_account(api):
     assert fake.calls[-1]["bank_account_id"] is None
     assert client.get(f"/api/orders/{second['id']}/settlement").json()["settlement"] == "simulada"
     assert client.get("/api/orders/9999999/settlement").status_code == 404
+
+
+def test_pey_mode_is_rejected_while_the_client_cannot_send_bank_account_id(tmp_path):
+    from app.services.pey import (
+        FakePeyClient,  # today's client: no bank_account_id parameter
+    )
+
+    settings = Settings(database_path=str(tmp_path / "nopey.db"))
+    application = create_app(web_dist=None)
+    application.dependency_overrides[get_settings] = lambda: settings
+    application.dependency_overrides[get_pey_client] = lambda: FakePeyClient()
+    with TestClient(application) as client:
+        bid = client.post("/api/businesses", json={"name": "N", "category": "C", "zone": "Z"}).json()["id"]
+        r = put(client, bid, clabe=BBVA, mode="pey", pey_bank_account_id="ba-1")
+        assert r.status_code == 422 and "cobro directo" in r.text.lower()
+        assert client.get(f"/api/businesses/{bid}/payout-account").status_code == 404  # nothing saved
+        assert put(client, bid, clabe=BBVA).status_code == 200  # simulated still fine
+        assert order(client, bid)["business_id"] == bid
+
+
+def test_existing_pey_account_never_crashes_a_charge_when_the_client_cannot_send_it(tmp_path):
+    from app.services.pey import FakePeyClient
+
+    settings = Settings(database_path=str(tmp_path / "legacy.db"))
+    application = create_app(web_dist=None)
+    application.dependency_overrides[get_settings] = lambda: settings
+    application.dependency_overrides[get_pey_client] = lambda: FakePeyClient()
+    with TestClient(application) as client:
+        bid = client.post("/api/businesses", json={"name": "N", "category": "C", "zone": "Z"}).json()["id"]
+        put(client, bid, clabe=BBVA)  # creates the tables
+        conn = sqlite3.connect(settings.database_path)
+        conn.execute("UPDATE payout_accounts SET mode = 'pey', pey_bank_account_id = 'ba-9' WHERE business_id = ?", (bid,))
+        conn.commit()
+        conn.close()
+        r = client.post(
+            "/api/orders", headers={"Idempotency-Key": "k9"},
+            json={"business_id": bid, "amount_cents": 10000, "concept": "Orden"},
+        )
+        assert r.status_code == 503 and "cobro directo" in r.text.lower()
+        assert "ba-9" not in r.text

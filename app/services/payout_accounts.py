@@ -3,6 +3,7 @@
 Only the bank (from the first 3 CLABE digits) and the last 4 digits are ever stored.
 db.py and the schemas belong to other tasks, so this service owns its two tables.
 """
+import inspect
 import re
 import sqlite3
 from datetime import UTC, datetime
@@ -18,6 +19,14 @@ MODES = ("simulated", "pey")
 SIMULATED = "simulada"
 DIRECT = "directa"
 PENDING_NOTE = "liquidación pendiente al negocio"
+
+
+DIRECT_UNAVAILABLE = "El cobro directo al negocio aún no está disponible en esta versión; por ahora los cobros llegan a la cuenta de la plataforma"
+
+
+def supports_bank_account_id(client_type: type) -> bool:
+    """True when the pey client class can send bankAccountId to POST /codi/qr."""
+    return "bank_account_id" in inspect.signature(client_type.create_qr).parameters
 
 
 def check_digit(first17: str) -> int:

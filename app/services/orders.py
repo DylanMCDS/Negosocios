@@ -71,6 +71,8 @@ def create_order(conn, body: OrderCreate, key: str, pey: PeyClient) -> tuple[Ord
     created_at = datetime.now(UTC)
     # A business with a real pey account collects directly; everyone else uses the platform account.
     bank_account_id = payout_accounts.real_bank_account_id(conn, body.business_id)
+    if bank_account_id and not payout_accounts.supports_bank_account_id(type(pey)):
+        raise HTTPException(503, payout_accounts.DIRECT_UNAVAILABLE)  # never a 500 for a saved pey account
     extra = {"bank_account_id": bank_account_id} if bank_account_id else {}
     try:
         qr = pey.create_qr(body.amount_cents / 100, body.concept, order_id, 600, **extra)
