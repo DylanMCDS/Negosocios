@@ -15,4 +15,4 @@ Task-Base: fe8a220e907820ec835bec333d58c5dc9f3b2d01
 Next: redactar docs/SUBMISSION.md y docs/DEMO.md desde el README/PEY.md reales
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 232
