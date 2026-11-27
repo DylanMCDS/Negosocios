@@ -6,7 +6,7 @@
 - Why: acceptance says keep Inicio/Pagar hidden/base order without rejecting Aliados
 - Failing: uak done refused: tests only grow (nav.test.tsx:17 toEqual changed); needs human uak allow --tests
 - Commands: npm --prefix web test -- --run src/features/negocio && npm --prefix web run build
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/35; run .uak/bin/smoke
+- Next: Integrated in main: 25f0c80d488ae74fbc7cd978fcec830b9e20bfc1
 
 ## History
 - 1795798988 | CLAIMED | dylan-1 | claim; next: Reproducir la assertion obsoleta con uak red; preparar patch de la prueba sin editar assertions hasta autorización humana | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795799742 | CLAIMED | dylan-1 | handoff; next: after human runs UAK_HUMAN=NAME uak allow HACK-039 --tests --reason TEXT: uak done HACK-039 --pr https://github.com/DylanMCDS/Negosocios/pull/35 --evidence ... | Harness: unknown | Model: unknown
 - 1795800248 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/35; evidence: Verify (npm test src/features/negocio + build) exit 0; nav.test.tsx:17 now order-preserving filter, human allowed --tests; red reproduced at b214729 · existing tests changed with a human's approval (dylan) · red at b214729: AssertionError: expected [ 'Inicio', 'Cobrar', 'Cierre', …(4) ] to deeply equal [ 'Inicio', 'Cobrar', 'Cierre', …(3); reviewer: - | Harness: unknown | Model: unknown
 - 1795800702 | REVIEW | dylan-2 | review; approve; SHA 6b3733ef3b1668f08a0d7ed118d5f6e897c1b0d7; reviewer dylan-2 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795800913 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit 25f0c80d488ae74fbc7cd978fcec830b9e20bfc1; reviewer dylan-2 | Harness: unknown | Model: unknown
