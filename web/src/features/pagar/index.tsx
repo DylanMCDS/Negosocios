@@ -38,12 +38,21 @@ function QrCubes({ value }: { value: string }) {
   );
 }
 
+interface Account {
+  bank: string;
+  last4: string;
+  label: string;
+}
+const isAccount = (d: unknown): d is Account =>
+  typeof d === "object" && d !== null && typeof (d as Account).bank === "string" && typeof (d as Account).last4 === "string";
+
 export default function Pagar() {
   const orderId = readOrderId();
   const [order, setOrder] = useState<Order | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [payment, setPayment] = useState<Payment | null>(null);
   const [missing, setMissing] = useState(false);
+  const [account, setAccount] = useState<Account | null>(null);
 
   const status = order?.status;
   const [checking, setChecking] = useState(false);
@@ -70,6 +79,20 @@ export default function Pagar() {
     // order is read only to avoid flagging a transient poll error as "not found"
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, status]);
+
+  // Receiving account (simulated in this demo): only bank and last 4 are ever exposed.
+  const businessId = business?.id;
+  useEffect(() => {
+    if (!businessId) return;
+    let alive = true;
+    api<unknown>(`/businesses/${encodeURIComponent(businessId)}/payout-account`).then(
+      (d) => alive && setAccount(isAccount(d) ? d : null),
+      () => undefined,
+    );
+    return () => {
+      alive = false;
+    };
+  }, [businessId]);
 
   // Receipt: the transaction id comes from the stored confirmation, never from the client.
   useEffect(() => {
@@ -131,7 +154,7 @@ export default function Pagar() {
   if (order.status === "paid") {
     return (
       <div className="mx-auto flex max-w-xl flex-col gap-8 py-2">
-        <PageHeader title="Comprobante de pago" lead="El comerciante ya recibió tu pago." />
+        <PageHeader title="Comprobante de pago" lead="CoDi confirmó tu pago." />
         <Surface className="flex flex-col gap-6">
           <div>
             <p className="text-[length:var(--text-s)] text-ink-2">Pagaste a</p>
@@ -163,6 +186,11 @@ export default function Pagar() {
             <p className="text-[length:var(--text-s)] text-ink-2">Pagas a</p>
             <p className="font-display text-[length:var(--text-xl)] leading-tight">{business.name}</p>
             <p className="text-ink-2">{business.zone}</p>
+            {account && (
+              <p className="text-[length:var(--text-s)] text-ink-2">
+                {`Recibe: ${business.name} · ${account.bank} · ****${account.last4} (${account.label})`}
+              </p>
+            )}
           </div>
           <Stat label="Importe" value={pesos(order.amount_cents)} unit="MXN" hero />
           <p>{order.concept}</p>

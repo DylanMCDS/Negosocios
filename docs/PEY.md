@@ -43,3 +43,17 @@ Una orden pasa a **pagada sólo** con un webhook verificado (o consulta al prove
 
 ## Importes (HACK-032)
 - `HttpPeyClient` envía `amount` redondeado a 2 decimales (`round(amount_mxn, 2)`), nunca `19.990000000000002`. Cobrar admite desde $0.01; si pey o el banco rechazan ese mínimo en producción, registrar aquí el mínimo real.
+
+## Cuenta receptora por negocio (HACK-031)
+**Decisión del prototipo (2026-11-26):** todos los cobros reales llegan a la cuenta CoDi de la **plataforma**. La cuenta de cada negocio es **simulada** y así se etiqueta en la UI y en la entrega. Nunca se afirma que el dinero llegó a la cuenta del negocio: la orden queda con `settlement = "simulada"` ("liquidación pendiente al negocio").
+
+- `PUT /api/businesses/{id}/payout-account` `{clabe, mode?, pey_bank_account_id?}` valida la CLABE (18 dígitos y dígito de control, pesos 3-7-1; inválida → 422). **No se guarda la CLABE completa**: sólo banco (primeros 3 dígitos) y últimos 4. `GET` devuelve ese resumen público.
+- `GET /api/orders/{id}/settlement` devuelve `simulada` o `directa` más una nota legible.
+- Tablas `payout_accounts` y `order_settlements`, creadas por `app/services/payout_accounts.py`.
+
+### Cómo pasar a real
+1. Registrar la cuenta del negocio con el endpoint **Register Bank Account** de pey (ver https://docs.pey.mx; confirmar ahí la ruta y los campos, no están copiados aquí) y esperar `codiStatus: ACTIVE`.
+2. Guardar el id que devuelve pey: `PUT /api/businesses/{id}/payout-account` con `mode: "pey"` y `pey_bank_account_id` (el modo `pey` exige ese id; sin él → 422).
+3. Desde entonces `orders.create_order` pasa `bank_account_id` a `create_qr` y la orden queda `settlement = "directa"`. Con modo `simulated` o sin cuenta, el QR va a la cuenta de la plataforma.
+
+> Pendiente (fuera de los Paths de HACK-031): `HttpPeyClient.create_qr` aún no envía `bankAccountId` en `POST /codi/qr`. Requiere un cambio en `app/services/pey.py` (dueño HACK-003); solicitado a la persona responsable. Hasta entonces el modo `pey` no debe activarse en producción.
