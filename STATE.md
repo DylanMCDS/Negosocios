@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795820204
+Updated: 1795820222
 AVAILABLE: HACK-016 HACK-046 
 CLAIMED: HACK-042 HACK-045 
 BLOCKED: -
@@ -18,11 +18,11 @@ HACK-045 | CLAIMED | dylan-4 | until 1795822515
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795819568 | HACK-044 | Mantener escucha bloqueada hasta resultado final tras Detener evita parsear texto antiguo | Why: Regresión asíncrona cubierta; identidad de puesto coinc
 - 1795819582 | HACK-045 | Explicit targets profile/current/assigned; legacy null target preserves prior contract | Why: Meets customization without breaking existing points
 - 1795819805 | HACK-044 | Confirmación en área principal y Surface sm mantiene guardar dentro720 | Why: Gasto mismo puesto que Cierre y reconocimiento termina de forma recuperabl
 - 1795819815 | HACK-045 | Human authorized old copy assertion; needs human allow --tests gate | Why: Kit requires human-run test exception; no impersonation
 - 1795820166 | HACK-046 | Contrato public_business_profiles JSON allowlist; schedule canónico network_profiles; 36 fixtures insert-only; edición mantiene modelo de prototipo actu
+- 1795820222 | allow | dylan | test change: HACK-046 | Why: Autorizado por Dylan (#222): actualizar explorar_opens_profile_not_payment / test de Explorar para que 'Ver negocio' abr
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.
