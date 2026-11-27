@@ -1,71 +1,128 @@
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight, ChartLineUp, CheckCircle, QrCode } from "@phosphor-icons/react";
+import type { ComponentType } from "react";
 import { DataBadge } from "../../lib/ui";
 
 // Facts come from IDEA.md §1/§4 and docs/CONTEXTO-CoDi.md; nothing here is invented.
+// The screens are real captures of the app (web/public/landing/*.webp) with example data.
 const SOURCE = "https://www.codi.org.mx/secundarias/preguntas_frecuentes.html";
 
-const steps = [
-  { title: "Cobra", text: "Escribe el importe y muestra el QR de CoDi." },
-  { title: "Recibe", text: "Tu cliente paga con su celular y ves “Pagado” en segundos." },
-  { title: "Cierra el día", text: "Ventas, gastos y utilidad estimada, sin libreta." },
+type IconType = ComponentType<{ size?: number; weight?: "duotone"; "aria-hidden"?: boolean }>;
+
+const steps: Array<{ title: string; text: string; Icon: IconType }> = [
+  { title: "Cobra", text: "Escribe el importe y muestra el QR de CoDi.", Icon: QrCode },
+  { title: "Recibe", text: "Tu cliente paga con su celular y ves “Pagado” en segundos.", Icon: CheckCircle },
+  { title: "Cierra el día", text: "Ventas, gastos y utilidad estimada, sin libreta.", Icon: ChartLineUp },
+];
+
+const screens = [
+  { src: "/landing/cobrar.webp", label: "Cobrar: de Pendiente a Pagado", width: "w-[10.5rem] md:w-56", alt: "Pantalla Cobrar con el QR de CoDi listo para escanear y el estado Pendiente" },
+  { src: "/landing/cierre.webp", label: "Cierre del día", width: "w-[13rem] md:w-80", alt: "Pantalla Cierre del día con la utilidad estimada, ventas, gastos y lista de cobros" },
+  { src: "/landing/explorar.webp", label: "Explorar", width: "w-[10.5rem] md:w-52", alt: "Pantalla Explorar con el mapa de negocios cercanos que cobran con CoDi" },
 ];
 
 const cta =
-  "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-accent px-6 font-display font-medium text-accent-ink transition-colors hover:bg-accent-hover";
+  "inline-flex h-14 items-center justify-center gap-2 rounded-full bg-accent px-6 font-display text-[length:var(--text-body)] text-accent-ink transition-colors hover:bg-accent-hover";
+
+/* The tianguis awning: lilac and purple stripes with a scalloped edge. Own SVG, decorative. */
+function Awning() {
+  const stripes = Array.from({ length: 12 }, (_, i) => i);
+  return (
+    <svg viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true" className="block h-8 w-full md:h-12">
+      {stripes.map((i) => (
+        <g key={i} className={i % 2 ? "fill-tint" : "fill-accent"}>
+          <rect x={i * 10} y="0" width="10" height="9" />
+          <path d={`M${i * 10} 9 a5 5 0 0 0 10 0 z`} />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/* A phone frame around a real capture. The capture is taller than the frame: it is cropped from the top. */
+function Phone({ src, alt, eager = false, crop = "object-[50%_59%]", ratio = "aspect-[390/760]" }: { src: string; alt: string; eager?: boolean; crop?: string; ratio?: string }) {
+  return (
+    <div className="overflow-hidden rounded-[2rem] bg-surface p-2 shadow-lift">
+      <img
+        src={src}
+        alt={alt}
+        width={390}
+        height={1080}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+        className={`${ratio} w-full rounded-[1.5rem] object-cover ${crop}`}
+      />
+    </div>
+  );
+}
 
 export default function Landing() {
   return (
-    <div className="flex flex-col gap-12 py-4 md:gap-20">
-      <section className="flex flex-col gap-6">
-        <h1 className="font-display text-[length:var(--text-2xl)] leading-tight md:text-[length:var(--text-hero)]">
-          Cobra con CoDi y sabe cuánto <span className="text-accent">ganaste hoy.</span>
-        </h1>
-        <div className="order-3 flex flex-col gap-5 md:order-none md:flex-row md:items-center md:justify-between">
-          <p className="max-w-2xl text-[length:var(--text-lg)] text-ink-2">
-            Para puestos y negocios que cobran en efectivo: cobra con QR, ve la confirmación al instante y cierra el día con tu utilidad.
-          </p>
-          <a href="#cobrar" className={`${cta} shrink-0`}>
-            Probar la demo
-            <ArrowRight size={24} aria-hidden="true" />
-          </a>
-        </div>
-        <figure className="order-2 flex flex-col gap-3 md:order-none">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="relative hidden overflow-hidden rounded-lg border border-ink md:block">
-              <img
-                src="/landing/cobrar-pendiente.png"
-                alt="Pantalla Cobrar con el QR de CoDi listo para escanear"
-                width={1568}
-                height={1036}
-                className="aspect-video h-auto w-full object-cover"
-              />
-              <span className="absolute left-4 top-4 rounded-full border border-ink bg-surface px-4 py-2 font-display text-[length:var(--text-s)]">
-                Pendiente
-              </span>
-              <span className="absolute right-4 top-4 rounded-full bg-surface"><DataBadge size="sm" /></span>
-            </div>
-            <div className="relative overflow-hidden rounded-lg border border-ink">
-              <img
-                src="/landing/cobrar-pagado.png"
-                alt="Pantalla Cobrar después del pago: el QR se atenúa y aparece Pagado"
-                width={1568}
-                height={1036}
-                className="aspect-video h-auto w-full object-cover"
-              />
-              <span className="absolute left-4 top-4 rounded-full bg-accent px-4 py-2 font-display text-[length:var(--text-s)] text-accent-ink">
-                Pagado 100 MXN
-              </span>
-              <span className="absolute right-4 top-4 rounded-full bg-surface"><DataBadge size="sm" /></span>
-            </div>
+    <div className="flex flex-col gap-16 pb-8 md:gap-24">
+      <section className="-mx-4 flex flex-col gap-8 md:mx-0">
+        <Awning />
+        <div className="grid gap-10 px-4 md:grid-cols-[1.1fr_0.9fr] md:items-start md:gap-16 md:px-0">
+          <div className="flex flex-col gap-6 md:pt-16">
+            <h1 className="font-display text-[length:var(--text-2xl)] leading-tight md:text-[length:var(--text-hero)]">
+              Cobra con CoDi y sabe cuánto <span className="text-money">ganaste hoy.</span>
+            </h1>
+            <p className="max-w-xl text-[length:var(--text-body)] text-ink-2">
+              Para puestos de tianguis y negocios que cobran en efectivo: muestra el QR, ve “Pagado” al instante y cierra el
+              día con tu utilidad.
+            </p>
+            <a href="#cobrar" className={`${cta} self-start`}>
+              Probar la demo
+              <ArrowRight size={24} aria-hidden="true" />
+            </a>
           </div>
-          <figcaption className="text-[length:var(--text-s)] text-ink-2">
-            Pantalla real de Cobrar antes y después del pago, en menos de 3 s. Datos de ejemplo.
-          </figcaption>
-        </figure>
+          <figure className="mx-auto flex w-full max-w-[20rem] flex-col gap-3 md:max-w-[22rem]">
+            <div className="relative">
+              <Phone eager ratio="aspect-[390/640]" crop="object-[50%_45%]" src="/landing/pagado.webp" alt="Pantalla real de Cobrar: el cliente pagó y aparece Pagado en verde" />
+              <span className="absolute -right-2 top-6 rounded-full bg-surface shadow-lift">
+                <DataBadge size="sm" />
+              </span>
+            </div>
+            <figcaption className="text-[length:var(--text-s)] text-ink-2">
+              Pantalla real de la app, con datos de ejemplo.
+            </figcaption>
+          </figure>
+        </div>
       </section>
 
-      <section className="flex flex-col gap-3 border-t border-ink pt-8">
-        <p className="font-display text-[length:var(--text-xl)] text-accent">Sin comisión</p>
+      <section className="flex flex-col gap-6">
+        <h2 className="font-display text-[length:var(--text-xl)]">Esto es lo que vas a ver</h2>
+        <p className="-mt-3 text-ink-2 md:hidden">Desliza para ver las demás pantallas.</p>
+        <div className="-mx-4 flex snap-x items-center gap-6 overflow-x-auto px-4 pb-4 md:mx-0 md:justify-center md:overflow-visible md:px-0">
+          {screens.map(({ src, alt, label, width }) => (
+            <figure key={src} className={`flex shrink-0 snap-center flex-col gap-3 ${width}`}>
+              <Phone src={src} alt={alt} crop={src.includes("cierre") || src.includes("explorar") ? "object-top" : undefined} />
+              <figcaption className="font-display text-[length:var(--text-body)]">{label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-6">
+        <h2 className="font-display text-[length:var(--text-xl)]">Así funciona</h2>
+        <ol className="divide-y divide-hairline border-y border-hairline">
+          {steps.map(({ title, text, Icon }, i) => (
+            <li key={title} className="flex items-center gap-4 py-6">
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-tint text-accent">
+                <Icon size={32} weight="duotone" aria-hidden={true} />
+              </span>
+              <div className="flex flex-col gap-1">
+                <span className="font-display text-[length:var(--text-l)]">
+                  {i + 1}. {title}
+                </span>
+                <span className="text-ink-2">{text}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="flex flex-col gap-2 rounded-lg bg-tint p-6 md:p-8">
+        <p className="font-display text-[length:var(--text-2xl)] leading-none text-money md:text-[length:var(--text-hero)]">$0</p>
+        <p className="font-display text-[length:var(--text-l)]">de comisión en cobros con CoDi</p>
         <p className="max-w-2xl text-ink-2">
           CoDi requiere internet y cuenta bancaria; las operaciones no tienen comisión. Fuente:{" "}
           <a className="underline" href={SOURCE} target="_blank" rel="noreferrer">
@@ -74,30 +131,29 @@ export default function Landing() {
         </p>
       </section>
 
-      <section className="flex flex-col gap-6">
-        <h2 className="font-display text-[length:var(--text-xl)]">Así funciona</h2>
-        <ol className="divide-y divide-line border-y border-ink">
-          {steps.map(({ title, text }, i) => (
-            <li key={title} className="grid grid-cols-[4rem_1fr] items-baseline gap-4 py-6 md:grid-cols-[6rem_14rem_1fr]">
-              <span className="font-display text-[length:var(--text-xl)] text-accent" aria-hidden="true">
-                {i + 1}
-              </span>
-              <span className="font-display text-[length:var(--text-lg)]">{title}</span>
-              <span className="col-span-2 text-ink-2 md:col-span-1">{text}</span>
-            </li>
-          ))}
-        </ol>
+      <section className="grid gap-8 md:grid-cols-2 md:gap-16">
+        <div className="flex flex-col gap-3 border-t border-line pt-6">
+          <h2 className="font-display text-[length:var(--text-xl)]">Para el comerciante</h2>
+          <p className="text-ink-2">Cobra con QR o sticker NFC, ve el pago al instante y cierra el día sabiendo tu utilidad estimada.</p>
+        </div>
+        <div className="flex flex-col gap-3 border-t border-line pt-6">
+          <h2 className="font-display text-[length:var(--text-xl)]">Para el cliente</h2>
+          <p className="text-ink-2">Encuentra negocios cercanos que aceptan CoDi y paga con tu celular, sin traer efectivo.</p>
+        </div>
       </section>
 
-      <section className="flex flex-col items-start gap-6 rounded-lg bg-tint p-8">
+      <section className="flex flex-col items-start gap-6 border-t border-hairline pt-8">
         <p className="font-display text-[length:var(--text-xl)]">Pruébalo ahora, sin registro.</p>
-        <a href="#cobrar" className={cta}>
+        <a
+          href="#cobrar"
+          className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-tint px-6 font-display text-[length:var(--text-body)] text-accent transition-colors hover:bg-hairline"
+        >
           Ir a Cobrar
           <ArrowRight size={24} aria-hidden="true" />
         </a>
       </section>
 
-      <footer className="border-t border-line pt-6 text-[length:var(--text-s)] text-ink-2">
+      <footer className="border-t border-hairline pt-6 text-[length:var(--text-s)] text-ink-2">
         Usa CoDi y la API de pey. Proyecto del Hackatón México 2026; no es un producto oficial de CoDi, Banxico ni pey.
       </footer>
     </div>
