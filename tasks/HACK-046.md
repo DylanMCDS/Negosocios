@@ -12,11 +12,11 @@ Verify: `uv run pytest -q app/tests/test_profile.py && npm --prefix web test -- 
 Lease-Until: 1795823165
 Updated: 1795820465
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Implementar profile.py modelos validados y store JSON; profiles.json de 36 productos sin costes; GET/PUT sincronizan schedule network; construir Perfil y MiPagina compartiendo renderer; sustituir enlace Explorar al recibir permiso. Luego Verify, browser, critic y REVIEW.
+Next: Apply option: Mantener modelo de edición del prototipo existente; contrato público allowlist sin datos bancarios. Horario canónico en network_profiles compartido con Explorar.
 PR: -
 Evidence: -
 Participants: author dylan-0 (unknown)
-Events: 6
+Events: 7
 Checkpoints: 1
 Sessions: 1
 Last-Checkpoint: 1795820166
