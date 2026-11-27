@@ -305,3 +305,104 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Acceptance:**
   - Actualizar la prueba antigua del menú para conservar Inicio, Pagar oculto y orden base sin rechazar features nuevas como Aliados
 - **Verify:** `npm --prefix web test -- --run src/features/negocio && npm --prefix web run build`
+## HACK-040 · Puesto activo único y "Mis puestos": varios negocios por persona y cambio de puesto
+
+- **Type:** bug
+- **Priority:** P0
+- **Estimate:** 60 min
+- **Rubric / Spec:** C4, C3 · prueba de Dylan 2026-11-27 (#1, #2, #9): en la laptop Negocio dice "No encontramos ese puesto" y Dividir sale vacío; no hay forma de dar de alta otro puesto; los gastos de Voz no aparecen en Cierre
+- **Depends on:** HACK-035
+- **Paths:** web/src/lib/business.ts, web/src/lib/business.test.ts, web/src/App.tsx, web/src/features/negocio/, app/tests/test_businesses_multi.py
+- **Freeze-Allowed:** yes
+- **Acceptance:** Causa raíz: `localStorage` guarda un `business_id` que ya no existe tras cada deploy (SQLite se reinicia) y cada pantalla lo usa distinto (Cobrar valida con `resolveActiveBusiness`, Cierre/Dividir/Aliados usan `getBusinessId()` sin validar, Voz tiene `"rosa"` fijo). Al arrancar la app se valida una sola vez el puesto guardado: si ya no existe se limpia y se usa el demo `rosa`; desde entonces `getBusinessId()` devuelve siempre un id válido para todas las pantallas sin que cada una cambie (contrato para HACK-044: Voz debe usar `getBusinessId()`)., "Mis puestos" en Negocio: lista de los puestos dados de alta en este navegador más el demo "Tacos de Doña Rosa (demo)", el activo marcado, **Cambiar** con un toque y **+ Dar de alta otro puesto** que abre el formulario vacío; al cambiar, todas las pantallas usan el nuevo puesto., Una misma persona y una misma CLABE pueden estar en varios puestos (sin restricción de unicidad; el backend ya lo permite, probarlo)., El nombre del puesto activo se ve en la cabecera de la app (escritorio y celular) para saber siempre en qué puesto estás., Recipe: flow · Hero: tarjeta del puesto activo con "Cambiar"., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** stale_saved_business_falls_back_to_demo, switching_business_changes_active_id, can_register_a_second_business, same_clabe_allowed_in_two_businesses
+- **Verify:** `uv run pytest -q app/tests/test_businesses_multi.py && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `stale_saved_business_falls_back_to_demo`.
+
+## HACK-041 · Cobrar: ver el importe al teclear, cobro pendiente visible y "Dividir este cobro"
+
+- **Type:** feature
+- **Priority:** P0
+- **Estimate:** 45 min
+- **Rubric / Spec:** C4, C1 · prueba de Dylan 2026-11-27 (#3, #4a, #4b, #7c)
+- **Depends on:** HACK-035
+- **Uses contract:** HACK-040
+- **Paths:** web/src/features/cobrar/
+- **Freeze-Allowed:** yes
+- **Acceptance:** El importe muestra exactamente lo tecleado mientras se escribe (`0` → `0.` → `0.0` → `0.01` se ve como `$0.0_` y luego `$0.01`, nunca un `$0.00` que parezca que no tecleaste nada); el dígito nuevo se resalta un instante., Al volver a Cobrar con cobros pendientes se ve un aviso "Tienes N cobros pendientes" con acceso a cada uno (su QR y estado) y a Cierre; el cobro en curso no "desaparece" al cambiar de pantalla., En la pantalla del QR, botón secundario **Dividir este cobro** que abre Dividir con esa orden ya elegida (`#dividir/<order_id>`); oculto si el importe es $0.01., El campo "Código del aliado" explica de dónde sale: "Te lo da tu cliente; viene de un negocio aliado"., Recipe: flow · Hero: importe grande., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** amount_display_shows_partial_cents_while_typing, pending_orders_are_listed_on_return, split_button_opens_dividir_with_order, referral_field_explains_origin
+- **Verify:** `npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `amount_display_shows_partial_cents_while_typing`.
+
+## HACK-042 · Dividir: carrusel de QR por parte, mínimo claro y cobro por celular
+
+- **Type:** feature
+- **Priority:** P0
+- **Estimate:** 60 min
+- **Rubric / Spec:** C4, C1, C5 · prueba de Dylan 2026-11-27 (#4c, #5, #10)
+- **Depends on:** HACK-029, HACK-028
+- **Uses contract:** HACK-041
+- **Paths:** web/src/features/dividir/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Las partes se muestran en un **carrusel**: un QR grande por pantalla con "Parte 1 de N", el monto y el estado; se desliza (touch y flechas en escritorio) y hay puntos indicadores que marcan las pagadas., Cuando una parte se paga: su tarjeta se pone verde con "Pagado ✓", aparece un aviso breve "Parte 1 pagada" y el carrusel pasa solo a la siguiente pendiente; al pagarse todas, pantalla "Cuenta completa" con el total., Cada parte tiene **Pedir por celular** (10 dígitos) que manda la solicitud CoDi push de esa parte con el mismo endpoint que usa Cobrar; si falla, "Muestra el QR"., Mínimo $0.01 por parte: el máximo de partes se ajusta al importe ($0.01 → 1, $0.03 → 3) y "Crear cobros" deshabilitado siempre dice por qué ("Cada parte debe ser de al menos $0.01"; en montos distintos, "Faltan $X" / "Sobran $X")., Recipe: flow · Hero: QR de la parte actual., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** parts_render_as_carousel_with_counter, paid_part_advances_to_next_pending, part_can_be_requested_by_phone, disabled_create_explains_minimum_per_part
+- **Verify:** `npm --prefix web test -- --run src/features/dividir && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `disabled_create_explains_minimum_per_part`.
+
+## HACK-043 · Descuentos que se entienden: formulario guiado, código de aliado visible y aceptación demo
+
+- **Type:** feature
+- **Priority:** P0
+- **Estimate:** 75 min
+- **Rubric / Spec:** C4, C5, C2 · prueba de Dylan 2026-11-27 (#6, #7a, #7b): "no supe qué poner en cada campo"; "¿dónde veo el código de aliado?"
+- **Depends on:** HACK-026, HACK-035
+- **Paths:** web/src/lib/discount/, web/src/features/aliados/, web/src/features/cierre/, app/services/alliances.py, app/routers/alliances.py, app/tests/test_alliances_demo_accept.py
+- **Freeze-Allowed:** yes
+- **Acceptance:** Un solo componente compartido `web/src/lib/discount/` para Aliados → Proponer y Cierre → Simulador de promoción: cada campo en lenguaje de comerciante con ejemplo ("¿En cuánto vendes el producto? Ej. $40 la orden"; "¿Cuánto te cuesta hacerlo?"; "¿Cuánto quieres ganar como mínimo por venta?"; "¿Cuánto darías en descuentos en total?"; "¿Cuántas veces se puede usar?"); en celular, una pregunta por paso., El resultado se actualiza mientras escribes en una frase: "Puedes dar hasta **$8** por venta y sigues ganando $10; con $300 te alcanza para 37 ventas"; si no alcanza: "Con estos números no puedes dar descuento sin perder"., El Simulador explica para qué sirve en su encabezado: "¿Cuánto descuento puedo dar sin perder?"., Código de aliado: en cada alianza activa donde el puesto da el descuento, el código se muestra grande con **Copiar**, **Compartir por WhatsApp** (`https://wa.me/?text=`) y un QR del código; en las alianzas donde el otro da el descuento se explica "Tus clientes reciben el código de <aliado>"., Demo: una propuesta a un negocio con `demo_data` se acepta sola a los pocos segundos (marcada como demo) para poder recorrer el flujo completo; con negocios reales sigue pidiendo aceptación., Recipe: flow · Hero: frase del resultado., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** fields_show_plain_language_examples, result_sentence_updates_while_typing, active_giver_alliance_shows_copyable_code, proposal_to_demo_business_is_auto_accepted, proposal_to_real_business_stays_pending
+- **Verify:** `uv run pytest -q app/tests/test_alliances_demo_accept.py && npm --prefix web test -- --run src/features/aliados src/features/cierre src/lib/discount && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `proposal_to_demo_business_is_auto_accepted`.
+
+## HACK-044 · Voz: control de la escucha y gastos en el puesto activo
+
+- **Type:** bug
+- **Priority:** P0
+- **Estimate:** 45 min
+- **Rubric / Spec:** C4, C5 · prueba de Dylan 2026-11-27 (#8, #9): se queda en "Escuchando…"; los gastos guardados no aparecen en Cierre
+- **Depends on:** HACK-031
+- **Uses contract:** HACK-040
+- **Paths:** web/src/features/voz/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Voz guarda los gastos en el puesto activo (`getBusinessId()` de `web/src/lib/business.ts`), no en `"rosa"` fijo; tras guardar, el gasto aparece en Cierre del mismo puesto y la pantalla ofrece "Ver en Cierre"., Estados visibles: "Toca para hablar" → "Escuchando…" (micrófono animado + botón **Detener**) → "Esto entendí" → confirmar; siempre se puede **Cancelar**., Tiempo límite de 8 s sin resultado: se detiene y dice "No te escuché. Intenta de nuevo o escríbelo", y enfoca el campo de texto con el ejemplo "gasté 350 en tortillas"., Permiso de micrófono negado o navegador sin voz (Safari iPhone incluido): mensaje claro y el campo de texto como camino principal., Recipe: flow · Hero: botón de micrófono., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** expense_is_saved_to_active_business, listening_can_be_stopped_and_cancelled, listening_times_out_to_text_input, denied_microphone_falls_back_to_text
+- **Verify:** `npm --prefix web test -- --run src/features/voz && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `expense_is_saved_to_active_business`.
+
+## HACK-045 · Puntos NFC/QR claros y personalizables
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C4, C5 · prueba de Dylan 2026-11-27 (#11): "no entiendo el uso de cada tipo"; "¿por qué se asocia una cuenta?"; "me gustaría que fueran personalizables"
+- **Depends on:** HACK-030
+- **Uses contract:** HACK-046
+- **Paths:** app/services/points.py, app/routers/points.py, app/tests/test_points_custom.py, web/src/features/puntos/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Lenguaje: "Asociar cuenta" → **Asignar cobro a este punto**; "Cuenta pendiente" → **Sin cobro asignado**; nunca "cuenta" en el sentido de consumo (se confunde con cuenta bancaria)., Al crear un punto, tarjetas por tipo con ícono, para qué sirve y "Lo que ve tu cliente": Entrada → la página del negocio; Caja → el cobro del momento; Mesa → el cobro que le asignes a esa mesa. Una guía de 3 pasos del flujo del negocio en una mesa (crear cobro → asignarlo a la mesa → el cliente acerca el celular y paga)., Puntos personalizables: nombre libre ("Barra", "Terraza", "Para llevar"), ícono de una lista y qué abre (página del negocio, cobro del momento o cobro asignado)., Lista de puntos con estado en vivo: "Mesa 3 · $0.05 · Pendiente/Pagado" o "Sin cobro asignado"., El destino "página del negocio" abre `#perfil/<business_id>` (contrato de HACK-046)., Recipe: list · Hero: lista de puntos con su estado., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** point_accepts_custom_name_icon_and_target, entrance_target_opens_business_profile, point_list_shows_assigned_order_status, copy_never_says_asociar_cuenta
+- **Verify:** `uv run pytest -q app/tests/test_points_custom.py app/tests/test_points.py && npm --prefix web test -- --run src/features/puntos && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `point_accepts_custom_name_icon_and_target`.
+
+## HACK-046 · Página pública de cada negocio (tipo perfil de red social) y "Mi página"
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 90 min
+- **Rubric / Spec:** C5, C2, C4 · prueba de Dylan 2026-11-27 (#12): "Paga aquí con CoDi" no debe llevar a un cobro; cada negocio con su página personalizable
+- **Depends on:** HACK-024, HACK-036
+- **Paths:** app/services/profile.py, app/routers/profile.py, app/tests/test_profile.py, app/fixtures/population/profiles.json, web/src/features/perfil/, web/src/features/mipagina/, web/src/features/explorar/
+- **Freeze-Allowed:** yes
+- **Acceptance:** `GET /api/profile/<business_id>` y `PUT /api/profile/<business_id>`: descripción corta, color/ilustración de portada (de una lista, sin subir archivos), productos o menú (nombre, precio, opcional destacado), WhatsApp opcional (sólo se muestra si el negocio lo pone), horario; validación de longitudes; nada de datos sensibles (sin CLABE, sin dirección exacta)., Página pública `#perfil/<business_id>`: portada, nombre, giro, zona aproximada, "Abierto ahora", descripción, menú con precios, promociones y aliados activos, reputación y reseñas, sello **"Aquí se paga con CoDi"** (informativo, no botón de pago) y botones **WhatsApp**, **Cómo llegar** (zona aproximada) y **Compartir**., "Mi página" (en Más) para editarla con vista previa en vivo., Explorar: "Paga aquí con CoDi" se cambia por **Ver negocio**, que abre la página pública; ya no abre un cobro., Los ~36 negocios demo traen perfil de ejemplo (`profiles.json`, `demo_data: true`)., Recipe: detail · Hero: portada con nombre del negocio., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** profile_roundtrip_saves_menu_and_description, profile_never_exposes_clabe, demo_businesses_have_profiles, explorar_opens_profile_not_payment, profile_page_shows_codi_badge_not_pay_button
+- **Verify:** `uv run pytest -q app/tests/test_profile.py && npm --prefix web test -- --run src/features/perfil src/features/mipagina src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `profile_roundtrip_saves_menu_and_description`.
