@@ -10,3 +10,4 @@
 
 ## History
 - 1795819162 | CLAIMED | dylan-4 | claim; next: Escribir el test rojo point_accepts_custom_name_icon_and_target | Harness: unknown | Model: unknown
+- 1795819539 | CLAIMED | dylan-4 | pending decision HACK-045-1795819539; option: Actualizar aserción Elige tu cuenta a Elige tu cobro, autorizado por Dylan en conversación: te autorizo; Why: Nuevo criterio exige cobro, test previo quedó obsoleto; solo cambia texto esperado | Harness: unknown | Model: unknown

@@ -16,7 +16,7 @@ Next: Escribir el test rojo point_accepts_custom_name_icon_and_target
 PR: -
 Evidence: -
 Participants: author dylan-4 (unknown)
-Events: 1
+Events: 2
 Checkpoints: 0
 Sessions: 1
 Last-Checkpoint: 0
