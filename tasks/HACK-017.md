@@ -15,10 +15,10 @@ Task-Base: 660b7843143357bdcf8cc79c408332148f4f386d
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/9; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/9
 Evidence: uv run pytest -q app/tests/test_voice.py exit 0 (16 passed); full suite green; ruff clean on touched files; criteria: amount/pesos/$/words/decimals, ambiguous, endpoint does not save · red at 660b784: E   AssertionError: assert {} == {'amount_cent...guous': False}
-Participants: author dylan-5 (unknown); author dylan-5 (claude-sonnet-5-5)
-Events: 3
+Participants: author dylan-5 (unknown); author dylan-5 (claude-sonnet-5-5); reviewer dylan-2 (unknown) approve
+Events: 4
 Checkpoints: 0
-Sessions: 1
+Sessions: 2
 Last-Checkpoint: 0
 Progress: 0 commit(s) since the claim · last: 660b784 Merge HACK-006 reviewed by dylan-2 (5 minutes ago) · 0 uncommitted tracked file(s) · at 1795739357
 Progress-Head: 660b784/4294967295
