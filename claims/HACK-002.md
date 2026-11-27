@@ -9,10 +9,10 @@ Priority: P0
 Paths: app/schemas/, app/db.py, app/fixtures/, app/tests/test_schemas.py, web/src/lib/types.ts, docs/API.md
 Depends: None
 Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py`
-Lease-Until: 1795752259
-Updated: 1795737859
+Lease-Until: 1795752303
+Updated: 1795737903
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Apply option: Pause edits until one session owns this worktree
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/4; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: -
 Thread-Read: 20
