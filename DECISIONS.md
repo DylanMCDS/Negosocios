@@ -72,3 +72,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795819311 | HACK-041 | pendientes por ids en localStorage + GET /orders/{id}; sin resaltar dígito nuevo | Why: no hay endpoint de lista de órdenes
 - 1795819357 | HACK-044 | Usar getBusinessId y fallback demo idéntico a Cierre; cerrar callbacks de reconocimiento al terminar | Why: La identidad fija ocultaba gastos y la falta de timeout dejaba escucha colgada
 - 1795819568 | HACK-044 | Mantener escucha bloqueada hasta resultado final tras Detener evita parsear texto antiguo | Why: Regresión asíncrona cubierta; identidad de puesto coincide con Cierre
+- 1795819582 | HACK-045 | Explicit targets profile/current/assigned; legacy null target preserves prior contract | Why: Meets customization without breaking existing points

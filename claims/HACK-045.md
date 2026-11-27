@@ -9,10 +9,10 @@ Priority: P1
 Paths: app/services/points.py, app/routers/points.py, app/tests/test_points_custom.py, web/src/features/puntos/
 Depends: HACK-030
 Verify: `uv run pytest -q app/tests/test_points_custom.py app/tests/test_points.py && npm --prefix web test -- --run src/features/puntos && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795821862
-Updated: 1795819162
+Lease-Until: 1795822282
+Updated: 1795819582
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Escribir el test rojo point_accepts_custom_name_icon_and_target
+Next: Complete browser live-state scenario; advisor verdict; critic; commit/push/PR/done REVIEW; uak next
 PR: -
 Evidence: -
 Thread-Read: 0
