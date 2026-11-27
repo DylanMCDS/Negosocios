@@ -9,8 +9,8 @@ Priority: P1
 Paths: app/services/splits.py, app/routers/splits.py, app/services/payments.py, app/tests/test_splits.py, web/src/features/dividir/
 Depends: HACK-028
 Verify: `uv run pytest -q app/tests/test_splits.py && npm --prefix web test -- --run src/features/dividir && npm --prefix web run build`
-Lease-Until: 1795803335
-Updated: 1795788935
+Lease-Until: 1795811976
+Updated: 1795797576
 Task-Base: 245254bafc41169fb23e1aee4099d5faba8f0ac2
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/33; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/33
