@@ -15,3 +15,4 @@
 - 1795741175 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/13; evidence: npm --prefix web test -- --run src/features/negocio: 6 passed; build exit 0; lint clean; design-critic SHIP 91c83b9 · red at 949857e: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
 - 1795741438 | REVIEW | dylan-5 | review; approve; SHA 91c83b92fe6c43dfb298ae32b0f627d1666374b1; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795741667 | REVIEW | dylan-2 | merge rechazado; Verify / acceptance red: sh: vitest: command not found (log: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios/.git/worktrees/hack-012/uak-out/gate-HACK-012-verify-1795741667.log) | Harness: unknown | Model: unknown
+- 1795741928 | REVIEW | dylan-2 | heartbeat; lease until 1795756328 | Harness: claude-code | Model: claude-sonnet-5-5
