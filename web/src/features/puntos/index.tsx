@@ -164,8 +164,29 @@ function ManagePoints() {
   if (!data) return <><PageHeader title="Puntos" lead="Los enlaces de tu puesto, en QR o NFC." /><p role="status">Cargando tu puesto…</p></>;
   return <>
     <PageHeader title="Puntos" lead="Un enlace para la entrada, cada caja y cada mesa." />
+      <section className="flex flex-col gap-3 pt-8" aria-label="Puntos del puesto">
+        <SectionHeader title="Puntos del puesto" />
+        <a href="#crear-punto" onClick={(event) => { event.preventDefault(); const form = document.getElementById("crear-punto"); form?.scrollIntoView({ block: "start" }); form?.focus(); }}
+          className="inline-flex min-h-11 items-center self-start text-accent underline">Crear un punto</a>
+        <p className="text-ink-2">Elige un punto para ver su QR. Los estados se actualizan cada 5 segundos.</p>
+        {data.business.demo_data && <div><DataBadge /></div>}
+        {!data.points.length && <p>Aún no tienes puntos. Crea uno con el nombre de tu espacio.</p>}
+        <ul className="divide-y divide-line">{data.points.map((point) => {
+          const Icon = ICONS[point.icon ?? "pin"];
+          const assigned = point.assigned_orders ?? [];
+          return <li key={point.id}><button type="button" aria-pressed={selectedId === point.id}
+            onClick={() => { setSelectedId(point.id); setNotice(""); }}
+            className={`flex min-h-14 w-full flex-wrap items-center justify-between gap-3 rounded-md px-3 py-4 text-left ${selectedId === point.id ? "bg-tint" : ""}`}>
+            <span className="flex items-center gap-3"><Icon size={24} aria-hidden="true" /><strong>{point.label}</strong></span>
+            {!point.active ? <Chip size="sm" tone="bad">Revocado</Chip> : targetOf(point) === "profile" ? <span className="text-ink-2">Página del negocio</span> :
+              assigned.length ? <span className="flex flex-col gap-2">{assigned.map((order) => <span key={order.id} className="flex items-center gap-3">
+                <strong>{pesos(order.amount_cents)}</strong><Chip size="sm" tone={order.status === "paid" ? "ok" : order.status === "pending" ? "warn" : "neutral"}>{statusName(order.status)}</Chip>
+              </span>)}</span> : <span className="text-ink-2">Sin cobro asignado</span>}
+          </button></li>;
+        })}</ul>
+      </section>
     <PageLayout aside={<>
-      <Surface className="flex flex-col gap-4">
+      <section id="crear-punto" tabIndex={-1} className="flex flex-col gap-4">
         <SectionHeader title="Crear punto" />
         <form onSubmit={create} className="flex flex-col gap-4">
           <fieldset className="flex flex-col gap-3"><legend className="mb-3">Elige un uso para empezar</legend>
@@ -189,7 +210,7 @@ function ManagePoints() {
           </select></label>
           <Button variant="primary" disabled={busy || !label.trim()}>Crear punto</Button>
         </form>
-      </Surface>
+      </section>
       <section className="flex flex-col gap-4">
         <SectionHeader title="Cobrar en una mesa" />
         <ol aria-label="Cobrar en una mesa" className="list-decimal space-y-3 pl-6">
@@ -210,25 +231,6 @@ function ManagePoints() {
         <a href={NFC_GUIDE} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-accent underline">Guía de NFC Tools</a>
       </section>
     </>}>
-      <section className="flex flex-col gap-3" aria-label="Puntos del puesto">
-        <SectionHeader title="Puntos del puesto" />
-        <p className="text-ink-2">Elige un punto para ver su QR. Los estados se actualizan cada 5 segundos.</p>
-        {data.business.demo_data && <div><DataBadge /></div>}
-        {!data.points.length && <p>Aún no tienes puntos. Crea uno con el nombre de tu espacio.</p>}
-        <ul className="divide-y divide-line">{data.points.map((point) => {
-          const Icon = ICONS[point.icon ?? "pin"];
-          const assigned = point.assigned_orders ?? [];
-          return <li key={point.id}><button type="button" aria-pressed={selectedId === point.id}
-            onClick={() => { setSelectedId(point.id); setNotice(""); }}
-            className={`flex min-h-14 w-full flex-wrap items-center justify-between gap-3 rounded-md px-3 py-4 text-left ${selectedId === point.id ? "bg-tint" : ""}`}>
-            <span className="flex items-center gap-3"><Icon size={24} aria-hidden="true" /><strong>{point.label}</strong></span>
-            {!point.active ? <Chip size="sm" tone="bad">Revocado</Chip> : targetOf(point) === "profile" ? <span className="text-ink-2">Página del negocio</span> :
-              assigned.length ? <span className="flex flex-col gap-2">{assigned.map((order) => <span key={order.id} className="flex items-center gap-3">
-                <strong>{pesos(order.amount_cents)}</strong><Chip size="sm" tone={order.status === "paid" ? "ok" : order.status === "pending" ? "warn" : "neutral"}>{statusName(order.status)}</Chip>
-              </span>)}</span> : <span className="text-ink-2">Sin cobro asignado</span>}
-          </button></li>;
-        })}</ul>
-      </section>
       <Surface className="flex min-w-0 flex-col gap-5">
         {selected ? <>
           <div data-point-print className="flex min-w-0 flex-col items-center gap-4 text-center">
