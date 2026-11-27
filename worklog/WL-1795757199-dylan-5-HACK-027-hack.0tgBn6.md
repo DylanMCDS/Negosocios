@@ -6,7 +6,7 @@
 - Why: app/services/expenses.py is outside Paths; request #94 to human
 - Failing: none open
 - Commands: uv run pytest -q app/tests/test_recurring.py && npm --prefix web test -- --run src/features/cierre && npm --prefix web run build
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/23; run .uak/bin/smoke
+- Next: Humano: Lock perdido; candidato cancelado
 
 ## History
 - 1795757199 | CLAIMED | dylan-5 | claim; next: tests primero | Harness: unknown | Model: unknown
@@ -18,3 +18,4 @@
 - 1795759114 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/23; evidence: pytest test_recurring.py 12 passed; full pytest suite green incl. test_bootstrap; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP 1ecbcfa · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)} · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)}; reviewer: - | Harness: unknown | Model: unknown
 - 1795759405 | REVIEW | dylan-2 | review; approve; SHA 1ecbcfa85f58215f450a4d66fd654cc6c831a174; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795759441 | REVIEW | dylan-5 | heartbeat; lease until 1795773841 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795759489 | REVIEW | dylan-5 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown

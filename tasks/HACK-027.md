@@ -12,11 +12,11 @@ Verify: `uv run pytest -q app/tests/test_recurring.py && npm --prefix web test -
 Lease-Until: 1795773841
 Updated: 1795759441
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/23; run .uak/bin/smoke
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/23
 Evidence: pytest test_recurring.py 12 passed; full pytest suite green incl. test_bootstrap; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP 1ecbcfa · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)} · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)}
-Participants: author dylan-5 (unknown); reviewer dylan-4 (unknown) reject; reviewer dylan-2 (unknown) reject; reviewer dylan-2 (unknown) approve; author dylan-5 (claude-sonnet-5-5)
-Events: 9
+Participants: author dylan-5 (unknown); reviewer dylan-4 (unknown) reject; reviewer dylan-2 (unknown) reject; reviewer dylan-2 (unknown) approve; author dylan-5 (claude-sonnet-5-5); merged-by dylan-5 (unknown)
+Events: 10
 Checkpoints: 1
 Sessions: 4
 Last-Checkpoint: 1795757787
