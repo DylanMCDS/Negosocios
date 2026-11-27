@@ -15,9 +15,9 @@ Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/42; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/42
 Evidence: npm --prefix web test -- --run src/features/cobrar && build && design-lint exit 0 en e44ee3d; 4 pruebas ux.test.tsx verdes; design-critic VERDICT: SHIP e44ee3d a 390 y 1280 · red at 3e7339c: AssertionError: expected 'Importe$0.00MXN' to contain '$0.__'
-Participants: author dylan-5 (unknown)
-Events: 3
+Participants: author dylan-5 (unknown); reviewer dylan-1 (unknown) approve
+Events: 4
 Checkpoints: 1
-Sessions: 1
+Sessions: 2
 Last-Checkpoint: 1795819311
 Task-Tip: e44ee3df09a728a05c8ed891c34aa9ce243caa30

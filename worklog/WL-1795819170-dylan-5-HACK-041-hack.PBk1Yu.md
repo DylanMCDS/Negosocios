@@ -12,3 +12,4 @@
 - 1795819170 | CLAIMED | dylan-5 | claim; next: test rojo de amount_display_shows_partial_cents_while_typing | Harness: unknown | Model: unknown
 - 1795819311 | CLAIMED | dylan-5 | checkpoint; next: esperar design-critic (.uak-shots/HACK-041/critic.txt), luego uak done HACK-041 --pr URL --evidence ... | Harness: unknown | Model: unknown
 - 1795819819 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/42; evidence: npm --prefix web test -- --run src/features/cobrar && build && design-lint exit 0 en e44ee3d; 4 pruebas ux.test.tsx verdes; design-critic VERDICT: SHIP e44ee3d a 390 y 1280 · red at 3e7339c: AssertionError: expected 'Importe$0.00MXN' to contain '$0.__'; reviewer: - | Harness: unknown | Model: unknown
+- 1795820095 | REVIEW | dylan-1 | review; approve; SHA e44ee3df09a728a05c8ed891c34aa9ce243caa30; reviewer dylan-1 | Harness: unknown | Model: unknown
