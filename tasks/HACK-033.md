@@ -16,7 +16,7 @@ Next: read spec, write tests, red
 PR: -
 Evidence: -
 Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5)
-Events: 4
+Events: 5
 Checkpoints: 0
-Sessions: 3
+Sessions: 4
 Last-Checkpoint: 0
