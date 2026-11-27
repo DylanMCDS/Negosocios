@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import QRCode from "qrcode";
-import { Printer } from "@phosphor-icons/react";
+import { Printer, WarningCircle } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business } from "../../lib/types";
 import { Button, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui";
@@ -101,7 +101,7 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
           <label className="flex flex-col gap-1">
             CLABE donde recibes tus cobros (opcional)
             <input
-              className={field}
+              className={clabeMessage ? `${field} border-2 border-bad` : field}
               inputMode="numeric"
               value={clabe}
               onChange={(e) => setClabe(e.target.value)}
@@ -111,7 +111,12 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
             />
           </label>
           <p id="clabe-help">Simulado en esta demo: los cobros llegan a la cuenta de la plataforma y la liquidación al puesto queda pendiente. Guardamos solo el banco y los últimos 4 dígitos.</p>
-          {clabeMessage && <p role="alert">{clabeMessage}</p>}
+          {clabeMessage && (
+            <p role="alert" className="flex items-start gap-2 font-semibold text-bad-ink">
+              <WarningCircle size={20} weight="fill" aria-hidden="true" className="mt-0.5 shrink-0" />
+              {clabeMessage}
+            </p>
+          )}
         </div>
         <label className="flex items-start gap-3 text-[length:var(--text-body)]">
           <input type="checkbox" className="mt-1 size-6 accent-accent" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
@@ -176,7 +181,7 @@ export default function Negocio() {
 
   const lead = business
     ? [business.category, business.zone, business.temporary_location && `Hoy: ${business.temporary_location}`].filter(Boolean).join(" · ")
-    : "Tres datos y listo.";
+    : "Tus datos y listo.";
   return (
     <>
       <PageHeader title={business ? business.name : "Alta de tu puesto"} lead={lead} />
