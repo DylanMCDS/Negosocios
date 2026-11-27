@@ -286,7 +286,7 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
         }}
       >
         <div className="flex transition-transform duration-300 motion-reduce:transition-none" style={{ transform: `translateX(-${current * 100}%)` }}>
-          {split.parts.map((p, i) => {
+          {split.parts.map((p) => {
             const paid = p.status === "paid";
             return (
               <div key={p.idx} className="w-full shrink-0">
@@ -300,15 +300,9 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
                   ) : (
                     p.qr_string && (
                       <div className="w-full rounded-md bg-surface p-3">
-                        <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="mx-auto max-w-[280px]" />
+                        <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="mx-auto max-w-[280px] md:max-w-[340px]" />
                       </div>
                     )
-                  )}
-                  {!paid && i === current && (
-                    <>
-                      <PartPush orderId={orderId} idx={p.idx} />
-                      <a className="underline underline-offset-4" href={`#dividir/${orderId}/${p.idx}`}>Abrir página de pago</a>
-                    </>
                   )}
                 </div>
               </div>
@@ -330,6 +324,14 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
           </button>
         ))}
       </div>
+      {split.parts[current].status !== "paid" && (
+        <div key={current} className="flex flex-col items-center gap-1">
+          <PartPush orderId={orderId} idx={split.parts[current].idx} />
+          <a className="inline-flex min-h-11 items-center px-3 underline underline-offset-4" href={`#dividir/${orderId}/${split.parts[current].idx}`}>
+            Abrir página de pago
+          </a>
+        </div>
+      )}
     </section>
   );
 }
@@ -343,7 +345,7 @@ function PartsView({ orderId, split, demo }: { orderId: string; split: Split; de
         lead={done ? "Todas las partes están pagadas." : "Cada parte se paga con su propio QR; el cobro se completa al pagar todas."}
         action={demo ? <DataBadge /> : undefined}
       />
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[360px_1fr] md:items-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
         {done ? (
           <section className="flex flex-col items-center gap-3 rounded-lg bg-ok p-8 text-ok-ink">
             <CheckCircle size={72} weight="fill" className="text-money" aria-hidden="true" />
