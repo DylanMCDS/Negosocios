@@ -7,6 +7,11 @@ import { appendKey, formatCents, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
 
+interface Referral { id: string; giver: string; giver_name: string; status: string; discount_pct: number }
+interface Quote { applied: boolean; total_cents: number; discount_cents: number; reason: string | null }
+// Estimate shown before charging; the allied quote at charge time is authoritative (it also caps the discount).
+const estimateDiscount = (cents: number, pct: number) => Math.floor((cents * Math.round(pct * 100)) / 10000);
+
 const POLL_MS = 2000;
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
@@ -56,6 +61,10 @@ export default function Cobrar() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [order, setOrder] = useState<Order | null>(null);
   const idempotencyKey = useRef<string>("");
+  const chargeCents = useRef(0);
+  const [refCode, setRefCode] = useState("");
+  const [referral, setReferral] = useState<Referral | null>(null);
+  const [refError, setRefError] = useState<string | null>(null);
   // null while a saved business is being checked against the server; no saved business = the demo one.
   const [active, setActive] = useState<{ id: string; name: string | null } | null>(() =>
     getBusinessId() ? null : { id: DEMO_BUSINESS_ID, name: null },
@@ -73,7 +82,7 @@ export default function Cobrar() {
         headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey.current },
         body: JSON.stringify({
           business_id: active?.id ?? DEMO_BUSINESS_ID,
-          amount_cents: amountCents,
+          amount_cents: chargeCents.current,
           concept: concept.trim().slice(0, 40) || "Cobro",
           currency: "MXN",
         }),
@@ -83,10 +92,43 @@ export default function Cobrar() {
     } catch {
       setPhase("failed");
     }
-  }, [amountCents, concept, active]);
+  }, [concept, active]);
 
-  const charge = () => {
+  const applyCode = async () => {
+    setRefError(null);
+    try {
+      const found = await api<Referral>(`/alliances/code/${encodeURIComponent(refCode.trim().toUpperCase())}`);
+      if (found.status !== "active") setRefError("La alianza no está activa");
+      else if (found.giver !== (active?.id ?? DEMO_BUSINESS_ID)) setRefError("Este código es de otro negocio");
+      else setReferral(found);
+    } catch {
+      setRefError("Código no encontrado");
+    }
+  };
+
+  const charge = async () => {
     idempotencyKey.current = crypto.randomUUID();
+    chargeCents.current = amountCents;
+    if (referral) {
+      // The benefit is reserved against the order's Idempotency-Key, so a retry of the same charge never spends it twice.
+      setPhase("creating");
+      try {
+        const quote = await api<Quote>(`/alliances/${referral.id}/quote`, {
+          method: "POST",
+          body: JSON.stringify({ amount_cents: amountCents, order_id: idempotencyKey.current }),
+        });
+        if (!quote.applied) {
+          setRefError(quote.reason ?? "La alianza no pudo aplicar el descuento");
+          setReferral(null);
+          setPhase("idle");
+          return;
+        }
+        chargeCents.current = quote.total_cents;
+      } catch {
+        setPhase("failed");
+        return;
+      }
+    }
     void create();
   };
   // Retry reuses the same key: pey never creates a second QR for the same charge.
@@ -95,6 +137,9 @@ export default function Cobrar() {
   const reset = () => {
     setDigits("");
     setConcept("");
+    setRefCode("");
+    setReferral(null);
+    setRefError(null);
     setOrder(null);
     setPhase("idle");
   };
@@ -162,6 +207,28 @@ export default function Cobrar() {
                     onChange={(e) => setConcept(e.target.value)}
                   />
                 </label>
+                <div className="flex flex-col gap-2">
+                  <label className="flex flex-col gap-2 text-ink-2">
+                    Cliente referido por (código)
+                    <input
+                      className="min-h-14 rounded-lg border border-line bg-white px-4 text-ink"
+                      value={refCode}
+                      maxLength={16}
+                      placeholder="Código del aliado"
+                      onChange={(e) => { setRefCode(e.target.value); setReferral(null); setRefError(null); }}
+                    />
+                  </label>
+                  <Button variant="secondary" size="sm" onClick={() => void applyCode()} disabled={refCode.trim() === ""}>Aplicar</Button>
+                  {refError && <p role="alert">{refError}</p>}
+                  {referral && (
+                    <div className="flex flex-col gap-1">
+                      <p className="text-ink-2">{`Aliado: ${referral.giver_name}`}</p>
+                      <p>{`Precio ${pesos(amountCents)}`}</p>
+                      <p>{`Descuento del aliado −${pesos(estimateDiscount(amountCents, referral.discount_pct))}`}</p>
+                      <p className="font-semibold">{`Total ${pesos(amountCents - estimateDiscount(amountCents, referral.discount_pct))}`}</p>
+                    </div>
+                  )}
+                </div>
                 {phase === "failed" && (
                   <div role="alert" className="flex flex-col gap-3 text-ink">
                     <p>No pudimos crear el cobro. Tu cliente no ha pagado nada.</p>
