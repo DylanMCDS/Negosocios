@@ -20,4 +20,25 @@ describe("Landing", () => {
     render(<Landing />);
     expect(screen.getByRole("link", { name: /probar la demo/i }).getAttribute("href")).toBe("#cobrar");
   });
+  it("shows_value_line_and_demo_cta", () => {
+    render(<Landing />);
+    expect(screen.getByRole("heading", { level: 2, name: /para el comerciante/i })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: /para el cliente/i })).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: /probar la demo/i }).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("shows_real_app_screens", () => {
+    render(<Landing />);
+    const srcs = screen.getAllByRole("img").map((i) => i.getAttribute("src") ?? "");
+    for (const name of ["cobrar", "pagado", "cierre", "explorar"]) {
+      expect(srcs.some((s) => s.startsWith("/landing/") && s.endsWith(".webp") && s.includes(name))).toBe(true);
+    }
+  });
+
+  it("images_have_alt_text", () => {
+    const { container } = render(<Landing />);
+    const imgs = Array.from(container.querySelectorAll("img"));
+    expect(imgs.length).toBeGreaterThanOrEqual(4);
+    for (const img of imgs) expect((img.getAttribute("alt") ?? "").trim().length).toBeGreaterThan(8);
+  });
 });
