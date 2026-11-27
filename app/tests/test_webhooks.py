@@ -32,8 +32,9 @@ def api(tmp_path):
 
 
 def post(client, webhook_id="evt-1", amount=10.5, qr="qr-1", secret=SECRET, kind="codi.qr.payment_received"):
-    body = json.dumps({"type": kind, "data": {
-        "amount": amount, "codiQrId": qr, "numRef": "1234", "transactionId": f"tx-{webhook_id}"}})
+    # Formato real de pey: payload PLANO (sin "data").
+    body = json.dumps({"type": kind, "amount": amount, "codiQrId": qr, "numRef": "1234",
+                       "transactionId": f"tx-{webhook_id}"})
     now = datetime.now(timezone.utc).replace(microsecond=0)
     headers = {
         "webhook-id": webhook_id, "webhook-timestamp": str(int(now.timestamp())),

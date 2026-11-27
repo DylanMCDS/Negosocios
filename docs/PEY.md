@@ -25,7 +25,8 @@ Un QR se puede pagar más de una vez hasta expirar → para una orden, usar `exp
 ## Webhooks
 - Firma **Standard Webhooks** (https://www.standardwebhooks.com/): verificar con el cuerpo **crudo** y los headers (`webhook-id`, `webhook-timestamp`, `webhook-signature`) usando `PEY_WEBHOOK_SECRET` (`whsec_...`). SDKs oficiales en Python/JS/etc.
 - `webhook-id` es la llave de **idempotencia**: guardar y descartar repetidos.
-- `codi.qr.payment_received`: payload con `amount`, `codiQrId` (IDC), `concept`, `numRef`, `transactionId`.
+- `codi.qr.payment_received`: el payload es **PLANO**, sin `data` (cobro real de 1 MXN, 2026-11-26): `{"type","amount","codiQrId","transactionId","numRef","concept","datePaid","apiKeyId","bankAccountId"?,"metadata"}`. `amount` es un número en **pesos** (1, 10.5, 150) → se convierte a centavos; `datePaid` es Unix en segundos. Ejemplo literal en https://docs.pey.mx/en/docs/webhooks/codi/qr/ y en `app/tests/test_payments_real_payload.py`.
+- Un pago con `codiQrId` desconocido queda en `webhook_events` y se registra en el log (sólo `type` y `codiQrId`, sin concepto ni metadata) para diagnóstico.
 - La URL del webhook se configura por API key en portal.pey.mx → necesita URL pública (deploy o túnel). Historial de entregas en portal.pey.mx/developers → "Webhook Logs".
 
 ## Regla de producto
