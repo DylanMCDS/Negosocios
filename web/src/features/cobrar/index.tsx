@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
-import { Button, Chip, PageHeader, PageLayout, Stat, Surface } from "../../lib/ui";
+import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
 import { api } from "../../lib/api";
 import { appendKey, formatCents, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
@@ -58,7 +58,7 @@ function PushToPhone({ orderId }: { orderId: string }) {
     <div className="flex flex-col gap-2">
       <label className="flex flex-col gap-1 text-ink-2">
         Celular del cliente (10 dígitos)
-        <input className="min-h-14 rounded-lg border border-line bg-white px-4 text-ink" inputMode="numeric" value={phone} maxLength={14} onChange={(e) => setPhone(e.target.value)} />
+        <input className="min-h-14 rounded-lg border border-line bg-white px-4 text-ink" type="tel" inputMode="tel" autoComplete="tel-national" value={phone} maxLength={14} onChange={(e) => setPhone(e.target.value)} />
       </label>
       <Button variant="secondary" size="sm" onClick={() => void send()} disabled={digits.length !== 10}>Enviar</Button>
       {state.kind === "sent" && <p aria-live="polite" className="rounded-md bg-ok p-3 text-ok-ink">{`Enviamos el cobro al celular terminado en ${state.last4}. Tu cliente lo aprueba en su app.`}</p>}
@@ -198,37 +198,76 @@ export default function Cobrar() {
 
   const showOrder = order && (phase === "pending" || phase === "paid");
 
+  const keypad = (
+    <div className="grid w-full max-w-[420px] grid-cols-3 gap-3" role="group" aria-label="Teclado numérico">
+      {KEYS.map((k) => (
+        <Button key={k} variant="secondary" onClick={() => setDigits((d) => appendKey(d, k))}>
+          {k}
+        </Button>
+      ))}
+      <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "."))} aria-label=".">
+        .
+      </Button>
+      <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "0"))}>
+        0
+      </Button>
+      <Button variant="secondary" onClick={() => setDigits((d) => d.slice(0, -1))} aria-label="Borrar">
+        <Backspace size={24} aria-hidden="true" />
+      </Button>
+    </div>
+  );
+
   return (
     <>
       <PageHeader
         title="Cobrar"
         action={active && <Chip>{active.name ?? "Puesto de ejemplo"}</Chip>}
         lead={showOrder ? "Muestra el QR. Tu cliente paga con su celular." : "Escribe el importe y cobra."} />
-      <PageLayout
-        aside={
-          <Surface className="flex flex-col gap-6">
+      {/* Mobile: amount on top, keypad under it, Cobrar fixed above the bottom nav (bottom-16 = nav height). pb leaves room for both. */}
+      <div data-cobrar-page className="grid gap-6 py-6 pb-28 md:gap-8 md:py-8 md:pb-0 lg:grid-cols-[minmax(0,1fr)_400px]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <Surface className="flex flex-col gap-4">
             <Stat label="Importe" value={pesos(order ? order.amount_cents : amountCents)} unit="MXN" hero />
-            {showOrder ? (
+            {showOrder && (
               <>
                 <p className="text-ink-2">{order.concept}</p>
                 <div aria-live="polite">
                   {phase === "paid" ? <Chip tone="ok">{`Pagado ${pesos(order.amount_cents)}`}</Chip> : <Chip tone="warn">Pendiente</Chip>}
                 </div>
-                {phase === "pending" && (
-                  <a className="text-ink-2 underline" href={`/pagar/${order.id}`}>
-                    Abrir página de pago
-                  </a>
-                )}
-                {phase === "pending" && <PushToPhone orderId={order.id} />}
-                {phase === "paid" && (
-                  <Button variant="secondary" onClick={reset}>
-                    <CheckCircle size={24} aria-hidden="true" />
+              </>
+            )}
+          </Surface>
+          {showOrder && order.qr_string ? (
+            <div className="relative flex justify-center rounded-lg border border-line bg-tint p-6 md:p-12">
+              <QrCubes value={order.qr_string} dim={phase === "paid"} />
+            </div>
+          ) : (
+            keypad
+          )}
+        </div>
+        <aside className="flex min-w-0 flex-col gap-6">
+          {showOrder ? (
+            <>
+              {phase === "pending" && (
+                <a className="inline-flex min-h-11 items-center text-ink-2 underline" href={`/pagar/${order.id}`}>
+                  Abrir página de pago
+                </a>
+              )}
+              {phase === "pending" && <PushToPhone orderId={order.id} />}
+              {phase === "paid" && (
+                <div role="status" className="fixed inset-0 z-20 flex flex-col items-center justify-center gap-8 bg-bg p-6 text-center">
+                  <CheckCircle size={96} weight="fill" aria-hidden="true" className="text-accent" />
+                  <p className="font-display text-[length:var(--text-hero)] text-accent">Pagado</p>
+                  <p className="font-display text-[length:var(--text-2xl)]">{pesos(order.amount_cents)}</p>
+                  <Button className="w-full max-w-sm" onClick={reset}>
                     Cobrar otra orden
                   </Button>
-                )}
-              </>
-            ) : (
-              <>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <Surface className="flex flex-col gap-4">
                 <label className="flex flex-col gap-2 text-ink-2">
                   Concepto
                   <input
@@ -246,6 +285,7 @@ export default function Cobrar() {
                       className="min-h-14 rounded-lg border border-line bg-white px-4 text-ink"
                       value={refCode}
                       maxLength={16}
+                      autoCapitalize="characters"
                       placeholder="Código del aliado"
                       onChange={(e) => { setRefCode(e.target.value); setReferral(null); setRefError(null); }}
                     />
@@ -261,54 +301,28 @@ export default function Cobrar() {
                     </div>
                   )}
                 </div>
-                {phase === "failed" && (
-                  <div role="alert" className="flex flex-col gap-3 text-ink">
-                    <p>No pudimos crear el cobro. Tu cliente no ha pagado nada.</p>
-                    <Button variant="secondary" onClick={retry}>
-                      <ArrowClockwise size={24} aria-hidden="true" />
-                      Reintentar
-                    </Button>
-                  </div>
-                )}
-                {phase !== "failed" && (
-                  <Button onClick={charge} disabled={amountCents <= 0 || phase === "creating" || !active}>
+              </Surface>
+              {phase === "failed" && (
+                <div role="alert" className="flex flex-col gap-3 text-ink">
+                  <p>No pudimos crear el cobro. Tu cliente no ha pagado nada.</p>
+                  <Button variant="secondary" onClick={retry}>
+                    <ArrowClockwise size={24} aria-hidden="true" />
+                    Reintentar
+                  </Button>
+                </div>
+              )}
+              {phase !== "failed" && (
+                <div data-thumb-bar className="fixed inset-x-0 bottom-16 z-10 border-t border-hairline bg-surface p-3 shadow-bar md:static md:border-0 md:bg-transparent md:p-0 md:shadow-none">
+                  <Button className="w-full" onClick={charge} disabled={amountCents <= 0 || phase === "creating" || !active}>
                     <QrCode size={24} aria-hidden="true" />
                     Cobrar
                   </Button>
-                )}
-              </>
-            )}
-          </Surface>
-        }
-      >
-        {showOrder && order.qr_string ? (
-          <div className="relative flex justify-center rounded-lg border border-line bg-tint p-6 md:p-12">
-            <QrCubes value={order.qr_string} dim={phase === "paid"} />
-            {phase === "paid" && (
-              <p className="absolute inset-0 grid place-content-center text-center font-display text-[length:var(--text-2xl)] text-accent md:text-[length:var(--text-hero)]">
-                Pagado
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="grid max-w-[420px] grid-cols-3 gap-3" role="group" aria-label="Teclado numérico">
-            {KEYS.map((k) => (
-              <Button key={k} variant="secondary" onClick={() => setDigits((d) => appendKey(d, k))}>
-                {k}
-              </Button>
-            ))}
-            <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "."))} aria-label=".">
-              .
-            </Button>
-            <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "0"))}>
-              0
-            </Button>
-            <Button variant="secondary" onClick={() => setDigits((d) => d.slice(0, -1))} aria-label="Borrar">
-              <Backspace size={24} aria-hidden="true" />
-            </Button>
-          </div>
-        )}
-      </PageLayout>
+                </div>
+              )}
+            </>
+          )}
+        </aside>
+      </div>
     </>
   );
 }
