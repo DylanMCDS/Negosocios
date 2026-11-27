@@ -50,10 +50,10 @@ Evidencia del primer cobro real (26 nov 2026): $1.00 MXN pagado desde una app ba
 - **Bibliotecas de código abierto:** FastAPI, Pydantic, httpx, standardwebhooks y uvicorn (servidor); React, Tailwind CSS, `qrcode`, Leaflet, Phosphor Icons y Motion (interfaz).
 - **Mapa:** © colaboradores de OpenStreetMap (ODbL), con Leaflet.
 - **Capturas e ilustraciones de la landing:** propias; el toldo es un SVG propio. Detalle y fuentes en `docs/CREDITS.md`.
-- **Código previo:** [PENDIENTE: Dylan confirma que no se reutilizó código de proyectos anteriores; el repositorio empezó el 2026-11-26.]
+- **Código previo:** ninguno de la aplicación. Todo el historial del repositorio empieza el 2026-11-26 (161 commits en `main` al redactar esto). La única herramienta previa es el kit de coordinación de agentes `uak` (carpeta `.uak/`), que no forma parte del producto.
 - **Herramientas de IA:** el desarrollo se hizo con agentes de código (Claude Code y Codex). La IA no calcula ningún importe, utilidad ni descuento.
 
 ## Integrantes
 
 - Dylan Martinez (responsable de la entrega).
-- [PENDIENTE: Dylan confirma si hay más integrantes y el contacto para la entrega.]
+- Equipo humano: una persona (Dylan Martinez), según `.uak/PROJECT.md`. El contacto de entrega se registra en el portal de pey.build, no en este documento.
