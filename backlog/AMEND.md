@@ -56,3 +56,16 @@ Append-only; the last section of an ID replaces its section in the backlog. Why:
 - **Verify:** `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/uak lint`
 - **Next step:** capturas actuales de landing, cobrar y cierre como "antes", luego `uak design round`.
 
+## HACK-016 · Video de demo y materiales de entrega
+
+- **Type:** demo
+- **Priority:** P0
+- **Estimate:** 60 min
+- **Rubric / Spec:** C1–C5 · reglas §10.1
+- **Depends on:** HACK-014, HACK-015, HACK-024, HACK-026, HACK-034, HACK-035, HACK-036
+- **Paths:** docs/SUBMISSION.md, docs/DEMO.md
+- **Freeze-Allowed:** yes
+- **Acceptance:** `docs/SUBMISSION.md`: descripción ≤ 500 palabras que dice explícitamente cómo usa el API de pey; instrucciones de prueba ≤ 1000 palabras; declaración de componentes previos y de terceros; integrantes., `docs/DEMO.md`: guion del video ≤ 3 min: cobro CoDi real desde el QR hasta "Pagado" por webhook, descuento de aliado al cobrar, mapa Explorar y cierre del día con recomendaciones; plan B (video grabado).
+- **Test-First:** no (documentos de entrega)
+- **Verify:** `test $(wc -w < docs/SUBMISSION.md) -le 1600 && grep -qi 'pey' docs/SUBMISSION.md && test -s docs/DEMO.md`
+- **Next step:** `/uak-demo`.
