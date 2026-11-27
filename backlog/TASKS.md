@@ -293,3 +293,15 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Acceptance:**
   - Alianzas: listar por negocio (GET /api/alliances?business_id=) y resolver por código de referido (GET /api/alliances/code/{code}) para la pantalla Aliados y Cobrar
 - **Verify:** `uv run pytest -q app/tests/test_alliances.py app/tests/test_reviews.py`
+
+## HACK-039 · Actualizar la prueba antigua del menú para conservar Inicio, Pagar oculto y orden base sin rechazar features nuevas como Aliados (follow-up of HACK-012)
+
+- **Type:** follow-up
+- **Priority:** P1
+- **Depends on:** HACK-012
+- **Follow-up of:** HACK-012
+- **Paths:** web/src/features/negocio/
+- **Freeze-Allowed:** no
+- **Acceptance:**
+  - Actualizar la prueba antigua del menú para conservar Inicio, Pagar oculto y orden base sin rechazar features nuevas como Aliados
+- **Verify:** `npm --prefix web test -- --run src/features/negocio && npm --prefix web run build`
