@@ -6,7 +6,7 @@
 - Why: Dylan picked v1 by looking at captures
 - Failing: v1 QA: canvas backing store 350px drawn at 701 at 390 (use devicePixelRatio); 10 font sizes vs limit 6; #000 literal in canvas sampler
 - Commands: PATH=<scratch>/pw/bin:$PATH bash .uak/bin/uak design shoot R1; uak lint
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/7; run .uak/bin/smoke
+- Next: Integrated in main: dc0dd4ed21c683468319e09e538e27e2bc53d615
 
 ## History
 - 1795738103 | CLAIMED | dylan-1 | claim; next: /uak-design-lock: direcciones con capturas, Dylan elige | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795739198 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/7; evidence: test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && uak lint exit 0 (LINT_OK); build ok; design-critic SHIP 07eff25; Dylan picked v1; reviewer: - | Harness: unknown | Model: unknown
 - 1795739211 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/7; evidence: Verify exit 0; removed .uak/design from PR (out of Paths); reviewer: - | Harness: unknown | Model: unknown
 - 1795739452 | REVIEW | dylan-5 | review; approve; SHA e25b95f379a558a937b77582d14d01e2dad6b310; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795739505 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit dc0dd4ed21c683468319e09e538e27e2bc53d615; reviewer dylan-5 | Harness: unknown | Model: unknown
