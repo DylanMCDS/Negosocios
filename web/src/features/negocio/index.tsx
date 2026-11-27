@@ -3,8 +3,9 @@ import QRCode from "qrcode";
 import { Printer, WarningCircle } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business } from "../../lib/types";
-import { Button, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui";
+import { Button, Chip, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui";
 import { getBusinessId, saveBusinessId } from "./businessId";
+import { BUSINESS_CHANGED, DEMO_BUSINESS_NAME, listMyBusinesses, setActiveBusiness } from "../../lib/business";
 import { clabeComplete, clabeError } from "./clabe";
 
 const field =
@@ -32,7 +33,7 @@ function FixedQr({ value }: { value: string }) {
   );
 }
 
-function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
+function AltaForm({ onCreated, onCancel }: { onCreated: (b: Business) => void; onCancel?: () => void }) {
   const [values, setValues] = useState({ name: "", category: "", zone: "" });
   const [clabe, setClabe] = useState("");
   const [consent, setConsent] = useState(false);
@@ -55,7 +56,7 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
         method: "POST",
         body: JSON.stringify({ name: values.name.trim(), category: values.category.trim(), zone: values.zone.trim() }),
       });
-      saveBusinessId(created.id);
+      saveBusinessId(created.id, created.name);
       if (clabe.trim() !== "") {
         try {
           await api(`/businesses/${encodeURIComponent(created.id)}/payout-account`, {
@@ -123,6 +124,7 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
           <span>Acepto que el nombre, giro y zona de mi puesto aparezcan en un perfil público.</span>
         </label>
         <Button type="submit" disabled={!consent || !complete || !clabeOk || saving}>Guardar</Button>
+        {onCancel && <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>}
       </form>
       {error && <p role="alert">No pudimos guardar tu puesto. Intenta de nuevo.</p>}
       {clabeSaveFailed && (
@@ -168,28 +170,69 @@ function Perfil({ business, owner }: { business: Business; owner: boolean }) {
   );
 }
 
+// "Mis puestos": the businesses registered in this browser plus the demo one; switching is one tap.
+function MisPuestos({ activeId, onNew }: { activeId: string | null; onNew: () => void }) {
+  const mine = listMyBusinesses();
+  const rows = [...mine.map((b) => ({ id: b.id as string | null, name: b.name })), { id: null as string | null, name: DEMO_BUSINESS_NAME }];
+  return (
+    <Surface className="mx-auto mt-6 flex w-full max-w-xl flex-col gap-4">
+      <h2 className="font-display text-[length:var(--text-l)]">Mis puestos</h2>
+      <ul className="flex flex-col gap-2">
+        {rows.map((r) => {
+          const on = r.id === activeId;
+          return (
+            <li key={r.id ?? "demo"} className="flex min-h-14 items-center justify-between gap-3 rounded-md bg-tint px-4">
+              <span className="min-w-0 break-words">{r.name}</span>
+              {on ? <Chip tone="ok">Activo</Chip> : <Button size="sm" variant="secondary" onClick={() => setActiveBusiness(r.id)}>Cambiar</Button>}
+            </li>
+          );
+        })}
+      </ul>
+      <Button onClick={onNew}>+ Dar de alta otro puesto</Button>
+    </Surface>
+  );
+}
+
 export default function Negocio() {
   const viewId = publicId();
-  const ownId = getBusinessId();
+  const [ownId, setOwnId] = useState(getBusinessId);
+  const [creating, setCreating] = useState(false);
+  useEffect(() => {
+    const sync = () => setOwnId(getBusinessId());
+    window.addEventListener(BUSINESS_CHANGED, sync);
+    return () => window.removeEventListener(BUSINESS_CHANGED, sync);
+  }, []);
   const [business, setBusiness] = useState<Business | null>(null);
   const [failed, setFailed] = useState(false);
   const lookup = viewId ?? ownId;
 
   useEffect(() => {
+    setBusiness(null);
+    setFailed(false);
     if (lookup) api<Business>(`/businesses/${encodeURIComponent(lookup)}`).then(setBusiness, () => setFailed(true));
   }, [lookup]);
 
+  const hasMine = !viewId && listMyBusinesses().length > 0;
   const lead = business
     ? [business.category, business.zone, business.temporary_location && `Hoy: ${business.temporary_location}`].filter(Boolean).join(" · ")
     : "Tus datos y listo.";
+  if (creating && !viewId) {
+    return (
+      <>
+        <PageHeader title="Alta de tu puesto" lead="Tus datos y listo." />
+        <AltaForm onCancel={() => setCreating(false)} onCreated={(b) => { setCreating(false); setBusiness(b); setOwnId(b.id); }} />
+      </>
+    );
+  }
   return (
     <>
       <PageHeader title={business ? business.name : "Alta de tu puesto"} lead={lead} />
       {failed && <p role="alert">No encontramos ese puesto.</p>}
+      {hasMine && <MisPuestos activeId={ownId} onNew={() => setCreating(true)} />}
       {business ? (
         <Perfil business={business} owner={!viewId && business.id === ownId} />
       ) : (
-        !lookup && <AltaForm onCreated={setBusiness} />
+        !lookup && !hasMine && <AltaForm onCreated={setBusiness} />
       )}
     </>
   );

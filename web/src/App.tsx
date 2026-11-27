@@ -1,6 +1,7 @@
 import { useEffect, useState, type ComponentType } from "react";
 import { AppShell, PageHeader, Surface } from "./lib/ui";
 import { buildMenu, MenuBar, type FeatureNav } from "./lib/ui/NavBar";
+import { activeBusinessName, BUSINESS_CHANGED, validateSavedBusiness } from "./lib/business";
 import Cobrar from "./lib/ui/locked/Cobrar";
 import Pagar from "./lib/ui/locked/Pagar";
 import Cierre from "./lib/ui/locked/Cierre";
@@ -32,6 +33,22 @@ const read = () => {
   return window.location.hash.slice(1).split("/")[0];
 };
 
+// The active business is always visible, desktop and phone, so the owner knows which puesto they are in.
+function ActiveBusiness() {
+  const [name, setName] = useState(activeBusinessName);
+  useEffect(() => {
+    void validateSavedBusiness();
+    const sync = () => setName(activeBusinessName());
+    window.addEventListener(BUSINESS_CHANGED, sync);
+    return () => window.removeEventListener(BUSINESS_CHANGED, sync);
+  }, []);
+  return (
+    <a href="#negocio" data-active-business className="mb-2 flex min-h-11 items-center justify-end text-[length:var(--text-s)] text-ink-2">
+      Puesto: <span className="ml-1 font-display text-ink">{name}</span>
+    </a>
+  );
+}
+
 export default function App() {
   const [active, setActive] = useState(() => (views.some((v) => v.id === read()) ? read() : "cobrar"));
   useEffect(() => {
@@ -54,6 +71,7 @@ export default function App() {
         />
       }
     >
+      {view.id !== "pagar" && <ActiveBusiness />}
       {Screen ? <Screen /> : <Soon title={view.label} />}
     </AppShell>
   );
