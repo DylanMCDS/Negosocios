@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
 import { DEMO_BUSINESS_ID, getBusinessId } from "../../lib/business";
-import { Button, Chip, PageHeader, PageLayout, SectionHeader, Stat, Surface } from "../../lib/ui";
+import { DiscountFields, PromoResult, emptyValues, promoNumbers, toCents, usePromoSimulation, validAmount, type DiscountValues } from "../../lib/discount";
+import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat, Surface } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
+import AllianceCode from "./AllianceCode";
 
 const CENTER = { lat: 19.432, lng: -99.133 }; // demo tianguis, same as Explorar
 const field = "h-14 w-full rounded-md border border-line bg-surface px-3 text-[length:var(--text-body)] font-display";
@@ -22,6 +24,7 @@ interface Alliance {
   partner_id: string;
   partner_name: string;
   role: "giver" | "referrer";
+  demo?: boolean;
 }
 interface Metrics {
   referrals: number;
@@ -32,82 +35,48 @@ interface Metrics {
   note: string;
 }
 interface Partner { business_id: string; name: string; category: string; zone: string }
-interface Simulation { ok: boolean; max_discount_pct: number | null; message: string | null }
-
 const STATUS = { proposal: "Propuesta", active: "Activa", closed: "Cerrada" } as const;
-const cents = (pesos: string) => Math.round(Number(pesos.replace(",", ".")) * 100);
-const validAmount = (pesos: string) => pesos.trim() !== "" && Number.isFinite(cents(pesos)) && cents(pesos) >= 0;
 
-function Proposal({ me, partner, onDone }: { me: string; partner: Partner; onDone: () => void }) {
-  const [v, setV] = useState({ price: "", cost: "", margin: "", budget: "", uses: "" });
-  const [sim, setSim] = useState<Simulation | null>(null);
+function Proposal({ me, partner, onDone }: { me: string; partner: Partner; onDone: (created: Alliance) => void }) {
+  const [v, setV] = useState<DiscountValues>(emptyValues);
+  const { sim, error: simError } = usePromoSimulation(v);
   const [discount, setDiscount] = useState(0);
   const [error, setError] = useState(false);
-  const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement>) => setV((o) => ({ ...o, [k]: e.target.value }));
-
-  const priceOk = validAmount(v.price) && cents(v.price) > 0 && validAmount(v.cost) && validAmount(v.margin);
-  useEffect(() => {
-    if (!priceOk) return;
-    let alive = true;
-    api<Simulation>("/campaigns/simulate", {
-      method: "POST",
-      body: JSON.stringify({ price_cents: cents(v.price), variable_cost_cents: cents(v.cost), min_contribution_cents: cents(v.margin), budget_cents: 0, currency: "MXN" }),
-    }).then((r) => alive && setSim(r), () => alive && setSim(null));
-    return () => {
-      alive = false;
-    };
-  }, [priceOk, v.price, v.cost, v.margin]);
 
   // The slider stops at the maximum the simulator allows: a discount that loses money cannot be selected.
-  const max = priceOk && sim?.ok && sim.max_discount_pct !== null ? Math.floor(sim.max_discount_pct * 10) / 10 : 0;
+  const max = promoNumbers(v) && sim?.ok && sim.max_discount_pct !== null ? Math.floor(sim.max_discount_pct * 10) / 10 : 0;
   const value = Math.min(discount, max);
-  const canSend = max > 0 && value > 0 && validAmount(v.budget) && cents(v.budget) > 0 && Number(v.uses) > 0;
+  const canSend = max > 0 && value > 0 && validAmount(v.budget) && toCents(v.budget) > 0 && Number(v.uses) > 0;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(false);
     try {
-      await api("/alliances", {
+      const created = await api<Alliance>("/alliances", {
         method: "POST",
         body: JSON.stringify({
-          business_a: me, business_b: partner.business_id, giver: me, discount_pct: value, budget_cents: cents(v.budget),
-          max_uses: Number(v.uses), price_cents: cents(v.price), variable_cost_cents: cents(v.cost), min_contribution_cents: cents(v.margin),
+          business_a: me, business_b: partner.business_id, giver: me, discount_pct: value, budget_cents: toCents(v.budget),
+          max_uses: Number(v.uses), price_cents: toCents(v.price), variable_cost_cents: toCents(v.cost), min_contribution_cents: toCents(v.margin),
         }),
       });
-      onDone();
+      onDone(created);
     } catch {
       setError(true);
     }
   }
 
-  const labeled = (k: keyof typeof v, label: string) => (
-    <label className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
-      {label}
-      <input className={field} inputMode="decimal" value={v[k]} onChange={set(k)} />
-    </label>
-  );
   return (
     <Surface className="flex flex-col gap-4">
       <SectionHeader title={`Alianza con ${partner.name}`} size="sm" />
-      <form className="grid grid-cols-2 gap-4" onSubmit={submit}>
-        {labeled("price", "Precio")}
-        {labeled("cost", "Costo")}
-        {labeled("margin", "Ganancia mínima")}
-        {labeled("budget", "Presupuesto")}
-        {labeled("uses", "Usos")}
-        <label className="col-span-2 flex flex-col gap-2 text-[length:var(--text-s)] text-ink-2">
+      <form className="flex flex-col gap-4" onSubmit={submit}>
+        <DiscountFields values={v} keys={["price", "cost", "margin", "budget", "uses"]} onChange={(k, val) => setV((o) => ({ ...o, [k]: val }))} />
+        <label className="flex flex-col gap-2 text-[length:var(--text-s)] text-ink-2">
           <span>Descuento</span>
           <input type="range" className="accent-accent" min={0} max={max} step={0.1} value={value} disabled={max <= 0} onChange={(e) => setDiscount(Math.min(Number(e.target.value), max))} aria-label="Descuento" aria-valuetext={`${value} %`} />
           <span className="font-display text-[length:var(--text-l)] text-ink">{`${value} %`}</span>
         </label>
-        {sim?.ok && max > 0 && (
-          <div className="col-span-2 flex flex-col gap-1">
-            <p className="font-display text-[length:var(--text-body)]">{`Puedes dar hasta ${max.toLocaleString("es-MX")} % de descuento`}</p>
-            <p className="text-ink-2">{`Cuenta: ${mxn(cents(v.price))} − ${mxn(cents(v.cost) + cents(v.margin))} (costo + ganancia mínima) = ${mxn(cents(v.price) - cents(v.cost) - cents(v.margin))}, o sea ${(sim.max_discount_pct ?? 0).toLocaleString("es-MX")} % del precio.`}</p>
-          </div>
-        )}
-        {sim && !sim.ok && <p className="col-span-2">{sim.message ?? "Con esos números no hay descuento posible."}</p>}
-        <Button type="submit" className="col-span-2" disabled={!canSend}>Proponer</Button>
+        <PromoResult values={v} sim={sim} error={simError} />
+        <Button type="submit" disabled={!canSend}>Proponer</Button>
       </form>
       {error && <p role="alert">No pudimos proponer la alianza: la cuenta no alcanza o ya existe.</p>}
     </Surface>
@@ -122,6 +91,7 @@ export default function Aliados() {
   const [search, setSearch] = useState("");
   const [picked, setPicked] = useState<Partner | null>(null);
   const [failed, setFailed] = useState(false);
+  const timers = useRef<number[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -142,6 +112,14 @@ export default function Aliados() {
       () => undefined,
     );
   }, [load, me]);
+
+  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+  // A proposal to a demo business accepts itself after a few seconds: look again so the flow can be walked through.
+  const afterProposal = (created: Alliance) => {
+    setPicked(null);
+    void load();
+    if (created?.demo) timers.current.push(window.setTimeout(() => void load(), 4000));
+  };
 
   const accept = async (a: Alliance) => {
     try {
@@ -165,7 +143,7 @@ export default function Aliados() {
         aside={
           <div className="flex flex-col gap-6">
             {picked ? (
-              <Proposal me={me} partner={picked} onDone={() => { setPicked(null); void load(); }} />
+              <Proposal me={me} partner={picked} onDone={afterProposal} />
             ) : (
               <Surface className="flex flex-col gap-4">
                 <SectionHeader title="Buscar negocios de la red" size="sm" />
@@ -199,11 +177,14 @@ export default function Aliados() {
                 <li key={a.id} className="flex flex-col gap-1 py-3">
                   <div className="flex items-center gap-3">
                     <p className="flex-1 font-semibold">{a.partner_name}</p>
+                    {a.demo && <DataBadge size="sm" />}
                     <Chip size="sm" tone={a.status === "active" ? "ok" : "warn"}>{STATUS[a.status]}</Chip>
                   </div>
                   <p className="text-ink-2">{a.role === "giver" ? `Tú das ${a.discount_pct} % de descuento a sus clientes` : `Te refiere clientes con ${a.discount_pct} % de descuento`}</p>
                   <p className="text-[length:var(--text-s)] text-ink-2">{`Quedan ${a.max_uses - a.uses} usos y ${mxn(a.budget_cents - a.budget_used_cents)} de presupuesto`}</p>
-                  {a.role === "giver" && a.status === "active" && <p className="text-[length:var(--text-s)]">{`Código para compartir: ${a.referral_code}`}</p>}
+                  {a.status === "proposal" && a.demo && a.business_b !== me && <p className="text-[length:var(--text-s)] text-ink-2">Negocio de ejemplo: aceptará solo en unos segundos.</p>}
+                  {a.role === "giver" && a.status === "active" && <AllianceCode code={a.referral_code} />}
+                  {a.role === "referrer" && a.status === "active" && <p className="text-[length:var(--text-s)]">{`Tus clientes reciben el código de ${a.partner_name}`}</p>}
                   {m && <p className="text-[length:var(--text-s)] text-ink-2">{`${m.referrals} referencias · ${m.paid_purchases} compras pagadas · beneficios dados ${mxn(m.benefit_cost_cents)} · contribución estimada ${mxn(m.estimated_contribution_cents)}`}</p>}
                   {a.status === "proposal" && a.business_b === me && (
                     <Button variant="secondary" size="sm" aria-label={`Aceptar propuesta de ${a.partner_name}`} onClick={() => void accept(a)}>Aceptar</Button>

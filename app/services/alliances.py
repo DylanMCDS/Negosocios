@@ -139,6 +139,7 @@ def _identities(conn, giver: str, ref: str) -> tuple[str, set[str]]:
 
 def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
     """Reserva el beneficio una sola vez por orden; presupuesto y usos se descuentan en la misma transacción."""
+    settle_demo_proposals(conn)
     conn.execute("BEGIN IMMEDIATE")
     try:
         row = _get(conn, alliance_id)
