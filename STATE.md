@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795822051
+Updated: 1795822058
 AVAILABLE: -
 CLAIMED: HACK-046 
 BLOCKED: -
@@ -16,11 +16,11 @@ HACK-046 | CLAIMED | dylan-0 | until 1795823165
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795820961 | allow | dylan | test change: HACK-045 | Why: Autorizado por Dylan: cambiar la aserción 'Elige tu cuenta' por 'Elige tu cobro' en la UI de HACK-045
 - 1795821134 | deadline decision/HACK-046-1795820044/1795820944 | REVERSIBLE_AND_LOG | Option: Mantener modelo de edición del prototipo existente; contrato público allowlist sin 
 - 1795821360 | HACK-042 | Push de parte llama POST /orders/<orden>-<n>/push; backend no lo soporta aun, pedido a human #241 | Why: app/ fuera de Paths de HACK-042
 - 1795821875 | HACK-045 | Compatibilidad con business.ts nuevo verificada; mantener task en REVIEW | Why: Autorización --tests humana registrada; upstream resuelto antes de revisi
 - 1795821910 | HACK-045 | HACK-045 queda en REVIEW; veredicto independiente HACK-016 enviado por protocolo | Why: uak next ofreció HACK-016; docs/SUBMISSION.md:53,59 incompletos a
+- 1795822058 | HACK-045 | Integrado por protocolo sprint Auto-Merge yes tras aprobación bf6ad84 | Why: Verify, smoke y critic verdes; aprobación independiente confirmada
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.

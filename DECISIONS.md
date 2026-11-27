@@ -83,3 +83,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795821360 | HACK-042 | Push de parte llama POST /orders/<orden>-<n>/push; backend no lo soporta aun, pedido a human #241 | Why: app/ fuera de Paths de HACK-042
 - 1795821875 | HACK-045 | Compatibilidad con business.ts nuevo verificada; mantener task en REVIEW | Why: Autorización --tests humana registrada; upstream resuelto antes de revisión
 - 1795821910 | HACK-045 | HACK-045 queda en REVIEW; veredicto independiente HACK-016 enviado por protocolo | Why: uak next ofreció HACK-016; docs/SUBMISSION.md:53,59 incompletos aunque Verify pasa
+- 1795822058 | HACK-045 | Integrado por protocolo sprint Auto-Merge yes tras aprobación bf6ad84 | Why: Verify, smoke y critic verdes; aprobación independiente confirmada

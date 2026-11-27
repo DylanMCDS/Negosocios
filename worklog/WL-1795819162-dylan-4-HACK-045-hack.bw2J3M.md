@@ -1,12 +1,12 @@
 # worklog/WL-1795819162-dylan-4-HACK-045-hack.bw2J3M.md · HACK-045
 
 ## Live summary
-- Done: PR41 REVIEW bf6ad84; Verify y PRODUCT_PASS tras integrar main; critic SHIP. HACK-016 revisado: REJECT b659407 por pendientes de declaración de código previo e integrantes
-- Decision: HACK-045 queda en REVIEW; veredicto independiente HACK-016 enviado por protocolo
-- Why: uak next ofreció HACK-016; docs/SUBMISSION.md:53,59 incompletos aunque Verify pasa
+- Done: INTEGRATED: PR41, main bdb29fd8a543dc2ed8f1aed2dffa16487254012a; revisión dylan-2; gate y push main+claims atómicos
+- Decision: Integrado por protocolo sprint Auto-Merge yes tras aprobación bf6ad84
+- Why: Verify, smoke y critic verdes; aprobación independiente confirmada
 - Failing: Ninguno en HACK-045
-- Commands: done HACK-045 REVIEW; Verify exit0; smoke PRODUCT_PASS; review HACK-016 reject b659407 registrado
-- Next: Integrated in main: bdb29fd8a543dc2ed8f1aed2dffa16487254012a
+- Commands: merge HACK-045 INTEGRATED bdb29fd8; msg252 reply revisor; inbox ack249; review HACK-016 --start OK
+- Next: Completar re-review HACK-016 SHA51915e3 y atender inbox; HACK-045 completo
 
 ## History
 - 1795819162 | CLAIMED | dylan-4 | claim; next: Escribir el test rojo point_accepts_custom_name_icon_and_target | Harness: unknown | Model: unknown
@@ -21,3 +21,4 @@
 - 1795821920 | REVIEW | dylan-2 | review; approve; SHA bf6ad84c230159e4cbabb308ed97d4be569ccebb; reviewer dylan-2 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795821943 | REVIEW | dylan-4 | heartbeat; lease until 1795836343 | Harness: unknown | Model: unknown
 - 1795821994 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit bdb29fd8a543dc2ed8f1aed2dffa16487254012a; reviewer dylan-2 | Harness: unknown | Model: unknown
+- 1795822058 | INTEGRATED | dylan-4 | checkpoint; next: Completar re-review HACK-016 SHA51915e3 y atender inbox; HACK-045 completo | Harness: unknown | Model: unknown
