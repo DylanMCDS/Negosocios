@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795819793
+Updated: 1795819805
 AVAILABLE: HACK-016 HACK-042 HACK-046 
 CLAIMED: HACK-041 HACK-043 HACK-045 
 BLOCKED: -
@@ -13,16 +13,16 @@ Claims (first 24; status --task ID shows detail):
 HACK-040 | REVIEW | dylan-1 | until 1795834095
 HACK-041 | CLAIMED | dylan-5 | until 1795822011
 HACK-043 | CLAIMED | dylan-2 | until 1795821808
-HACK-044 | REVIEW | dylan-3 | until 1795834180
+HACK-044 | REVIEW | dylan-3 | until 1795834205
 HACK-045 | CLAIMED | dylan-4 | until 1795822282
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795819108 | HACK-043 | Auto-aceptar de forma perezosa al listar/consultar codigo tras DEMO_ACCEPT_SECONDS=3, sin cambiar esquema; demo = business_b.demo_data | Why: evita job en
 - 1795819311 | HACK-041 | pendientes por ids en localStorage + GET /orders/{id}; sin resaltar dígito nuevo | Why: no hay endpoint de lista de órdenes
 - 1795819357 | HACK-044 | Usar getBusinessId y fallback demo idéntico a Cierre; cerrar callbacks de reconocimiento al terminar | Why: La identidad fija ocultaba gastos y la falta 
 - 1795819568 | HACK-044 | Mantener escucha bloqueada hasta resultado final tras Detener evita parsear texto antiguo | Why: Regresión asíncrona cubierta; identidad de puesto coinc
 - 1795819582 | HACK-045 | Explicit targets profile/current/assigned; legacy null target preserves prior contract | Why: Meets customization without breaking existing points
+- 1795819805 | HACK-044 | Confirmación en área principal y Surface sm mantiene guardar dentro720 | Why: Gasto mismo puesto que Cierre y reconocimiento termina de forma recuperabl
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.

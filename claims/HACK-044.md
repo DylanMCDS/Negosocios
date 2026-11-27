@@ -9,10 +9,10 @@ Priority: P0
 Paths: web/src/features/voz/
 Depends: HACK-031
 Verify: `npm --prefix web test -- --run src/features/voz && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795834180
-Updated: 1795819780
+Lease-Until: 1795834205
+Updated: 1795819805
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/39; run .uak/bin/smoke
+Next: uak next y luego HACK-046 según instrucción del humano
 PR: https://github.com/DylanMCDS/Negosocios/pull/39
 Evidence: -
 Thread-Read: 0
