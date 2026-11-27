@@ -11,3 +11,4 @@
 ## History
 - 1795758353 | CLAIMED | dylan-5 | claim; next: tests primero: CLABE con dígito de control | Harness: unknown | Model: unknown
 - 1795758579 | CLAIMED | dylan-5 | checkpoint; next: Start with CLABE check digit (weights 3-7-1 mod 10) in app/services/payout_accounts.py, tests first: rejects_clabe_with_wrong_check_digit, stores_only_bank_and_last_four; note app/db.py is not in Paths so create payout_accounts table inside the service (see recurring.py _ensure pattern); web/src/features/pagar overlaps HACK-010 (dylan-1) | Harness: unknown | Model: unknown
+- 1795758586 | AVAILABLE | dylan-5 | release; claim released by dylan-5; reason: -; summary kept | Harness: unknown | Model: unknown
