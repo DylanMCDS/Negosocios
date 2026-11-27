@@ -107,3 +107,32 @@ def test_metrics_count_paid_attributed_purchases(api):
     assert metrics["referrals"] == 2 and metrics["paid_purchases"] == 1
     assert metrics["benefit_cost_cents"] == 2000 and metrics["estimated_contribution_cents"] == 9000 - 6000
     assert "correlación" in metrics["note"] and "causalidad" in metrics["note"]
+
+
+def test_one_paid_order_named_two_ways_gets_one_benefit(api):
+    client, conn = api
+    alliance = active(client, budget_cents=100000, max_uses=5)
+    conn.execute("INSERT INTO orders (id, business_id, amount_cents, concept, status, idempotency_key, created_at, paid_at)"
+                 " VALUES ('9001', 'taqueria', 9000, 'x', 'paid', 'key-A', '2026-11-26T10:00:00-06:00', '2026-11-26T10:01:00-06:00')")
+    conn.commit()
+    url = f"/api/alliances/{alliance['id']}/quote"
+    by_key = client.post(url, json={"amount_cents": 10000, "order_id": "key-A"}).json()
+    by_id = client.post(url, json={"amount_cents": 10000, "order_id": "9001"}).json()
+    assert by_key == by_id and by_key["uses_remaining"] == 4 and by_key["budget_remaining_cents"] == 99000
+    metrics = client.get(f"/api/alliances/{alliance['id']}/metrics").json()
+    assert (metrics["referrals"], metrics["paid_purchases"], metrics["paid_sales_cents"]) == (1, 1, 9000)
+
+
+def test_discount_never_leaves_less_than_minimum_contribution_in_cents(api):
+    client, _ = api
+    economics = {"price_cents": 100000, "variable_cost_cents": 60000, "min_contribution_cents": 33333}  # 6667 cents of margin
+    body = {"business_a": "cafe", "business_b": "taqueria", "giver": "taqueria", "budget_cents": 1000000, "max_uses": 5, **economics}
+    over = client.post("/api/alliances", json={**body, "discount_pct": 6.67})
+    assert over.status_code == 422 and "6.67" in over.json()["detail"]["message"]
+    alliance = client.post("/api/alliances", json={**body, "discount_pct": 6.66}).json()
+    client.post(f"/api/alliances/{alliance['id']}/accept")
+    quoted = client.post(f"/api/alliances/{alliance['id']}/quote", json={"amount_cents": 100000, "order_id": "big"}).json()
+    assert quoted["discount_cents"] == 6660 and quoted["total_cents"] - 60000 >= 33333
+    # A small amount rounds against the giver: the discount is capped so the minimum still holds.
+    small = client.post(f"/api/alliances/{alliance['id']}/quote", json={"amount_cents": 3, "order_id": "tiny"}).json()
+    assert small["total_cents"] >= -(-(60000 + 33333) * 3 // 100000)

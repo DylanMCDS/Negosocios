@@ -64,8 +64,13 @@ def propose(conn, data: dict) -> dict:
             raise HTTPException(404, "Negocio no encontrado")
     limit = finance.max_discount(data["price_cents"], data["variable_cost_cents"], data["min_contribution_cents"])
     pct = data["discount_pct"]
-    if not limit["ok"] or pct > limit["max_discount_pct"]:
+    margin = data["price_cents"] - data["variable_cost_cents"] - data["min_contribution_cents"]
+    # The percentage is rounded to 2 decimals; the real limit is whole cents of the price.
+    over_in_cents = _discount_cents(data["price_cents"], pct) > margin
+    if not limit["ok"] or pct > limit["max_discount_pct"] or over_in_cents:
         top = limit["max_discount_pct"]
+        if limit["ok"] and not pct > top:  # within the rounded percentage but over in cents
+            top = round(max(margin, 0) * 100 / data["price_cents"], 4) if margin > 0 else 0.0
         message = (f"Un descuento de {pct} % deja al negocio por debajo de su contribución mínima; "
                    + (f"el máximo es {top} %." if limit["ok"] else limit["message"] + "."))
         raise HTTPException(422, {
@@ -84,6 +89,10 @@ def propose(conn, data: dict) -> dict:
     return _view(_get(conn, row["id"]))
 
 
+def _discount_cents(amount_cents: int, pct) -> int:
+    return int((Decimal(amount_cents) * Decimal(str(pct)) / 100).to_integral_value(ROUND_FLOOR))
+
+
 def finance_formula() -> str:
     return "100 * (1 - (variable_cost_cents + min_contribution_cents) / price_cents)"
 
@@ -99,6 +108,16 @@ def accept(conn, alliance_id: str) -> dict:
     return _view(_get(conn, alliance_id))
 
 
+def _identities(conn, giver: str, ref: str) -> tuple[str, set[str]]:
+    """One purchase can be named by its order id or by the Idempotency-Key it was created with."""
+    order = conn.execute(
+        "SELECT id, idempotency_key FROM orders WHERE business_id = ? AND (id = ? OR idempotency_key = ?)",
+        (giver, ref, ref)).fetchone()
+    if order is None:
+        return ref, {ref}
+    return order["id"], {ref, order["id"], order["idempotency_key"]}
+
+
 def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
     """Reserva el beneficio una sola vez por orden; presupuesto y usos se descuentan en la misma transacción."""
     conn.execute("BEGIN IMMEDIATE")
@@ -106,13 +125,19 @@ def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
         row = _get(conn, alliance_id)
         if row["status"] != "active":
             raise HTTPException(409, "La alianza no está activa")
+        canonical, names = _identities(conn, row["giver"], order_id)
+        marks = ",".join("?" * len(names))
         prior = conn.execute(
-            "SELECT * FROM referrals WHERE alliance_id = ? AND order_id = ?", (alliance_id, order_id)).fetchone()
+            f"SELECT * FROM referrals WHERE alliance_id = ? AND order_id IN ({marks})", (alliance_id, *names)).fetchone()
         if prior is not None:
             return _result(row, True, prior["original_cents"], prior["discount_cents"], None)
-        discount = int((Decimal(amount_cents) * Decimal(str(row["discount_pct"])) / 100).to_integral_value(ROUND_FLOOR))
+        # Never leave the giver below its minimum contribution, in whole cents, for this amount.
+        required = -(-(row["variable_cost_cents"] + row["min_contribution_cents"]) * amount_cents // row["price_cents"])
+        discount = min(_discount_cents(amount_cents, row["discount_pct"]), max(amount_cents - required, 0))
         reason = None
-        if row["uses"] >= row["max_uses"]:
+        if discount <= 0:
+            reason = "Este importe no deja margen para un descuento"
+        elif row["uses"] >= row["max_uses"]:
             reason = "Se agotaron los usos de la alianza"
         elif row["budget_used_cents"] + discount > row["budget_cents"]:
             reason = "El presupuesto de la alianza no alcanza para este descuento"
@@ -121,7 +146,7 @@ def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
         conn.execute(
             "INSERT INTO referrals (id, alliance_id, order_id, original_cents, discount_cents, total_cents, created_at)"
             " VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (f"rf-{uuid.uuid4().hex[:10]}", alliance_id, order_id, amount_cents, discount, amount_cents - discount,
+            (f"rf-{uuid.uuid4().hex[:10]}", alliance_id, canonical, amount_cents, discount, amount_cents - discount,
              datetime.now(UTC).isoformat()))
         conn.execute("UPDATE alliances SET uses = uses + 1, budget_used_cents = budget_used_cents + ? WHERE id = ?",
                      (discount, alliance_id))
@@ -143,12 +168,14 @@ def metrics(conn, alliance_id: str) -> dict:
     row = _get(conn, alliance_id)
     refs = conn.execute("SELECT * FROM referrals WHERE alliance_id = ?", (alliance_id,)).fetchall()
     paid_total = paid_count = contribution = 0
+    seen: set[str] = set()
     for ref in refs:
         order = conn.execute(
-            "SELECT amount_cents FROM orders WHERE business_id = ? AND status = 'paid' AND (id = ? OR idempotency_key = ?)",
+            "SELECT id, amount_cents FROM orders WHERE business_id = ? AND status = 'paid' AND (id = ? OR idempotency_key = ?)",
             (row["giver"], ref["order_id"], ref["order_id"])).fetchone()
-        if order is None:
+        if order is None or order["id"] in seen:
             continue
+        seen.add(order["id"])
         paid_count += 1
         paid_total += order["amount_cents"]
         cost = row["variable_cost_cents"] * ref["original_cents"] // row["price_cents"]
