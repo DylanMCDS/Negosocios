@@ -12,6 +12,7 @@ from fastapi import HTTPException
 
 from app.db import connect, init_db
 from app.schemas import Business, Order, OrderCreate
+from app.services import payout_accounts
 from app.services.pey import FakePeyClient, PeyClient, PeyError
 
 
@@ -68,8 +69,13 @@ def create_order(conn, body: OrderCreate, key: str, pey: PeyClient) -> tuple[Ord
         raise HTTPException(503, "No hay referencias de cobro disponibles")
     order_id = str(number)
     created_at = datetime.now(UTC)
+    # A business with a real pey account collects directly; everyone else uses the platform account.
+    bank_account_id = payout_accounts.real_bank_account_id(conn, body.business_id)
+    if bank_account_id and not payout_accounts.supports_bank_account_id(type(pey)):
+        raise HTTPException(503, payout_accounts.DIRECT_UNAVAILABLE)  # never a 500 for a saved pey account
+    extra = {"bank_account_id": bank_account_id} if bank_account_id else {}
     try:
-        qr = pey.create_qr(body.amount_cents / 100, body.concept, order_id, 600)
+        qr = pey.create_qr(body.amount_cents / 100, body.concept, order_id, 600, **extra)
     except PeyError:
         raise HTTPException(502, "No se pudo crear el cobro; revisa pey antes de reintentar") from None
     order = Order(
@@ -84,5 +90,6 @@ def create_order(conn, body: OrderCreate, key: str, pey: PeyClient) -> tuple[Ord
         f"INSERT INTO orders ({','.join(columns)}) VALUES ({','.join('?' for _ in columns)})",
         list(values.values()),
     )
+    payout_accounts.record_settlement(conn, order_id, bank_account_id)
     conn.commit()
     return order, True
