@@ -265,15 +265,19 @@ export default function Cobrar() {
       {/* Mobile: amount on top, keypad under it, Cobrar fixed above the bottom nav (bottom-16 = nav height). pb leaves room for both. */}
       <div data-cobrar-page className="grid gap-6 py-6 pb-28 md:gap-8 md:py-8 md:pb-0 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex min-w-0 flex-col gap-6">
-              {waiting.length > 0 && (
-                <Surface className="flex flex-col gap-2 p-4" aria-live="polite">
-                  <p className="font-display">{waiting.length === 1 ? "Tienes 1 cobro pendiente" : `Tienes ${waiting.length} cobros pendientes`}</p>
-                  {waiting.map((o) => (
-                    <Button key={o.id} variant="secondary" onClick={() => openWaiting(o)}>
-                      {`${pesos(o.amount_cents)} · ${o.concept}`}
-                    </Button>
-                  ))}
-                  <a className="inline-flex min-h-11 items-center text-ink-2 underline" href="#cierre">Ir a Cierre</a>
+              {!showOrder && waiting.length > 0 && (
+                <Surface className="flex flex-col gap-2 p-3" aria-live="polite">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-display text-[length:var(--text-s)]">{waiting.length === 1 ? "Tienes 1 cobro pendiente" : `Tienes ${waiting.length} cobros pendientes`}</p>
+                    <a className="inline-flex min-h-11 shrink-0 items-center text-[length:var(--text-s)] text-ink-2 underline" href="#cierre">Ir a Cierre</a>
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto">
+                    {waiting.map((o) => (
+                      <Button key={o.id} variant="secondary" size="sm" className="shrink-0" onClick={() => openWaiting(o)}>
+                        {`${pesos(o.amount_cents)} · ${o.concept}`}
+                      </Button>
+                    ))}
+                  </div>
                 </Surface>
               )}
           <Surface className={showOrder ? "order-2 flex flex-col gap-4 lg:order-1" : "flex flex-col gap-4"}>
