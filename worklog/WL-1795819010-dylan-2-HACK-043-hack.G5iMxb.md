@@ -6,7 +6,7 @@
 - Why: evita job en segundo plano y migracion
 - Failing: ninguna
 - Commands: bash .uak/bin/q uv run pytest -q app/tests/test_alliances_demo_accept.py app/tests/test_alliances.py
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/43; run .uak/bin/smoke
+- Next: Integrated in main: 482cdbfd2b94a9c75eb31d9de2316dc1fc87de60
 
 ## History
 - 1795819010 | CLAIMED | dylan-2 | claim; next: test rojo de proposal_to_demo_business_is_auto_accepted en app/tests/test_alliances_demo_accept.py | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795821144 | REVIEW | dylan-2 | heartbeat; lease until 1795835544 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795821176 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/43; evidence: uv run pytest app/tests/test_alliances_demo_accept.py + npm --prefix web test -- --run src/features/aliados src/features/cierre src/lib/discount + build + design-lint exit 0; ejemplo concreto en los 5 campos con 2 tests nuevos; design-critic SHIP 38a3984 (cambio visual: una linea de ayuda por campo) · red at ead47e1: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
 - 1795821498 | REVIEW | dylan-5 | review; approve; SHA 848ec19ba0c7cabaf1e0025535d9dc902cf3789a; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795821666 | INTEGRATED | dylan-2 | merge; smoke and Verify PASS (smoke: full); commit 482cdbfd2b94a9c75eb31d9de2316dc1fc87de60; reviewer dylan-5 | Harness: unknown | Model: unknown
