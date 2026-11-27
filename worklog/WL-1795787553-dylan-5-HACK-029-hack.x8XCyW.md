@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `uv run pytest -q app/tests/test_splits.py && npm --prefix web test -- --run src/features/dividir && npm --prefix web run build`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/33; run .uak/bin/smoke
+- Next: Integrated in main: cf2f20fe6be1c25498a85a2992d1d516ac6c51f1
 
 ## History
 - 1795787553 | CLAIMED | dylan-5 | claim; next: tests primero | Harness: unknown | Model: unknown
@@ -18,3 +18,4 @@
 - 1795798887 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/33; evidence: pytest test_splits.py 7 passed + full backend suite green; npm test src/features/dividir 11 passed; build exit 0; design-lint PASS; design-critic SHIP 603a622 (e87e495 UI unchanged) · red at 1f1acc3: AssertionError: expected true not to be true // Object.is equality; reviewer: - | Harness: unknown | Model: unknown
 - 1795799423 | REVIEW | dylan-5 | heartbeat; lease until 1795813823 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795800501 | REVIEW | dylan-1 | review; approve; SHA 603a622d157c8e7b4bc53286eb8f43b5e0e26f72; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795800730 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit cf2f20fe6be1c25498a85a2992d1d516ac6c51f1; reviewer dylan-1 | Harness: unknown | Model: unknown
