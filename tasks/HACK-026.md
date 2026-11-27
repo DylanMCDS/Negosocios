@@ -1,6 +1,6 @@
 # HACK-026
 ID: HACK-026
-State: REVIEW
+State: INTEGRATED
 Owner: dylan-2
 Branch: feat/hack-026
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-026
@@ -9,15 +9,20 @@ Priority: P0
 Paths: web/src/features/aliados/, web/src/features/cobrar/
 Depends: HACK-022, HACK-025
 Verify: `npm --prefix web test -- --run src/features/aliados src/features/cobrar && npm --prefix web run build`
-Lease-Until: 1795786174
-Updated: 1795771774
+Lease-Until: 0
+Updated: 1795772311
 Task-Base: 029eb55ab0fea7fb76e50cab6e3be10d9b903ab5
-Next: if human allows (uak allow HACK-024 --tests), land the one-line nav test fix, merge HACK-024 then HACK-026; else keep looping uak next
+Next: Integrated in main: 4eb7730a01de38afbafde0afe084538681d2a136
 PR: https://github.com/DylanMCDS/Negosocios/pull/30
 Evidence: npm --prefix web test -- --run src/features/aliados src/features/cobrar: all passed (3 named + 2 extra tests; earlier Cobrar tests unchanged); build exit 0; lint 0 errors; design-critic SHIP b9166cf; red at f28a535 (stub) · red at f28a535: exit 1 (no assertion line recognized: the reviewer reads the log)
-Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve
-Events: 6
+Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-5 (claude-sonnet-5-5)
+Events: 7
 Checkpoints: 1
 Sessions: 2
 Last-Checkpoint: 1795771774
 Task-Tip: b9166cfc3fc66b800b092168004ca45a36dd6389
+Merge-Commit: 4eb7730a01de38afbafde0afe084538681d2a136
+Reviewer: dylan-5
+Integration-Proof: ancestry
+Smoke: full
+Merged-By: dylan-5

@@ -6,7 +6,7 @@
 - Why: dylan-5 flagged it; human asked 3 times (#133,#142,#151), no answer; tests only grow rule blocks my edit
 - Failing: none open besides the nav test
 - Commands: bash .uak/bin/uak merge HACK-026 ; npm --prefix web test -- --run
-- Next: if human allows (uak allow HACK-024 --tests), land the one-line nav test fix, merge HACK-024 then HACK-026; else keep looping uak next
+- Next: Integrated in main: 4eb7730a01de38afbafde0afe084538681d2a136
 
 ## History
 - 1795770386 | CLAIMED | dylan-2 | claim; next: read spec, write tests, red | Harness: unknown | Model: unknown
@@ -15,3 +15,4 @@
 - 1795771190 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/30; evidence: npm --prefix web test -- --run src/features/aliados src/features/cobrar: all passed (3 named + 2 extra tests; earlier Cobrar tests unchanged); build exit 0; lint 0 errors; design-critic SHIP b9166cf; red at f28a535 (stub) · red at f28a535: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
 - 1795771494 | REVIEW | dylan-5 | review; approve; SHA b9166cfc3fc66b800b092168004ca45a36dd6389; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795771774 | REVIEW | dylan-2 | checkpoint; next: if human allows (uak allow HACK-024 --tests), land the one-line nav test fix, merge HACK-024 then HACK-026; else keep looping uak next | Harness: unknown | Model: unknown
+- 1795772311 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit 4eb7730a01de38afbafde0afe084538681d2a136; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
