@@ -1,6 +1,6 @@
 # HACK-045
 ID: HACK-045
-State: CLAIMED
+State: REVIEW
 Owner: dylan-4
 Branch: feat/hack-045
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-045
@@ -9,10 +9,10 @@ Priority: P1
 Paths: app/services/points.py, app/routers/points.py, app/tests/test_points_custom.py, web/src/features/puntos/
 Depends: HACK-030
 Verify: `uv run pytest -q app/tests/test_points_custom.py app/tests/test_points.py && npm --prefix web test -- --run src/features/puntos && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795822515
-Updated: 1795819815
+Lease-Until: 1795836196
+Updated: 1795821796
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Apply option: Actualizar aserción Elige tu cuenta a Elige tu cobro, autorizado por Dylan en conversación: te autorizo
-PR: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/41; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/41
 Evidence: -
 Thread-Read: 223
