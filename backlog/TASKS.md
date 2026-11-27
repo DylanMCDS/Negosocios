@@ -203,3 +203,16 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** rejects_clabe_with_wrong_check_digit, stores_only_bank_and_last_four, order_uses_pey_bank_account_id_when_real, order_marks_settlement_simulated_without_real_account, pagar_shows_simulated_receiver_account
 - **Verify:** `uv run pytest -q app/tests/test_payout_accounts.py app/tests/test_orders.py && npm --prefix web test -- --run src/features/negocio src/features/pagar && npm --prefix web run build`
 - **Next step:** test rojo del dígito de control con una CLABE válida y la misma con el último dígito alterado.
+## HACK-032 · Cobrar con centavos ($35.50)
+
+- **Type:** bug
+- **Priority:** P0
+- **Estimate:** 30 min
+- **Rubric / Spec:** C1, C4 · pedido de Dylan 2026-11-26
+- **Depends on:** HACK-021
+- **Paths:** web/src/features/cobrar/, app/services/pey.py, app/tests/test_pey_amounts.py
+- **Freeze-Allowed:** yes
+- **Acceptance:** Bug: el teclado de Cobrar sólo tiene dígitos y calcula `Number(digits) * 100`, así que no se puede cobrar $35.50., El teclado agrega la tecla "." (en el hueco junto al 0 o reemplazando "C" por un botón aparte); máximo 2 decimales; un solo punto; "0.50" y ".5" válidos; importe mostrado siempre como `$35.50`., El importe se convierte a centavos sin errores de coma flotante (parsear el texto, no multiplicar floats): "19.99" → 1999, "0.1" → 10, "35.5" → 3550; importe 0 deshabilita "Cobrar"., `HttpPeyClient` envía `amount` redondeado a 2 decimales (p. ej. `round(cents / 100, 2)` o `Decimal`), nunca `19.990000000000002`., Prueba manual en producción (Dylan): cobro real de $1.50 pasa a "Pagado $1.50".
+- **Tests:** keypad_accepts_two_decimals, keypad_rejects_second_dot_and_third_decimal, converts_text_amount_to_cents_without_float_error, pey_amount_has_at_most_two_decimals
+- **Verify:** `uv run pytest -q app/tests/test_pey_amounts.py && npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build`
+- **Next step:** test rojo `converts_text_amount_to_cents_without_float_error` con "19.99" → 1999.
