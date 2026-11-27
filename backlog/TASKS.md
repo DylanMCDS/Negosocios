@@ -190,3 +190,16 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** entrance_point_opens_profile, cashier_point_opens_latest_pending_order, revoked_point_is_rejected, two_pending_orders_ask_to_choose
 - **Verify:** `uv run pytest -q app/tests/test_points.py && npm --prefix web test -- --run src/features/puntos && npm --prefix web run build`
 - **Next step:** test rojo de `revoked_point_is_rejected`.
+## HACK-031 · Cada negocio tiene su cuenta receptora (simulada, lista para ser real)
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C1, C2 · idea original: cada negocio de la red recibe sus cobros · https://docs.pey.mx/en/docs/api/create-qr/ (`bankAccountId`)
+- **Depends on:** HACK-023
+- **Paths:** app/services/payout_accounts.py, app/routers/payout_accounts.py, app/services/orders.py, app/tests/test_payout_accounts.py, web/src/features/negocio/, web/src/features/pagar/, docs/PEY.md
+- **Freeze-Allowed:** no
+- **Acceptance:** Decisión de Dylan (2026-11-26): en el prototipo todos los cobros reales llegan a la cuenta CoDi de la plataforma; la cuenta de cada negocio es **simulada** y así se etiqueta en la UI y en la entrega. Nunca se afirma que el dinero llegó a la cuenta del negocio., Tabla propia `payout_accounts` (creada por el servicio): business_id, banco (de los 3 primeros dígitos de la CLABE), últimos 4 dígitos, `mode` = `simulated` | `pey` y `pey_bank_account_id` opcional. **No se guarda la CLABE completa** (sólo banco + últimos 4)., `PUT /api/businesses/{id}/payout-account` valida la CLABE: 18 dígitos y **dígito de control** (algoritmo oficial de pesos 3-7-1); CLABE inválida → 422 con mensaje claro., Al crear una orden (`orders.create_order`): si el negocio tiene `mode = pey` con `pey_bank_account_id`, se envía `bankAccountId` a `POST /codi/qr` (cobro real directo al negocio); si es `simulated` o no tiene cuenta, el QR va a la cuenta de la plataforma y la orden guarda `settlement = "simulada"` con "liquidación pendiente al negocio"., Alta del puesto: campo "CLABE donde recibes tus cobros" (opcional, con la etiqueta "Simulado en esta demo"). Página de pago: "Recibe: <negocio> · <banco> ·<últimos 4> (cuenta simulada)" antes de pagar., `docs/PEY.md`: cómo pasar a real (Register Bank Account de pey → `codiStatus: ACTIVE` → `mode = pey`).
+- **Tests:** rejects_clabe_with_wrong_check_digit, stores_only_bank_and_last_four, order_uses_pey_bank_account_id_when_real, order_marks_settlement_simulated_without_real_account, pagar_shows_simulated_receiver_account
+- **Verify:** `uv run pytest -q app/tests/test_payout_accounts.py app/tests/test_orders.py && npm --prefix web test -- --run src/features/negocio src/features/pagar && npm --prefix web run build`
+- **Next step:** test rojo del dígito de control con una CLABE válida y la misma con el último dígito alterado.
