@@ -6,7 +6,22 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 
 PAYMENT_EVENT = "codi.qr.payment_received"
+PUSH_EVENT = "codi.pn.payment_received"
 log = logging.getLogger(__name__)
+
+
+def ensure_push_table(conn: sqlite3.Connection) -> None:
+    conn.execute("""CREATE TABLE IF NOT EXISTS push_requests (
+        transaction_id TEXT PRIMARY KEY NOT NULL, order_id TEXT NOT NULL REFERENCES orders(id),
+        codi_id TEXT, phone_last4 TEXT NOT NULL, created_at TEXT NOT NULL)""")
+
+
+def record_push(conn: sqlite3.Connection, order_id: str, transaction_id: str, codi_id: str | None, phone: str) -> None:
+    """Guarda sólo lo necesario para asociar el pago: el teléfono completo nunca se persiste."""
+    ensure_push_table(conn)
+    conn.execute(
+        "INSERT OR REPLACE INTO push_requests (transaction_id, order_id, codi_id, phone_last4, created_at) VALUES (?, ?, ?, ?, ?)",
+        (transaction_id, order_id, codi_id, phone[-4:], datetime.now(timezone.utc).isoformat()))
 
 
 def _cents(amount) -> int | None:
@@ -22,20 +37,27 @@ def process_event(conn: sqlite3.Connection, webhook_id: str, event: dict) -> Non
     kind = event.get("type")
     # El payload real de pey es PLANO. `data` anidado sólo por compatibilidad: nunca existió en pey.
     data = event if "codiQrId" in event or "data" not in event else (event.get("data") or {})
+    ensure_push_table(conn)
+    conn.commit()
     conn.execute("BEGIN IMMEDIATE")
     try:
         order = None
         if kind == PAYMENT_EVENT and data.get("codiQrId"):
             order = conn.execute("SELECT * FROM orders WHERE codi_qr_id = ?", (data["codiQrId"],)).fetchone()
+        elif kind == PUSH_EVENT and data.get("transactionId"):
+            # El payload del push no trae codiQrId: se asocia por el transactionId que pey devolvió al enviarlo.
+            order = conn.execute(
+                "SELECT o.* FROM orders o JOIN push_requests p ON p.order_id = o.id WHERE p.transaction_id = ?",
+                (data["transactionId"],)).fetchone()
         inserted = conn.execute(
             "INSERT OR IGNORE INTO webhook_events (webhook_id, order_id, event_type) VALUES (?, ?, ?)",
             (webhook_id, order["id"] if order else None, kind),
         ).rowcount
         if inserted and order is not None:
             _apply_payment(conn, order, webhook_id, data)
-        elif inserted and kind == PAYMENT_EVENT:
+        elif inserted and kind in (PAYMENT_EVENT, PUSH_EVENT):
             # Sólo tipo y QR (sin concepto, metadata ni datos del pagador) para diagnosticar.
-            log.warning("pago pey sin orden: type=%s codiQrId=%s", kind, data.get("codiQrId"))
+            log.warning("pago pey sin orden: type=%s ref=%s", kind, data.get("codiQrId") or data.get("transactionId"))
         conn.commit()
     except BaseException:
         conn.rollback()

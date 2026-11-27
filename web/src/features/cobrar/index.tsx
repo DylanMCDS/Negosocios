@@ -36,6 +36,37 @@ function celebrate() {
   }
 }
 
+// Sends the charge to the customer's phone as a CoDi push; payment still arrives through the same order polling.
+function PushToPhone({ orderId }: { orderId: string }) {
+  const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [state, setState] = useState<{ kind: "idle" } | { kind: "sent"; last4: string } | { kind: "error" }>({ kind: "idle" });
+  const digits = phone.replace(/\D/g, "");
+  const send = async () => {
+    setState({ kind: "idle" });
+    try {
+      const res = await api<{ phone_last4: string }>(`/orders/${orderId}/push`, { method: "POST", body: JSON.stringify({ phone: digits }) });
+      setState({ kind: "sent", last4: res.phone_last4 });
+    } catch {
+      setState({ kind: "error" });
+    }
+  };
+  if (!open) {
+    return <Button variant="secondary" size="sm" aria-label="Enviar al celular del cliente" onClick={() => setOpen(true)}>Pedir por celular</Button>;
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="flex flex-col gap-1 text-ink-2">
+        Celular del cliente (10 dígitos)
+        <input className="min-h-14 rounded-lg border border-line bg-white px-4 text-ink" inputMode="numeric" value={phone} maxLength={14} onChange={(e) => setPhone(e.target.value)} />
+      </label>
+      <Button variant="secondary" size="sm" onClick={() => void send()} disabled={digits.length !== 10}>Enviar</Button>
+      {state.kind === "sent" && <p aria-live="polite" className="rounded-md bg-ok p-3 text-ok-ink">{`Enviamos el cobro al celular terminado en ${state.last4}. Tu cliente lo aprueba en su app.`}</p>}
+      {state.kind === "error" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">No pudimos enviar el cobro al celular. Muestra el QR.</p>}
+    </div>
+  );
+}
+
 function QrCubes({ value, dim }: { value: string; dim: boolean }) {
   const { size, data } = useMemo(() => QRCode.create(value, { errorCorrectionLevel: "M" }).modules, [value]);
   const cells: Array<[number, number]> = [];
@@ -188,6 +219,7 @@ export default function Cobrar() {
                     Abrir página de pago
                   </a>
                 )}
+                {phase === "pending" && <PushToPhone orderId={order.id} />}
                 {phase === "paid" && (
                   <Button variant="secondary" onClick={reset}>
                     <CheckCircle size={24} aria-hidden="true" />
