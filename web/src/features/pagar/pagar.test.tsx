@@ -46,7 +46,7 @@ const json = (body: unknown, status = 200) =>
 function serve(o: Record<string, unknown>) {
   vi.stubGlobal(
     "fetch",
-    vi.fn((url: string, init?: RequestInit) =>
+    vi.fn((_url: string, init?: RequestInit) =>
       init?.method === "POST" ? json({ order: order(o), payment }) : json({ order: order(o), business }),
     ),
   );
