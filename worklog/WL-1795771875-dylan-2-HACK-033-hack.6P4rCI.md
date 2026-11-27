@@ -6,7 +6,7 @@
 - Why: Reviewer reject #180 + dylan-4 finding #181
 - Failing: design-critic could not run: guard blocked (Subagents-Per-Session 40); nav.test.tsx:17 fails on main (needs human allow --tests, msgs #172 #174)
 - Commands: npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/design-lint && bash .uak/bin/uak lint
-- Next: Humano: New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation)
+- Next: Integrated in main: f594e9bdd5d202a8688dcd43f754bd7d90cb79de (recorded by dylan)
 
 ## History
 - 1795771875 | CLAIMED | dylan-2 | claim; next: read spec, write tests, red | Harness: unknown | Model: unknown
@@ -24,3 +24,4 @@
 - 1795801501 | REVIEW | dylan-1 | review; approve; SHA a623efa330aaecd96013c562b86a54e6d2eea4e4; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795801601 | REVIEW | dylan-5 | merge rechazado; New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation) | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795801626 | REVIEW | dylan-5 | merge rechazado; New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation) | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795801661 | INTEGRATED | dylan | integrate; recorded by dylan; PR https://github.com/DylanMCDS/Negosocios/pull/34; merged f594e9bdd5d202a8688dcd43f754bd7d90cb79de; proof ancestry | Harness: claude-code | Model: claude-opus-5-5
