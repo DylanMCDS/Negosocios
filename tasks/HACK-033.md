@@ -9,14 +9,14 @@ Priority: P0
 Paths: web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/public/design-lock/, web/index.html
 Depends: HACK-022
 Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/uak lint`
-Lease-Until: 1795813830
-Updated: 1795799430
+Lease-Until: 1795815215
+Updated: 1795800815
 Task-Base: f28a5352e73165d9d539db0cadf797c09779138c
 Next: New session: run design-critic on 899ac2b (write .uak-shots/HACK-033/critic.txt with VERDICT: SHIP 899ac2b), then uak done HACK-033 --pr https://github.com/DylanMCDS/Negosocios/pull/34 --note 'what changed'. Human: allow --tests for nav.test.tsx, amend Paths for .uak/design/rounds/ (msg #174)
 PR: https://github.com/DylanMCDS/Negosocios/pull/34
 Evidence: design-critic SHIP 5aab746 (inicio, cobrar, cobrar-pagado, cierre at 390 and 1280 in web/public/design-lock/screens + .uak-shots/HACK-033); build exit 0; design-lint PASS; uak lint LINT_OK; web tests 66/67: only negocio/nav.test.tsx fails (menu list lacks Aliados, outside Paths, on main already; msg #172). Direction chosen by the human: 'la direccion 1' (decision recorded).
 Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5); author dylan-5 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject; author dylan-5 (claude-sonnet-5-5)
-Events: 9
+Events: 10
 Checkpoints: 1
 Sessions: 6
 Last-Checkpoint: 1795799269
