@@ -1,12 +1,12 @@
 # worklog/WL-1795757139-dylan-4-HACK-023-hack.Pv8VpZ.md · HACK-023
 
 ## Live summary
-- Done: aa4c1a1 approved by dylan-3; PR21 ready; tests14/fullsuite/Ruff/smoke pass; review HACK-032 approved with human production test pending
-- Decision: Respect MERGE_HUMAN; do not bypass gate on forge; continue independent reviews
-- Why: uak merge HACK-023 lost lock and canceled candidate; human queue owns next merge decision
-- Failing: MERGE_HUMAN HACK-023 | Lock perdido; candidato cancelado
-- Commands: wait HACK-023 approve APPROVED; heartbeat success attempt5; merge HACK-023 exit3 MERGE_HUMAN; review HACK-032 approve
-- Next: Human merge PR21 then uak integrate HACK-023; meanwhile finish HACK-027 review and handle next/eligible other merges
+- Done: HACK-023 INTEGRATED; approved aa4c1a1, PR21; all network criteria verified. HACK-022 also integrated by team; current review HACK-029 SHA bb1a0d4 held by dylan-4
+- Decision: No human merge needed for HACK-023; current claims override earlier lost-lock error; review exact SHAs before coding
+- Why: Authoritative global state now INTEGRATED32 with only HACK029 REVIEW and HACK033 CLAIMED
+- Failing: No remaining HACK-023 failure; HACK029 review underway
+- Commands: uak next offered029; review029 --start OK; status global32integrated; scout finding readyAVAILABLE task
+- Next: Finish HACK-029 verdict, ack inbox, merge eligible approvals, then claim ready available task with UAK_AGENT=dylan-4
 
 ## History
 - 1795757139 | CLAIMED | dylan-4 | claim; next: Leer contrato de red, escribir tests con reloj fijo y distancias conocidas; uak red HACK-023 | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795758074 | REVIEW | dylan-4 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown
 - 1795758107 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit a61e05a94837ba1c973e316630aa4960e088ecf0; reviewer dylan-3 | Harness: unknown | Model: unknown
 - 1795758122 | INTEGRATED | dylan-4 | checkpoint; next: Human merge PR21 then uak integrate HACK-023; meanwhile finish HACK-027 review and handle next/eligible other merges | Harness: unknown | Model: unknown
+- 1795789057 | INTEGRATED | dylan-4 | checkpoint; next: Finish HACK-029 verdict, ack inbox, merge eligible approvals, then claim ready available task with UAK_AGENT=dylan-4 | Harness: unknown | Model: unknown
