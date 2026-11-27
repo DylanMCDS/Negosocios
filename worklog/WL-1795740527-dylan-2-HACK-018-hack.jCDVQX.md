@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/12; run .uak/bin/smoke
+- Next: Integrated in main: ef4fc58fe8a50369239a9bbb44c7ed951f43ce21
 
 ## History
 - 1795740527 | CLAIMED | dylan-2 | claim; next: fix Cuenta line, test | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795741932 | REVIEW | dylan-2 | heartbeat; lease until 1795756332 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795742522 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/12; evidence: npm --prefix web test -- --run src/features/cierre: 6 passed; build exit 0 · no red: tests for the sign-up id written with the change; fallback behavior already covered by existing tests; reviewer: - | Harness: unknown | Model: unknown
 - 1795742634 | REVIEW | dylan-5 | review; approve; SHA a94daeea56441809325e9c11e885ec45971209d9; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795742812 | INTEGRATED | dylan-2 | merge; smoke and Verify PASS (smoke: full); commit ef4fc58fe8a50369239a9bbb44c7ed951f43ce21; reviewer dylan-5 | Harness: unknown | Model: unknown
