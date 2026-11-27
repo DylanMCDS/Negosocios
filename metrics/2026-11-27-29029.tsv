@@ -43,6 +43,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -3765,3 +3766,26 @@
 1795813588	board	-	0	-	1000	-	claude-code
 1795813576	hook-pr-sync	HACK-039	0	-	3000	dylan-1	claude-code
 1795813579	hook-status	-	0	-	4000	dylan-1	claude-code
+1795813594	hook-pr-sync	HACK-030	0	-	3000	dylan-2	claude-code
+1795813597	hook-status	-	0	-	0	dylan-2	claude-code
+1795813613	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795813626	hook-inbox	-	0	-	6000	dylan-2	claude-code
+1795814214	board	-	0	-	1000	-	claude-code
+1795813742	checkpoint	HACK-034	0	-	5000	dylan-2	claude-code
+1795813751	hook-inbox	-	0	-	3000	dylan-2	claude-code
+1795813754	hook-inbox	-	0	-	3000	dylan-2	claude-code
+1795814214	board	-	0	-	2000	-	claude-code
+1795813899	hook-pr-sync	HACK-030	0	-	4000	dylan-2	claude-code
+1795813903	hook-status	-	0	-	6000	dylan-2	claude-code
+1795813919	done	HACK-034	2	error	0	dylan-2	claude-code
+1795814214	board	-	0	-	1000	-	claude-code
+1795814214	board	-	0	-	1000	-	claude-code
+1795814214	board	-	0	-	1000	-	claude-code
+1795814103	plan	-	0	-	5000	dylan	claude-code
+1795814108	allow	-	0	-	5000	dylan	claude-code
+1795814214	board	-	0	-	2000	-	claude-code
+1795814188	hook-pr-sync	HACK-039	0	-	7000	dylan-1	claude-code
+1795814188	hook-heartbeat	HACK-039	0	-	7000	dylan-1	claude-code
+1795814189	hook-inbox	-	0	-	6000	dylan-1	claude-code
+1795814195	hook-status	-	0	-	4000	dylan-1	claude-code
+1795814198	done	HACK-034	0	-	13000	dylan-2	claude-code
