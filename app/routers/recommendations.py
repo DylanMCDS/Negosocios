@@ -23,6 +23,7 @@ class Decision(BaseModel):
 def get_recommendations(business_id: str, conn: Conn, as_of: AsOf = None) -> dict:
     if not expenses_svc.business_exists(conn, business_id):
         raise HTTPException(404, "negocio no encontrado")
+    recurring.ensure_demo_history(conn, business_id, as_of)
     return recurring.recommendations(conn, business_id, as_of)
 
 

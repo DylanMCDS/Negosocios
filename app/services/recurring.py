@@ -59,6 +59,20 @@ def seed_history(conn: sqlite3.Connection, business_id: str = "rosa", today: dat
     return inserted
 
 
+def ensure_demo_history(conn: sqlite3.Connection, business_id: str, today: date | None = None) -> int:
+    """Load the labeled demo history the first time a DEMO business (demo_data = 1) is read.
+
+    Real businesses are never touched. Startup stays free of demo expenses (HACK-019 contract);
+    POST /api/demo/seed lives in another task's files, so the demo history loads here, once.
+    """
+    demo = conn.execute("SELECT demo_data FROM businesses WHERE id = ?", (business_id,)).fetchone()
+    if demo is None or not demo["demo_data"]:
+        return 0
+    if conn.execute("SELECT 1 FROM expenses WHERE business_id = ? AND id LIKE 'hist-%' LIMIT 1", (business_id,)).fetchone():
+        return 0
+    return seed_history(conn, business_id, today)
+
+
 def _add_month(d: date) -> date:
     year, month = (d.year + 1, 1) if d.month == 12 else (d.year, d.month + 1)
     return date(year, month, min(d.day, calendar.monthrange(year, month)[1]))

@@ -164,3 +164,30 @@ def test_demo_provenance_is_reported(conn):
     mine = recurring.recommendations(conn, "rosa", TODAY)
     assert mine["demo_data"] is False
     assert mine["recommendations"][0]["demo_data"] is False
+
+
+def test_demo_business_gets_history_on_first_read_after_standard_seed(tmp_path, monkeypatch):
+    path = tmp_path / "fresh.db"
+    monkeypatch.setenv("DATABASE_PATH", str(path))
+    with TestClient(create_app(web_dist=None)) as client:  # startup creates the demo business `rosa`
+        assert client.post("/api/demo/seed").status_code == 200
+        got = client.get("/api/recommendations", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
+    kinds = {(r["kind"], r.get("label")) for r in got["recommendations"]}
+    assert ("recurring_proposal", "renta del local") in kinds
+    assert ("growing_expense", "tortillas") in kinds
+    assert got["demo_data"] is True
+    c = connect(path)
+    n = c.execute("SELECT COUNT(*) FROM expenses WHERE id LIKE 'hist-%'").fetchone()[0]
+    c.close()
+    with TestClient(create_app(web_dist=None)) as client:  # reading again does not duplicate
+        client.get("/api/recommendations", params={"business_id": "rosa", "as_of": "2026-11-26"})
+    c = connect(path)
+    assert c.execute("SELECT COUNT(*) FROM expenses WHERE id LIKE 'hist-%'").fetchone()[0] == n
+    c.close()
+
+
+def test_real_business_never_receives_demo_history(conn):
+    client = TestClient(create_app(web_dist=None))  # fixture business `rosa` has demo_data = 0
+    got = client.get("/api/recommendations", params={"business_id": "rosa", "as_of": "2026-11-26"}).json()
+    assert [r for r in got["recommendations"] if r["kind"] == "recurring_proposal"] == []
+    assert conn.execute("SELECT COUNT(*) FROM expenses").fetchone()[0] == 0
