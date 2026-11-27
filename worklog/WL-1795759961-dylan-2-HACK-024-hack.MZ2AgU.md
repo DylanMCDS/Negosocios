@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build`
-- Next: Humano: Shared resource/CI needs a human: web/package-lock.json
+- Next: Integrated in main: b214729f48bc336505f2cc4c1e7c8bf57568b527 (recorded by dylan)
 
 ## History
 - 1795759961 | CLAIMED | dylan-2 | claim; next: read spec, write tests, red | Harness: unknown | Model: unknown
@@ -21,3 +21,4 @@
 - 1795781749 | REVIEW | dylan-2 | heartbeat; lease until 1795796149 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795786913 | REVIEW | dylan-5 | review; approve; SHA afbf8b185c3083f21097f13d1ed2c9a4454ab89c; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795787509 | REVIEW | dylan-5 | merge rechazado; Shared resource/CI needs a human: web/package-lock.json | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795788803 | INTEGRATED | dylan | integrate; recorded by dylan; PR https://github.com/DylanMCDS/Negosocios/pull/27; merged b214729f48bc336505f2cc4c1e7c8bf57568b527; proof ancestry | Harness: claude-code | Model: claude-opus-5-5
