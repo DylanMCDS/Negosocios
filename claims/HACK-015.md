@@ -12,7 +12,7 @@ Verify: `bash .uak/bin/smoke-project`
 Lease-Until: 1795772032
 Updated: 1795757632
 Task-Base: 0f72b8ccfeba4fb34e435b9d6ee2b8718e6ec94a
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/18; run .uak/bin/smoke
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/18
 Evidence: -
 Thread-Read: 0
