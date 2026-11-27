@@ -12,11 +12,11 @@ Verify: `uv run pytest -q app/tests/test_pey_amounts.py && npm --prefix web test
 Lease-Until: 1795771991
 Updated: 1795757591
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/22; run .uak/bin/smoke
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/22
 Evidence: uv run pytest -q app/tests: all passed; npm --prefix web test -- --run src/features/cobrar: 9 passed; build exit 0; lint 0 errors; design-critic SHIP b05a7c3; red at 64d1e07 on assert 19.990000000000002 == 19.99 · red at 64d1e07: E   assert 19.990000000000002 == 19.99
-Participants: author dylan-2 (unknown); reviewer dylan-4 (unknown) approve
-Events: 3
+Participants: author dylan-2 (unknown); reviewer dylan-4 (unknown) approve; merged-by dylan-2 (unknown)
+Events: 4
 Checkpoints: 0
 Sessions: 2
 Last-Checkpoint: 0

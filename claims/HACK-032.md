@@ -12,7 +12,7 @@ Verify: `uv run pytest -q app/tests/test_pey_amounts.py && npm --prefix web test
 Lease-Until: 1795771991
 Updated: 1795757591
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/22; run .uak/bin/smoke
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/22
 Evidence: -
 Thread-Read: 101
