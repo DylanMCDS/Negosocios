@@ -15,9 +15,9 @@ const steps: Array<{ title: string; text: string; Icon: IconType }> = [
 ];
 
 const screens = [
-  { src: "/landing/cobrar.webp", label: "Cobrar: de Pendiente a Pagado", width: "w-48 md:w-56", alt: "Pantalla Cobrar con el QR de CoDi listo para escanear y el estado Pendiente" },
-  { src: "/landing/cierre.webp", label: "Cierre del día", width: "w-64 md:w-80", alt: "Pantalla Cierre del día con la utilidad estimada, ventas, gastos y lista de cobros" },
-  { src: "/landing/explorar.webp", label: "Explorar", width: "w-44 md:w-52", alt: "Pantalla Explorar con el mapa de negocios cercanos que cobran con CoDi" },
+  { src: "/landing/cobrar.webp", label: "Cobrar: de Pendiente a Pagado", width: "w-[10.5rem] md:w-56", alt: "Pantalla Cobrar con el QR de CoDi listo para escanear y el estado Pendiente" },
+  { src: "/landing/cierre.webp", label: "Cierre del día", width: "w-[13rem] md:w-80", alt: "Pantalla Cierre del día con la utilidad estimada, ventas, gastos y lista de cobros" },
+  { src: "/landing/explorar.webp", label: "Explorar", width: "w-[10.5rem] md:w-52", alt: "Pantalla Explorar con el mapa de negocios cercanos que cobran con CoDi" },
 ];
 
 const cta =
@@ -39,7 +39,7 @@ function Awning() {
 }
 
 /* A phone frame around a real capture. The capture is taller than the frame: it is cropped from the top. */
-function Phone({ src, alt, eager = false, crop = "object-[50%_59%]" }: { src: string; alt: string; eager?: boolean; crop?: string }) {
+function Phone({ src, alt, eager = false, crop = "object-[50%_59%]", ratio = "aspect-[390/760]" }: { src: string; alt: string; eager?: boolean; crop?: string; ratio?: string }) {
   return (
     <div className="overflow-hidden rounded-[2rem] bg-surface p-2 shadow-lift">
       <img
@@ -49,7 +49,7 @@ function Phone({ src, alt, eager = false, crop = "object-[50%_59%]" }: { src: st
         height={1080}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
-        className={`aspect-[390/760] w-full rounded-[1.5rem] object-cover ${crop}`}
+        className={`${ratio} w-full rounded-[1.5rem] object-cover ${crop}`}
       />
     </div>
   );
@@ -60,8 +60,8 @@ export default function Landing() {
     <div className="flex flex-col gap-16 pb-8 md:gap-24">
       <section className="-mx-4 flex flex-col gap-8 md:mx-0">
         <Awning />
-        <div className="grid gap-10 px-4 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-16 md:px-0">
-          <div className="flex flex-col gap-6">
+        <div className="grid gap-10 px-4 md:grid-cols-[1.1fr_0.9fr] md:items-start md:gap-16 md:px-0">
+          <div className="flex flex-col gap-6 md:pt-16">
             <h1 className="font-display text-[length:var(--text-2xl)] leading-tight md:text-[length:var(--text-hero)]">
               Cobra con CoDi y sabe cuánto <span className="text-money">ganaste hoy.</span>
             </h1>
@@ -74,9 +74,9 @@ export default function Landing() {
               <ArrowRight size={24} aria-hidden="true" />
             </a>
           </div>
-          <figure className="mx-auto flex w-full max-w-[20rem] flex-col gap-3 md:max-w-md">
+          <figure className="mx-auto flex w-full max-w-[20rem] flex-col gap-3 md:max-w-[22rem]">
             <div className="relative">
-              <Phone eager src="/landing/pagado.webp" alt="Pantalla real de Cobrar: el cliente pagó y aparece Pagado en verde" />
+              <Phone eager ratio="aspect-[390/640]" crop="object-[50%_45%]" src="/landing/pagado.webp" alt="Pantalla real de Cobrar: el cliente pagó y aparece Pagado en verde" />
               <span className="absolute -right-2 top-6 rounded-full bg-surface shadow-lift">
                 <DataBadge size="sm" />
               </span>
@@ -90,6 +90,7 @@ export default function Landing() {
 
       <section className="flex flex-col gap-6">
         <h2 className="font-display text-[length:var(--text-xl)]">Esto es lo que vas a ver</h2>
+        <p className="-mt-3 text-ink-2 md:hidden">Desliza para ver las demás pantallas.</p>
         <div className="-mx-4 flex snap-x items-center gap-6 overflow-x-auto px-4 pb-4 md:mx-0 md:justify-center md:overflow-visible md:px-0">
           {screens.map(({ src, alt, label, width }) => (
             <figure key={src} className={`flex shrink-0 snap-center flex-col gap-3 ${width}`}>
