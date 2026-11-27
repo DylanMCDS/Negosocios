@@ -28,3 +28,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795755999 | plan | dylan/dylan | tasks added: HACK-021 | Why: backlog without PR (Plan-Channel: claims)
 - 1795756040 | plan --amend | dylan/dylan | amended: HACK-015 Paths: .uak/bin/smoke-project, .uak/bin/.smoke-project.provenance, docs/DEPLOY.md → .uak/bin/smoke-project, .uak/bin/.smoke-project.provenance, docs/DEPLOY.md, docs/evidence/; | Why: scope or criteria fixed before review
 - 1795756158 | HACK-006 | Current identity dylan-4; do not repeat approved reviews; wait for new review requests | Why: 17 tasks integrated, HACK-015 and HACK-021 in progress; no eligible merge remains
+- 1795756936 | HACK-006 | No duplicate approved reviews; attempt HACK-016 claim only after dependencies integrate | Why: HACK-016 claim refused on HACK-014 dependency; HACK-014 mobile visual concern requires real-browser confirmation

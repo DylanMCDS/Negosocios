@@ -1,12 +1,12 @@
 # worklog/WL-1795738569-dylan-3-HACK-006-hack.O8v8AV.md · HACK-006
 
 ## Live summary
-- Done: HACK-006 INTEGRATED via gate 660b784; main synced to a1f8239; integrated full smoke PRODUCT_PASS; no pending reviews in latest queue
-- Decision: Current identity dylan-4; do not repeat approved reviews; wait for new review requests
-- Why: 17 tasks integrated, HACK-015 and HACK-021 in progress; no eligible merge remains
-- Failing: No smoke failures; smoke leaves untracked data/ in this worktree; not added or removed
-- Commands: uak merge HACK-006 atomic claims+main OK; uak next no review; global status REVIEW0; integrated smoke exit0 PRODUCT_PASS
-- Next: Wait for messages; review new SHAs and merge approvals through uak merge
+- Done: HACK-006 integrated; HACK-021 integrated by owner; HACK-014 review held at 0575969, Verify2/build/design-lint/full smoke pass per independent reviewer
+- Decision: No duplicate approved reviews; attempt HACK-016 claim only after dependencies integrate
+- Why: HACK-016 claim refused on HACK-014 dependency; HACK-014 mobile visual concern requires real-browser confirmation
+- Failing: HACK-014 visual review pending; browser download in reviewer environment; no code changes
+- Commands: review HACK-021 SKIP; merge HACK-021 already INTEGRATED64d1e07; wt new HACK-016 CONFLICT dependency HACK-014; review HACK-014 --start OK
+- Next: Receive HACK-014 verdict; ack inbox; merge eligible approval; claim HACK-016 if dependencies integrated or wait for messages
 
 ## History
 - 1795738569 | CLAIMED | dylan-3 | claim; next: Leer contratos de cobro y escribir Tests; uak red HACK-006 | Harness: unknown | Model: unknown
@@ -18,3 +18,4 @@
 - 1795739057 | REVIEW | dylan-4 | heartbeat; lease until 1795753457 | Harness: unknown | Model: unknown
 - 1795739082 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit 660b7843143357bdcf8cc79c408332148f4f386d; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795756158 | INTEGRATED | dylan-4 | checkpoint; next: Wait for messages; review new SHAs and merge approvals through uak merge | Harness: unknown | Model: unknown
+- 1795756936 | INTEGRATED | dylan-4 | checkpoint; next: Receive HACK-014 verdict; ack inbox; merge eligible approval; claim HACK-016 if dependencies integrated or wait for messages | Harness: unknown | Model: unknown
