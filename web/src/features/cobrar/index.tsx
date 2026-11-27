@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
 import { api } from "../../lib/api";
-import { appendKey, formatCents, toCents } from "./amount";
+import { appendKey, formatCents, formatTyping, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
 
@@ -18,6 +18,19 @@ const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 type Phase = "idle" | "creating" | "pending" | "paid" | "failed";
 
 const pesos = formatCents;
+
+// Orders waiting for payment survive a change of screen: only their ids are kept, the server holds the rest.
+const PENDING_KEY = "negosocios.cobrar.pending";
+const readPending = (): string[] => {
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(PENDING_KEY) ?? "[]");
+    return Array.isArray(raw) ? raw.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+};
+const writePending = (ids: string[]) => localStorage.setItem(PENDING_KEY, JSON.stringify(ids.slice(-20)));
+const forgetPending = (id: string) => writePending(readPending().filter((x) => x !== id));
 
 // Sound and vibration are best effort: a phone may block either.
 function celebrate() {
@@ -104,6 +117,23 @@ export default function Cobrar() {
     if (getBusinessId()) void resolveActiveBusiness().then(setActive);
   }, []);
   const amountCents = toCents(digits);
+  const [waiting, setWaiting] = useState<Order[]>([]);
+  useEffect(() => {
+    const ids = readPending();
+    if (ids.length === 0) return;
+    let live = true;
+    void Promise.all(
+      ids.map((id) =>
+        api<{ order: Order }>(`/orders/${encodeURIComponent(id)}`).then((r) => r.order, () => null),
+      ),
+    ).then((found) => {
+      if (!live) return;
+      const open = found.filter((o): o is Order => o !== null && o.status === "pending");
+      writePending(open.map((o) => o.id));
+      setWaiting(open);
+    });
+    return () => { live = false; };
+  }, []);
 
   const create = useCallback(async () => {
     setPhase("creating");
@@ -119,6 +149,7 @@ export default function Cobrar() {
         }),
       });
       setOrder(created);
+      if (created.status === "pending") writePending([...readPending().filter((x) => x !== created.id), created.id]);
       setPhase(created.status === "paid" ? "paid" : "pending");
     } catch {
       setPhase("failed");
@@ -174,6 +205,12 @@ export default function Cobrar() {
     setOrder(null);
     setPhase("idle");
   };
+  const openWaiting = (o: Order) => {
+    idempotencyKey.current = o.idempotency_key;
+    setWaiting((list) => list.filter((x) => x.id !== o.id));
+    setOrder(o);
+    setPhase("pending");
+  };
 
   const orderId = order?.id;
   useEffect(() => {
@@ -182,10 +219,12 @@ export default function Cobrar() {
       try {
         const { order: fresh } = await api<{ order: Order }>(`/orders/${orderId}`);
         if (fresh.status === "paid") {
+          forgetPending(fresh.id);
           setOrder(fresh);
           setPhase("paid");
           celebrate();
         } else if (fresh.status === "expired" || fresh.status === "failed") {
+          forgetPending(fresh.id);
           setOrder(fresh);
           setPhase("failed");
         }
@@ -227,7 +266,7 @@ export default function Cobrar() {
       <div data-cobrar-page className="grid gap-6 py-6 pb-28 md:gap-8 md:py-8 md:pb-0 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex min-w-0 flex-col gap-6">
           <Surface className={showOrder ? "order-2 flex flex-col gap-4" : "flex flex-col gap-4"}>
-            <Stat label="Importe" value={pesos(order ? order.amount_cents : amountCents)} unit="MXN" hero />
+            <Stat label="Importe" value={order ? pesos(order.amount_cents) : formatTyping(digits)} unit="MXN" hero />
             {showOrder && (
               <>
                 <p className="text-ink-2">{order.concept}</p>
@@ -254,6 +293,11 @@ export default function Cobrar() {
                 </a>
               )}
               {phase === "pending" && <PushToPhone orderId={order.id} />}
+              {phase === "pending" && order.amount_cents > 1 && (
+                <Button variant="secondary" onClick={() => { window.location.hash = `dividir/${order.id}`; }}>
+                  Dividir este cobro
+                </Button>
+              )}
               {phase === "paid" && (
                 <div role="status" className="fixed inset-0 z-20 flex flex-col items-center justify-center gap-8 bg-bg p-6 text-center">
                   <CheckCircle size={96} weight="fill" aria-hidden="true" className="text-ok-ink" />
@@ -267,6 +311,17 @@ export default function Cobrar() {
             </>
           ) : (
             <>
+              {waiting.length > 0 && (
+                <Surface className="flex flex-col gap-3" aria-live="polite">
+                  <p className="font-display">{waiting.length === 1 ? "Tienes 1 cobro pendiente" : `Tienes ${waiting.length} cobros pendientes`}</p>
+                  {waiting.map((o) => (
+                    <Button key={o.id} variant="secondary" onClick={() => openWaiting(o)}>
+                      {`${pesos(o.amount_cents)} · ${o.concept}`}
+                    </Button>
+                  ))}
+                  <a className="inline-flex min-h-11 items-center text-ink-2 underline" href="#cierre">Ir a Cierre</a>
+                </Surface>
+              )}
               <Surface className="flex flex-col gap-4">
                 <label className="flex flex-col gap-2 text-ink-2">
                   Concepto
@@ -290,6 +345,7 @@ export default function Cobrar() {
                       onChange={(e) => { setRefCode(e.target.value); setReferral(null); setRefError(null); }}
                     />
                   </label>
+                  <p className="text-[length:var(--text-s)] text-ink-2">Te lo da tu cliente; viene de un negocio aliado</p>
                   <Button variant="secondary" size="sm" onClick={() => void applyCode()} disabled={refCode.trim() === ""}>Aplicar</Button>
                   {refError && <p role="alert">{refError}</p>}
                   {referral && (
