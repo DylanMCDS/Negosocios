@@ -9,8 +9,8 @@ Priority: P0
 Paths: web/src/features/explorar/, web/package.json, web/package-lock.json
 Depends: HACK-022, HACK-023
 Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build`
-Lease-Until: 1795787300
-Updated: 1795772900
+Lease-Until: 1795789585
+Updated: 1795775185
 Task-Base: a4bca459625f6958311de173616e6763085ca117
 Next: Humano: Shared resource/CI needs a human: web/package-lock.json
 PR: https://github.com/DylanMCDS/Negosocios/pull/27
