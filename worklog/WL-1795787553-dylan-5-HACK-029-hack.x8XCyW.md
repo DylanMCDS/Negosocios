@@ -1,12 +1,13 @@
 # worklog/WL-1795787553-dylan-5-HACK-029-hack.x8XCyW.md · HACK-029
 
 ## Live summary
-- Done: Claim created; implementation pending
+- Done: pytest test_splits.py 4 passed + full backend suite green; npm test src/features/dividir 7 passed; build exit 0; design-lint PASS; design-critic SHIP bb1a0d4. Full web suite 69/70: only negocio/nav.test.tsx (Aliados, already on main). DEVIATION: part payment page is #dividir/<order>/<n> not /pagar/<id> (pagar/ outside Paths); parts in own table (closing sums paid orders) · red at 64ada81: exit 1 (no assertion line recognized: the reviewer reads the log)
 - Decision: Own branch and worktree
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `uv run pytest -q app/tests/test_splits.py && npm --prefix web test -- --run src/features/dividir && npm --prefix web run build`
-- Next: tests primero
+- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/33; run .uak/bin/smoke
 
 ## History
 - 1795787553 | CLAIMED | dylan-5 | claim; next: tests primero | Harness: unknown | Model: unknown
+- 1795787919 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/33; evidence: pytest test_splits.py 4 passed + full backend suite green; npm test src/features/dividir 7 passed; build exit 0; design-lint PASS; design-critic SHIP bb1a0d4. Full web suite 69/70: only negocio/nav.test.tsx (Aliados, already on main). DEVIATION: part payment page is #dividir/<order>/<n> not /pagar/<id> (pagar/ outside Paths); parts in own table (closing sums paid orders) · red at 64ada81: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
