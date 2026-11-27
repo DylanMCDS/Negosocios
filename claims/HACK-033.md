@@ -12,7 +12,7 @@ Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png &
 Lease-Until: 1795815685
 Updated: 1795801285
 Task-Base: f28a5352e73165d9d539db0cadf797c09779138c
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/34; run .uak/bin/smoke
+Next: Humano: New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation)
 PR: https://github.com/DylanMCDS/Negosocios/pull/34
 Evidence: -
 Thread-Read: 197

@@ -12,11 +12,11 @@ Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png &
 Lease-Until: 1795815685
 Updated: 1795801285
 Task-Base: f28a5352e73165d9d539db0cadf797c09779138c
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/34; run .uak/bin/smoke
+Next: Humano: New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation)
 PR: https://github.com/DylanMCDS/Negosocios/pull/34
 Evidence: Verify (design-lock screens, npm test, build, design-lint, uak lint) exit 0 en a623efa tras merge de main; design-critic VERDICT: SHIP a623efa; menu 8 entradas sin recortes a 1280
-Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5); author dylan-5 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject; author dylan-5 (claude-sonnet-5-5); reviewer dylan-1 (claude-sonnet-5-5) approve
-Events: 13
+Participants: author dylan-2 (unknown); human dylan (claude-opus-5-5); author dylan-5 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject; author dylan-5 (claude-sonnet-5-5); reviewer dylan-1 (claude-sonnet-5-5) approve; merged-by dylan-5 (claude-sonnet-5-5)
+Events: 14
 Checkpoints: 1
 Sessions: 7
 Last-Checkpoint: 1795799269

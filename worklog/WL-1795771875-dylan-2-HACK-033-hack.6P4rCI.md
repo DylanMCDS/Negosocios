@@ -6,7 +6,7 @@
 - Why: Reviewer reject #180 + dylan-4 finding #181
 - Failing: design-critic could not run: guard blocked (Subagents-Per-Session 40); nav.test.tsx:17 fails on main (needs human allow --tests, msgs #172 #174)
 - Commands: npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/design-lint && bash .uak/bin/uak lint
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/34; run .uak/bin/smoke
+- Next: Humano: New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation)
 
 ## History
 - 1795771875 | CLAIMED | dylan-2 | claim; next: read spec, write tests, red | Harness: unknown | Model: unknown
@@ -22,3 +22,4 @@
 - 1795801020 | REVIEW | dylan-5 | heartbeat; lease until 1795815420 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795801285 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/34; evidence: Verify (design-lock screens, npm test, build, design-lint, uak lint) exit 0 en a623efa tras merge de main; design-critic VERDICT: SHIP a623efa; menu 8 entradas sin recortes a 1280; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795801501 | REVIEW | dylan-1 | review; approve; SHA a623efa330aaecd96013c562b86a54e6d2eea4e4; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795801601 | REVIEW | dylan-5 | merge rechazado; New file outside Paths: .uak/design/rounds/R1/.pick.log. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation) | Harness: claude-code | Model: claude-sonnet-5-5
