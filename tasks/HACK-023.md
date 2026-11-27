@@ -9,15 +9,18 @@ Priority: P0
 Paths: app/services/network.py, app/routers/network.py, app/fixtures/network_demo.json, app/tests/test_network.py
 Depends: HACK-019
 Verify: `uv run pytest -q app/tests/test_network.py`
-Lease-Until: 1795772019
-Updated: 1795757619
+Lease-Until: 1795772401
+Updated: 1795758001
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
 Next: uak next; independent review of PR21; merge HACK-023 after approval; respond review/contract messages
 PR: https://github.com/DylanMCDS/Negosocios/pull/21
 Evidence: aa4c1a1 pushed. uak red assertion failure recorded before implementation; Verify uv run pytest -q app/tests/test_network.py exit0 (14 passed,2 lifecycle warnings); full backend pytest exit0; full smoke PRODUCT_PASS; Ruff All checks passed; diff checks exit0. Advisor GO. Known distances, Mexico overnight hours, expiring/removable temp points, precision, seed preservation and validation covered. Auth/ratings prototype limitations documented in PR. · red at 64d1e07: E   AssertionError: assert [] == ['start', 'near', 'far'] · red at 64d1e07: E   AssertionError: assert [] == ['start', 'near', 'far']
 Participants: author dylan-4 (unknown); reviewer dylan-3 (gpt-6.1-sol) approve
-Events: 4
+Events: 5
 Checkpoints: 1
 Sessions: 3
 Last-Checkpoint: 1795757619
 Task-Tip: aa4c1a1e1305d581cfbe856d4212a8f1e27ab185
+Progress: 6 commit(s) since the claim · last: aa4c1a1 HACK-023: add local business network with hours and expiring locations (8 minutes ago) · 0 uncommitted tracked file(s) · at 1795758001
+Progress-Head: aa4c1a1/2262605012
+Progress-Changed: 1795758001
