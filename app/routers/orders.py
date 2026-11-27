@@ -10,7 +10,7 @@ from app.services.pey import HttpPeyClient, PeyClient
 router = APIRouter()
 
 
-def get_pey_client(settings: Settings = Depends(get_settings)) -> PeyClient:
+def get_pey_client(settings: Annotated[Settings, Depends(get_settings)]) -> PeyClient:
     if not settings.pey_api_key:
         raise HTTPException(502, "Servicio de cobro no configurado")
     return HttpPeyClient(settings.pey_api_key)
@@ -25,8 +25,8 @@ class OrderDetail(Contract):
 def create_order(
     body: OrderCreate, response: Response,
     idempotency_key: Annotated[str, Header(min_length=1)],
-    settings: Settings = Depends(get_settings),
-    pey: PeyClient = Depends(get_pey_client),
+    settings: Annotated[Settings, Depends(get_settings)],
+    pey: Annotated[PeyClient, Depends(get_pey_client)],
 ):
     with orders.database(settings.database_path) as conn:
         order, created = orders.create_order(conn, body, idempotency_key, pey)
@@ -35,7 +35,7 @@ def create_order(
 
 
 @router.get("/api/orders/{order_id}", response_model=OrderDetail)
-def get_order(order_id: str, settings: Settings = Depends(get_settings)):
+def get_order(order_id: str, settings: Annotated[Settings, Depends(get_settings)]):
     with orders.database(settings.database_path) as conn:
         order = orders.find_order(conn, order_id)
         return OrderDetail(order=order, business=orders.find_business(conn, order.business_id))

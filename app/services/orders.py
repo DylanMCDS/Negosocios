@@ -3,10 +3,10 @@
 The SQLite write lock spans the provider request to serialize idempotent retries.
 A provider timeout is ambiguous: inspect pey before retrying a failed creation.
 """
-from contextlib import contextmanager
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
 import sqlite3
+from contextlib import contextmanager
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 from fastapi import HTTPException
 
@@ -67,7 +67,7 @@ def create_order(conn, body: OrderCreate, key: str, pey: PeyClient) -> tuple[Ord
     if number > 9_999_999:
         raise HTTPException(503, "No hay referencias de cobro disponibles")
     order_id = str(number)
-    created_at = datetime.now(timezone.utc)
+    created_at = datetime.now(UTC)
     try:
         qr = pey.create_qr(body.amount_cents / 100, body.concept, order_id, 600)
     except PeyError:

@@ -21,7 +21,7 @@ class BusinessCreate(Contract):
 
 
 @router.post("/api/businesses", status_code=201, response_model=Business)
-def create_business(body: BusinessCreate, settings: Settings = Depends(get_settings)):
+def create_business(body: BusinessCreate, settings: Annotated[Settings, Depends(get_settings)]):
     business = Business(id=str(uuid4()), **body.model_dump())
     values = business.model_dump(mode="json")
     columns = list(values)
@@ -35,6 +35,6 @@ def create_business(body: BusinessCreate, settings: Settings = Depends(get_setti
 
 
 @router.get("/api/businesses/{business_id}", response_model=Business)
-def get_business(business_id: str, settings: Settings = Depends(get_settings)):
+def get_business(business_id: str, settings: Annotated[Settings, Depends(get_settings)]):
     with database(settings.database_path) as conn:
         return find_business(conn, business_id)
