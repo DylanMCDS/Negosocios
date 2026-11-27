@@ -87,3 +87,11 @@ describe("Explorar", () => {
     expect(screen.getByText(/Lunes/)).toBeInTheDocument(); // horario
   });
 });
+
+
+it("explorar_opens_profile_not_payment", async () => {
+  render(<Explorar />);
+  await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+  expect(screen.getByRole("link", { name: "Ver negocio" })).toHaveAttribute("href", "#perfil/rosa");
+  expect(screen.queryByRole("link", { name: "Paga aquí con CoDi" })).not.toBeInTheDocument();
+});
