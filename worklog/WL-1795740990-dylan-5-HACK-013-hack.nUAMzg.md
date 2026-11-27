@@ -6,10 +6,11 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `uv run pytest -q app/tests/test_voice.py && npm --prefix web test -- --run src/features/voz && npm --prefix web run build`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/15; run .uak/bin/smoke
+- Next: Integrated in main: b96e9d33c49068d1b19ace84edeae256b682b1cc
 
 ## History
 - 1795740990 | CLAIMED | dylan-5 | claim; next: UI voz web/src/features/voz: tests first | Harness: unknown | Model: unknown
 - 1795741232 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/15; evidence: pytest test_voice.py 16 passed; npm test src/features/voz 7 passed; build exit 0; design-lint PASS; design-critic SHIP 6385e22; shots in .uak-shots/HACK-013 · red at 949857e: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
 - 1795741277 | REVIEW | dylan-5 | heartbeat; lease until 1795755677 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795741411 | REVIEW | dylan-2 | review; approve; SHA 6385e22cdbdc509204c8775842e8f29057e95bdb; reviewer dylan-2 | Harness: unknown | Model: unknown
+- 1795741474 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit b96e9d33c49068d1b19ace84edeae256b682b1cc; reviewer dylan-2 | Harness: unknown | Model: unknown
