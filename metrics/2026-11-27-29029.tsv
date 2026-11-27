@@ -30,6 +30,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -3117,3 +3118,185 @@
 1795797812	lint	-	0	-	8000	dylan-5	claude-code
 1795797819	hook-inbox	-	0	-	10000	dylan-4	other
 1795797821	hook-inbox	-	0	-	9000	dylan-5	claude-code
+1795798505	board	-	0	-	1000	-	claude-code
+1795797847	lint	-	0	-	9000	dylan-5	claude-code
+1795797856	hook-inbox	-	0	-	14000	dylan-5	claude-code
+1795797856	hook-pr-sync	HACK-017	0	-	15000	dylan-5	claude-code
+1795797861	next	-	0	-	14000	dylan-4	codex
+1795797871	hook-status	-	0	-	17000	dylan-5	claude-code
+1795797875	next	-	0	-	13000	dylan-1	claude-code
+1795797890	next	-	0	-	0	dylan-5	claude-code
+1795797881	next	-	0	-	32000	dylan-3	codex
+1795797888	hook-heartbeat	HACK-001	0	-	28000	dylan-1	claude-code
+1795797888	hook-pr-sync	HACK-029	0	-	32000	dylan-5	claude-code
+1795797892	status	HACK-001	0	-	30000	dylan-1	claude-code
+1795797888	hook-pr-sync	HACK-001	0	-	37000	dylan-1	claude-code
+1795797876	heartbeat	HACK-030	0	-	49000	dylan-4	codex
+1795797907	hook-inbox	-	0	-	22000	dylan-4	other
+1795797916	hook-status	-	0	-	27000	dylan-1	claude-code
+1795797922	status	HACK-002	0	-	26000	dylan-1	claude-code
+1795797891	hook-inbox	-	0	-	57000	dylan-1	claude-code
+1795797926	status	HACK-030	0	-	26000	dylan-4	codex
+1795797925	hook-status	-	0	-	32000	dylan-1	claude-code
+1795797951	hook-inbox	-	0	-	15000	dylan-3	other
+1795798505	board	-	0	-	2000	-	claude-code
+1795797948	status	HACK-003	0	-	21000	dylan-1	claude-code
+1795797943	hook-inbox	-	0	-	27000	dylan-5	claude-code
+1795797944	review	HACK-029	0	-	59000	dylan-3	codex
+1795797953	hook-inbox	-	0	-	24000	dylan-4	other
+1795797969	status	HACK-004	0	-	13000	dylan-1	claude-code
+1795797973	status	HACK-029	0	-	11000	dylan-3	codex
+1795798505
+1795797983	status	HACK-005	1	-	0	dylan-1	claude-code
+1795798505
+1795797983	status	HACK-006	1	-	0	dylan-1	claude-code
+1795798505
+1795797984	status	HACK-007	1	-	0	dylan-1	claude-code
+1795798505
+1795797984	status	HACK-008	1	-	1000	dylan-1	claude-code
+1795798505
+1795797985	status	HACK-009	1	-	0	dylan-1	claude-code
+1795798505
+1795797985	status	HACK-010	1	-	0	dylan-1	claude-code
+1795798505
+1795797986	status	HACK-011	1	-	0	dylan-1	claude-code
+1795798505
+1795797986	status	HACK-012	1	-	0	dylan-1	claude-code
+1795798505
+1795797987	status	HACK-013	1	-	0	dylan-1	claude-code
+1795798505
+1795797987	status	HACK-014	1	-	0	dylan-1	claude-code
+1795798505
+1795797987	status	HACK-015	1	-	1000	dylan-1	claude-code
+1795798505
+1795797988	status	HACK-016	1	-	0	dylan-1	claude-code
+1795798505
+1795797988	status	HACK-017	1	-	1000	dylan-1	claude-code
+1795798505
+1795797989	status	HACK-018	1	-	0	dylan-1	claude-code
+1795798505
+1795797989	status	HACK-019	1	-	1000	dylan-1	claude-code
+1795798505
+1795797990	status	HACK-020	1	-	0	dylan-1	claude-code
+1795798505
+1795797990	status	HACK-021	1	-	0	dylan-1	claude-code
+1795798505
+1795797991	status	HACK-022	1	-	0	dylan-1	claude-code
+1795798505
+1795797991	status	HACK-023	1	-	0	dylan-1	claude-code
+1795798505
+1795797992	status	HACK-024	1	-	1000	dylan-1	claude-code
+1795798505
+1795797992	status	HACK-025	1	-	0	dylan-1	claude-code
+1795797986	hook-inbox	-	0	-	6000	dylan-5	claude-code
+1795798505
+1795797992	status	HACK-026	1	-	1000	dylan-1	claude-code
+1795797993	status	HACK-027	0	-	6000	dylan-1	claude-code
+1795798505
+1795797999	status	HACK-028	1	-	0	dylan-1	claude-code
+1795798505
+1795797999	status	HACK-029	1	-	1000	dylan-1	claude-code
+1795798505
+1795798000	status	HACK-030	1	-	0	dylan-1	claude-code
+1795798505
+1795798000	status	HACK-031	1	-	1000	dylan-1	claude-code
+1795798505
+1795798001	status	HACK-032	1	-	0	dylan-1	claude-code
+1795798505
+1795798001	status	HACK-033	1	-	1000	dylan-1	claude-code
+1795798505
+1795798002	status	HACK-034	1	-	0	dylan-1	claude-code
+1795798001	hook-inbox	-	0	-	9000	dylan-3	other
+1795798002	status	HACK-035	0	-	20000	dylan-1	claude-code
+1795798002	checkpoint	HACK-030	0	-	20000	dylan-4	codex
+1795798022	status	HACK-036	0	-	13000	dylan-1	claude-code
+1795798024	msg	-	0	-	28000	dylan-5	claude-code
+1795798035	status	HACK-037	0	-	15000	dylan-1	claude-code
+1795798041	hook-inbox	-	0	-	16000	dylan-5	claude-code
+1795798045	hook-inbox	-	0	-	13000	dylan-3	other
+1795798050	status	HACK-038	0	-	13000	dylan-1	claude-code
+1795798063	status	HACK-039	2	-	11000	dylan-1	claude-code
+1795798505
+1795798074	status	HACK-040	1	-	0	dylan-1	claude-code
+1795798505
+1795798075	status	HACK-041	1	-	1000	dylan-1	claude-code
+1795798049	done	HACK-033	0	-	27000	dylan-5	claude-code
+1795798073	hook-inbox	-	0	-	10000	dylan-1	claude-code
+1795798077	hook-inbox	-	0	-	10000	dylan-5	claude-code
+1795798505	board	-	0	-	1000	-	claude-code
+1795798075	review	HACK-029	3	review-locked	22000	dylan-1	claude-code
+1795798075	status	HACK-042	2	-	23000	dylan-1	claude-code
+1795798094	hook-inbox	-	0	-	15000	dylan-3	other
+1795798088	msg	-	0	-	28000	dylan-5	claude-code
+1795798098	hook-inbox	-	0	-	27000	dylan-1	claude-code
+1795798116	next	-	0	-	23000	dylan-5	claude-code
+1795798122	hook-inbox	-	0	-	19000	dylan-3	other
+1795798140	hook-inbox	-	0	-	13000	dylan-5	claude-code
+1795798098	status	HACK-043	2	-	64000	dylan-1	claude-code
+1795798148	hook-inbox	-	0	-	21000	dylan-5	claude-code
+1795798150	hook-inbox	-	0	-	20000	dylan-3	other
+1795798162	status	HACK-044	2	-	18000	dylan-1	claude-code
+1795798159	inbox	-	0	-	80000	dylan-1	claude-code
+1795798505
+1795798180	status	HACK-045	1	-	0	dylan-1	claude-code
+1795798103	status	HACK-033	0	-	78000	dylan-4	codex
+1795798182	claim	HACK-016	3	dependency-pending	12000	dylan-1	claude-code
+1795798176	next	-	0	-	19000	dylan-5	claude-code
+1795798505	board	-	0	-	2000	-	claude-code
+1795798193	msg	-	0	-	29000	dylan-4	codex
+1795798196	claim	HACK-034	3	dependency-in-review	35000	dylan-1	claude-code
+1795798204	hook-inbox	-	130	-	29000	dylan-5	claude-code
+1795798195	hook-inbox	-	0	-	44000	dylan-2	claude-code
+1795798196	hook-pr-sync	HACK-017	0	-	45000	dylan-5	claude-code
+1795798195	hook-inbox	-	0	-	47000	dylan-4	other
+1795798195	hook-pr-sync	HACK-004	0	-	49000	dylan-2	claude-code
+1795798198	next	-	0	-	53000	dylan-2	claude-code
+1795798195	hook-heartbeat	HACK-004	0	-	57000	dylan-2	claude-code
+1795798197	hook-inbox	-	0	-	62000	dylan-5	claude-code
+1795798224	status	HACK-034	0	-	36000	dylan-1	claude-code
+1795798221	hook-inbox	-	0	-	49000	dylan-1	claude-code
+1795798241	hook-status	-	0	-	35000	dylan-5	claude-code
+1795798235	claim	HACK-035	3	dependency-in-review	47000	dylan-1	claude-code
+1795798204	hook-inbox	-	0	-	81000	dylan-3	other
+1795798220	hook-pr-sync	HACK-001	0	-	69000	dylan-1	claude-code
+1795798251	inbox	-	0	-	44000	dylan-2	claude-code
+1795798252	hook-status	-	0	-	44000	dylan-2	claude-code
+1795798261	status	HACK-035	0	-	40000	dylan-1	claude-code
+1795798237	hook-inbox	-	0	-	65000	dylan-4	other
+1795798272	hook-inbox	-	0	-	36000	dylan-3	other
+1795798266	review	HACK-029	0	-	43000	dylan-3	codex
+1795798277	hook-pr-sync	HACK-029	0	-	37000	dylan-5	claude-code
+1795798505	board	-	0	-	3000	-	claude-code
+1795798244	hook-status	-	0	-	94000	dylan-2	claude-code
+1795798295	status	-	0	-	45000	dylan-2	claude-code
+1795798313	hook-pr-sync	HACK-033	0	-	28000	dylan-5	claude-code
+1795798505	board	-	0	-	1000	-	claude-code
+1795798289	hook-status	-	0	-	53000	dylan-1	claude-code
+1795798297	hook-inbox	-	0	-	51000	dylan-4	other
+1795798307	next	-	0	-	41000	dylan-1	claude-code
+1795798302	hook-inbox	-	0	-	47000	dylan-1	claude-code
+1795798309	next	-	0	-	40000	dylan-3	codex
+1795798307	hook-inbox	-	0	-	43000	dylan-3	other
+1795798323	status	HACK-033	0	-	31000	dylan-2	claude-code
+1795798319	hook-inbox	-	0	-	36000	dylan-2	claude-code
+1795798341	status	HACK-033	0	-	23000	-	claude-code
+1795798349	hook-inbox	-	0	-	18000	dylan-1	claude-code
+1795798351	hook-inbox	-	0	-	17000	dylan-1	claude-code
+1795798371	timeline	HACK-033	0	-	2446	-	claude-code
+1795798374	timeline	HACK-029	0	-	2313	-	claude-code
+1795798505	who	-	2	unknown-command	0	-	claude-code
+1795798368	hook-inbox	-	0	-	6000	dylan-4	other
+1795798354	handover	HACK-033	3	conflict	23000	dylan-2	claude-code
+1795798378	timeline	HACK-033	0	-	1604	-	claude-code
+1795798380	timeline	HACK-029	0	-	1553	-	claude-code
+1795798385	inbox	-	0	-	13000	dylan-0	claude-code
+1795798381	hook-inbox	-	0	-	23000	dylan-3	other
+1795798380	inbox	-	0	-	27000	dylan-2	claude-code
+1795798407	review	HACK-029	0	-	16000	dylan-2	claude-code
+1795798413	review	HACK-033	0	-	33000	dylan-3	codex
+1795798505	board	-	0	-	1000	-	claude-code
+1795798437	inbox	-	0	-	26000	dylan-5	claude-code
+1795798447	status	HACK-033	0	-	25000	dylan-3	codex
+1795798462	hook-heartbeat	HACK-017	0	-	21000	dylan-5	claude-code
+1795798450	review	HACK-033	3	review-locked	64000	dylan-1	claude-code
+1795798505	red	HACK-029	0	-	3000	dylan-5	claude-code
