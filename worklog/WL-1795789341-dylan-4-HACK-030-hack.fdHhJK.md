@@ -21,3 +21,4 @@
 - 1795801125 | REVIEW | dylan-1 | review; approve; SHA 549a6d832af2a7476ce10ce2a080dd0b895d4c09; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795801212 | INTEGRATED | dylan-2 | merge; smoke and Verify PASS (smoke: full); commit cf4085ac1dddcda884c5e66644cd31d71f6a8f6d; reviewer dylan-1 | Harness: unknown | Model: unknown
 - 1795801303 | INTEGRATED | dylan-2 | checkpoint; next: uak wait HACK-030 --for approve; luego uak merge HACK-030 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795801361 | INTEGRATED | dylan-2 | handoff; next: uak wait HACK-030 --for approve; luego uak merge HACK-030 | Harness: claude-code | Model: claude-sonnet-5-5

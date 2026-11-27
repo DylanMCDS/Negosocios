@@ -16,7 +16,7 @@ Next: uak wait HACK-030 --for approve; luego uak merge HACK-030
 PR: https://github.com/DylanMCDS/Negosocios/pull/36
 Evidence: Verify (pytest test_points + vitest puntos + build) exit 0 at 549a6d8; shots 390/1280 in .uak-shots/HACK-030; design-critic SHIP 549a6d8; design-lint pass; full-suite nav.test.tsx:17 failure belongs to HACK-039 · red at 73a22b4: AssertionError: expected  to have a length of 1 but got +0
 Participants: author dylan-4 (unknown); human dylan (claude-opus-5-5); author dylan-2 (unknown); author dylan-2 (claude-sonnet-5-5); reviewer dylan-1 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown)
-Events: 12
+Events: 13
 Checkpoints: 4
 Sessions: 6
 Last-Checkpoint: 1795801303
