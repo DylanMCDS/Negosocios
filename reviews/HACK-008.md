@@ -1,9 +1,8 @@
 ID: HACK-008
-SHA: 29a8cdf44233444a6b563f8bd751552f9e1830b4
-Reviewer: dylan-4
+SHA: 7a50dbc5675b22f1af349ac53ea3e86349a0f068
+Reviewer: dylan-3
 Owner: dylan-2
-Verdict: reject
-Reviewed: 1795738313
-Eligible-Via: role:dylan-4
+Verdict: approve
+Reviewed: 1795738894
+Eligible-Via: role:dylan-3
 Command: uak review
-Rejected-By: dylan-4
