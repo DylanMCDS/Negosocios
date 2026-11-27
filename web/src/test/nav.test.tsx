@@ -52,3 +52,19 @@ describe("Menú por features", () => {
     expect(onSelect).toHaveBeenCalledWith("explorar");
   });
 });
+
+describe("Barra móvil", () => {
+  it("mobile_groups_share_width_by_entry_count", () => {
+    const menu = buildMenu({
+      "../features/landing/nav.ts": mod({ label: "Inicio", icon: House, order: 0, group: "inicio" }),
+      "../features/cobrar/nav.ts": mod({ label: "Cobrar", icon: QrCode, order: 1, group: "negocio" }),
+      "../features/cierre/nav.ts": mod({ label: "Cierre", icon: QrCode, order: 2, group: "negocio" }),
+      "../features/explorar/nav.ts": mod({ label: "Explorar", icon: MapPin, order: 1, group: "clientes" }),
+    });
+    render(<MenuBar menu={menu} active="cobrar" onSelect={() => undefined} />);
+    const mobile = screen.getAllByRole("navigation", { name: "Principal" }).find((n) => n.className.includes("fixed"))!;
+    const grow = (name: string) => within(mobile).getByRole("group", { name }).style.flexGrow;
+    // Equal shares would give the single "Clientes" entry as much width as two "Mi negocio" entries and clip its label.
+    expect([grow("Mi negocio"), grow("Clientes")]).toEqual(["2", "1"]);
+  });
+});

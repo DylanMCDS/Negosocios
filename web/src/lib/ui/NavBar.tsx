@@ -58,7 +58,7 @@ export function MenuBar({ menu, active, onSelect }: Props) {
         className={
           mobile
             ? cx(
-                "flex h-16 min-w-[76px] flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 font-display text-[length:var(--text-s)]",
+                "flex h-16 min-w-[60px] flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 font-display text-[length:var(--text-s)]",
                 on ? "bg-accent text-accent-ink" : "text-ink",
               )
             : cx(
@@ -92,7 +92,7 @@ export function MenuBar({ menu, active, onSelect }: Props) {
         <div className="flex overflow-x-auto">
           {menu.inicio.map((e) => button(e, true))}
           {groups.map((g) => (
-            <div key={g.key} role="group" aria-label={g.label} className="flex flex-1 border-l border-hairline">
+            <div key={g.key} role="group" aria-label={g.label} style={{ flexGrow: menu[g.key].length }} className="flex border-l border-hairline">
               {menu[g.key].map((e) => button(e, true))}
             </div>
           ))}
