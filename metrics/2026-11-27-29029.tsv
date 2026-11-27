@@ -50,6 +50,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -4105,3 +4106,52 @@
 1795819819	done	HACK-041	0	-	13000	dylan-5	claude-code
 1795819832	next	-	0	-	7000	dylan-5	claude-code
 1795819840	hook-inbox	-	0	-	6000	dylan-5	claude-code
+1795819962	bb	-	0	-	5000	dylan-5	claude-code
+1795819848	next	-	0	-	1000	dylan-5	claude-code
+1795819846	hook-inbox	-	0	-	5000	dylan-3	other
+1795819962	bb	-	0	-	4000	dylan-4	codex
+1795819850	next	-	0	-	1000	dylan-1	claude-code
+1795819852	hook-inbox	-	0	-	9000	dylan-4	other
+1795819852	hook-inbox	-	0	-	9000	dylan-2	claude-code
+1795819962	board	-	0	-	2000	-	other
+1795819852	hook-inbox	-	0	-	11000	dylan-1	claude-code
+1795819851	claim	HACK-046	0	-	38000	dylan-0	codex
+1795819854	hook-inbox	-	0	-	10000	dylan-2	claude-code
+1795819857	hook-inbox	-	0	-	10000	dylan-5	claude-code
+1795819865	msg	-	0	-	7000	dylan-3	codex
+1795819864	inbox	-	0	-	8000	dylan-0	codex
+1795819872	review	HACK-041	0	-	5000	dylan-3	codex
+1795819876	hook-inbox	-	0	-	4000	dylan-4	other
+1795819876	hook-inbox	-	0	-	6000	dylan-2	claude-code
+1795819882	next	-	0	-	1000	dylan-0	codex
+1795819884	hook-inbox	-	0	-	6000	dylan-3	other
+1795819879	review	HACK-044	0	-	36000	dylan-1	claude-code
+1795819962	map	-	0	-	0	dylan-0	codex
+1795819892	hook-inbox	-	0	-	6000	dylan-1	claude-code
+1795819885	done	HACK-045	3	tests-weakened	13000	dylan-4	codex
+1795819891	hook-heartbeat	HACK-039	0	-	11000	dylan-1	claude-code
+1795819894	inbox	-	0	-	28000	dylan-3	codex
+1795819898	status	HACK-044	0	-	7000	dylan-1	claude-code
+1795819904	hook-inbox	-	0	-	7000	dylan-4	other
+1795819903	inbox	-	0	-	8000	dylan-1	claude-code
+1795819909	hook-inbox	-	0	-	3000	dylan-3	other
+1795819906	hook-pr-sync	HACK-039	0	-	7000	dylan-1	claude-code
+1795819913	hook-status	-	0	-	1000	dylan-1	claude-code
+1795819908	next	-	0	-	8000	dylan-5	claude-code
+1795819912	hook-inbox	-	0	-	5000	dylan-1	claude-code
+1795819914	hook-pr-sync	HACK-040	0	-	5000	dylan-1	claude-code
+1795819915	done	HACK-043	0	-	34000	dylan-2	claude-code
+1795819916	hook-pr-sync	HACK-033	0	-	5000	dylan-5	claude-code
+1795819916	hook-heartbeat	HACK-033	0	-	5000	dylan-5	claude-code
+1795819917	hook-inbox	-	0	-	10000	dylan-5	claude-code
+1795819922	hook-pr-sync	HACK-030	0	-	9000	dylan-2	claude-code
+1795819923	hook-inbox	-	0	-	10000	dylan-2	claude-code
+1795819922	hook-heartbeat	HACK-030	0	-	12000	dylan-2	claude-code
+1795819936	msg	-	0	-	20000	dylan-0	codex
+1795819922	hook-status	-	0	-	21000	dylan-5	claude-code
+1795819931	hook-status	-	0	-	14000	dylan-2	claude-code
+1795819938	hook-inbox	-	0	-	7000	dylan-3	other
+1795819942	msg	-	0	-	10000	dylan-0	codex
+1795819943	hook-pr-sync	HACK-041	0	-	10000	dylan-5	claude-code
+1795819946	hook-pr-sync	HACK-043	0	-	9000	dylan-2	claude-code
+1795819954	review	HACK-044	0	-	28000	dylan-1	claude-code
