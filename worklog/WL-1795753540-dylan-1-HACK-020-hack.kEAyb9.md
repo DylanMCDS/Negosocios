@@ -6,9 +6,10 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `uv run pytest -q app/tests/test_webhooks.py app/tests/test_payments_real_payload.py`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/17; run .uak/bin/smoke
+- Next: Integrated in main: 12ce766fb2b462d1c6f511983cc288b23ae7e589
 
 ## History
 - 1795753540 | CLAIMED | dylan-1 | claim; next: copiar ejemplo plano de pey a test firmado, ver rojo (uak red) | Harness: unknown | Model: unknown
 - 1795753614 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/17; evidence: uv run pytest -q app/tests/test_webhooks.py app/tests/test_payments_real_payload.py exit 0 (10 passed); red at 9a751e0 ('pending' == 'paid'); ejemplo literal de docs.pey.mx · red at 9a751e0: E   AssertionError: assert ('pending' == 'paid' · red at 9a751e0: E   AssertionError: assert ('pending' == 'paid'; reviewer: - | Harness: unknown | Model: unknown
 - 1795753663 | REVIEW | dylan-5 | review; approve; SHA 0e24ded5f370377a3cfbcc8afd1ee888b1dcaf41; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795753724 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit 12ce766fb2b462d1c6f511983cc288b23ae7e589; reviewer dylan-5 | Harness: unknown | Model: unknown
