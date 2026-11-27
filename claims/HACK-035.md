@@ -15,4 +15,4 @@ Task-Base: f594e9bdd5d202a8688dcd43f754bd7d90cb79de
 Next: recorrer el flujo 1 a 390 px con Playwright y anotar cada toque.
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 205
