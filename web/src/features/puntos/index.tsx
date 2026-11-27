@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { MapPin, Printer, QrCode } from "@phosphor-icons/react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { MapPin, Printer, QrCode, Door, CashRegister, Table, Plant, Bag } from "@phosphor-icons/react";
 import QRCode from "qrcode";
 import { api } from "../../lib/api";
 import { resolveActiveBusiness } from "../../lib/business";
@@ -7,12 +7,23 @@ import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Surface
 import "./print.css";
 
 type Kind = "entrance" | "cashier" | "table";
+type Target = "profile" | "current" | "assigned";
+type PointIcon = "pin" | "door" | "cash" | "table" | "plant" | "bag";
 interface Business { id: string; name: string; demo_data: boolean }
-interface Point { id: string; kind: Kind; label: string; path: string; active: boolean; demo_data: boolean; pending_count: number }
+interface Point { id: string; kind: Kind; label: string; path: string; active: boolean; demo_data: boolean; pending_count: number; icon?: PointIcon; target?: Target; assigned_orders?: Array<PendingOrder & { status: string }> }
 interface PendingOrder { id: string; concept: string; amount_cents: number; url: string; demo_data?: boolean }
 interface PointList { business: Business; points: Point[] }
 interface Destination { point: Point; business: Business; mode: "profile" | "payment" | "choose" | "empty"; orders: PendingOrder[]; url: string }
 const KIND: Record<Kind, string> = { entrance: "Entrada", cashier: "Caja", table: "Mesa" };
+const ICONS = { pin: MapPin, door: Door, cash: CashRegister, table: Table, plant: Plant, bag: Bag };
+const ICON_NAMES: Record<PointIcon, string> = { pin: "Punto", door: "Entrada", cash: "Caja", table: "Mesa", plant: "Terraza", bag: "Para llevar" };
+const DEFAULTS: Record<Kind, { icon: PointIcon; target: Target; purpose: string; customer: string }> = {
+  entrance: { icon: "door", target: "profile", purpose: "Da a conocer tu negocio.", customer: "La página del negocio" },
+  cashier: { icon: "cash", target: "current", purpose: "Cobra donde atiendes.", customer: "El cobro del momento" },
+  table: { icon: "table", target: "assigned", purpose: "Lleva el cobro a cada mesa.", customer: "El cobro que le asignes a esa mesa" },
+};
+const targetOf = (point: Point): Target => point.target ?? (point.kind === "entrance" ? "profile" : "assigned");
+const statusName = (status: string) => ({ pending: "Pendiente", paid: "Pagado", expired: "Vencido", cancelled: "Cancelado", failed: "Fallido" })[status] ?? "No disponible";
 const pesos = (cents: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(cents / 100);
 const NFC_GUIDE = "https://www.wakdev.com/en/knowledge-base/how-to-guides/how-to-write-a-link-url-on-an-nfc-chip.html";
 const field = "h-14 w-full min-w-0 rounded-md border border-line bg-surface px-4 text-ink";
@@ -47,16 +58,16 @@ export function PublicPoint({ token }: { token: string }) {
   }, [token, attempt]);
   if (error) return <><PageHeader title={error} lead="Pide al negocio su enlace o QR actual." />
     <Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>Intentar de nuevo</Button></>;
-  if (!destination) return <><PageHeader title="Abriendo punto" lead="Estamos buscando el puesto y sus cuentas." /><p role="status">Cargando…</p></>;
+  if (!destination) return <><PageHeader title="Abriendo punto" lead="Estamos buscando el puesto y sus cobros." /><p role="status">Cargando…</p></>;
   const { business, orders, mode } = destination;
   return <>
-    <PageHeader title={mode === "choose" ? "Elige tu cuenta" : mode === "profile" ? "Perfil del puesto" :
-      mode === "empty" ? "No hay cuentas pendientes" : "Revisa tu cuenta"} lead="Confirma el receptor y el importe antes de pagar." />
+    <PageHeader title={mode === "choose" ? "Elige tu cobro" : mode === "profile" ? "Perfil del puesto" :
+      mode === "empty" ? "No hay cobros pendientes" : "Revisa tu cobro"} lead="Confirma el receptor y el importe antes de pagar." />
     <Surface className="flex flex-col gap-6">
       <div><p className="text-ink-2">Pagas a</p><h2 className="text-[length:var(--text-l)]">{business.name}</h2></div>
       {(business.demo_data || orders.some((order) => order.demo_data)) && <div><DataBadge /></div>}
       {mode === "profile" && <a className="inline-flex min-h-14 items-center text-accent underline" href={destination.url}>Ver perfil</a>}
-      {mode === "empty" && <p>Pide al comerciante que cree y asocie tu cuenta a este punto.</p>}
+      {mode === "empty" && <p>Pide al comerciante que cree y asigne tu cobro a este punto.</p>}
       <ul className="divide-y divide-line">
         {orders.map((order) => <li key={order.id}><a href={order.url}
           className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-4 text-ink underline decoration-line underline-offset-4">
@@ -74,16 +85,21 @@ function ManagePoints() {
   const [selectedId, setSelectedId] = useState("");
   const [kind, setKind] = useState<Kind>("cashier");
   const [label, setLabel] = useState("");
+  const [icon, setIcon] = useState<PointIcon>("cash");
+  const [target, setTarget] = useState<Target>("current");
   const [orderId, setOrderId] = useState("");
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const [notice, setNotice] = useState("");
 
+  const loadVersion = useRef(0);
   const load = async (id: string) => {
+    const version = ++loadVersion.current;
     const [list, pending] = await Promise.all([
       api<PointList>(`/points?business_id=${encodeURIComponent(id)}`),
       api<PendingOrder[]>(`/points/pending-orders?business_id=${encodeURIComponent(id)}`),
     ]);
+    if (version !== loadVersion.current) return;
     setData(list); setOrders(pending); setFailed(false);
     setSelectedId((old) => list.points.some((p) => p.id === old) ? old : (list.points.find((p) => p.active) ?? list.points[0])?.id ?? "");
   };
@@ -94,8 +110,19 @@ function ManagePoints() {
       setBusinessId(id);
       try { await load(id); } catch { if (alive) setFailed(true); }
     }).catch(() => alive && setFailed(true));
-    return () => { alive = false; };
+    return () => { alive = false; loadVersion.current++; };
   }, []);
+  useEffect(() => {
+    if (!businessId) return;
+    let alive = true;
+    const timer = window.setInterval(() => {
+      if (!alive || document.visibilityState === "hidden") return;
+      void load(businessId).catch(() => { /* Keep the last list; announce stale status. */
+        if (alive) setNotice("No pudimos actualizar los estados. Revisa tu conexión.");
+      });
+    }, 5000);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, [businessId]);
   useEffect(() => {
     window.addEventListener("afterprint", clearPrint);
     return () => { window.removeEventListener("afterprint", clearPrint); clearPrint(); };
@@ -103,6 +130,7 @@ function ManagePoints() {
   const selected = data?.points.find((p) => p.id === selectedId);
   const url = selected ? new URL(selected.path, window.location.origin).href : "";
   const act = async (action: () => Promise<unknown>, message: string) => {
+    loadVersion.current++;
     setBusy(true); setNotice("");
     try { await action(); await load(businessId); setNotice(message); }
     catch { setNotice("No se guardó el cambio. Revisa tu conexión e intenta de nuevo."); }
@@ -111,7 +139,7 @@ function ManagePoints() {
   const create = (event: FormEvent) => {
     event.preventDefault();
     void act(async () => {
-      const point = await api<Point>("/points", { method: "POST", body: JSON.stringify({ business_id: businessId, kind, label }) });
+      const point = await api<Point>("/points", { method: "POST", body: JSON.stringify({ business_id: businessId, kind, label, icon, target }) });
       setSelectedId(point.id); setLabel("");
     }, "Punto creado. Puedes imprimirlo o grabarlo en NFC.");
   };
@@ -140,13 +168,36 @@ function ManagePoints() {
       <Surface className="flex flex-col gap-4">
         <SectionHeader title="Crear punto" />
         <form onSubmit={create} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-2">Tipo<select className={field} value={kind} onChange={(e) => setKind(e.target.value as Kind)}>
-            <option value="entrance">Entrada: perfil</option><option value="cashier">Caja: cobrar</option><option value="table">Mesa: cuenta</option>
-          </select></label>
+          <fieldset className="flex flex-col gap-3"><legend className="mb-3">Elige un uso para empezar</legend>
+            {(Object.keys(KIND) as Kind[]).map((value) => {
+              const Icon = ICONS[DEFAULTS[value].icon];
+              return <label key={value} className={`flex min-h-14 cursor-pointer items-start gap-3 rounded-md p-3 ${kind === value ? "bg-tint" : "bg-bg"}`}>
+                <input type="radio" name="kind" value={value} checked={kind === value} className="mt-2 accent-accent"
+                  onChange={() => { setKind(value); setIcon(DEFAULTS[value].icon); setTarget(DEFAULTS[value].target); }} />
+                <Icon size={24} aria-hidden="true" className="mt-1 shrink-0" />
+                <span><strong>{KIND[value]}</strong><span className="block text-ink-2">{DEFAULTS[value].purpose}</span>
+                  <span className="block text-[length:var(--text-s)]">Lo que ve tu cliente: {DEFAULTS[value].customer.toLowerCase()}.</span></span>
+              </label>;
+            })}
+          </fieldset>
           <label className="flex flex-col gap-2">Nombre del punto<input className={field} maxLength={60} required value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Caja principal" /></label>
-          <Button variant={selected?.active ? "secondary" : "primary"} disabled={busy || !label.trim()}>Crear punto</Button>
+          <label className="flex flex-col gap-2">Ícono<select className={field} value={icon} onChange={(e) => setIcon(e.target.value as PointIcon)}>
+            {(Object.keys(ICON_NAMES) as PointIcon[]).map((value) => <option key={value} value={value}>{ICON_NAMES[value]}</option>)}
+          </select></label>
+          <label className="flex flex-col gap-2">Qué abre<select className={field} value={target} onChange={(e) => setTarget(e.target.value as Target)}>
+            <option value="profile">Página del negocio</option><option value="current">Cobro del momento</option><option value="assigned">Cobro asignado</option>
+          </select></label>
+          <Button variant="primary" disabled={busy || !label.trim()}>Crear punto</Button>
         </form>
       </Surface>
+      <section className="flex flex-col gap-4">
+        <SectionHeader title="Cobrar en una mesa" />
+        <ol aria-label="Cobrar en una mesa" className="list-decimal space-y-3 pl-6">
+          <li>Crea el cobro en <a className="text-accent underline" href="#cobrar">Cobrar</a>.</li>
+          <li>Selecciona la mesa y asigna el cobro a ese punto.</li>
+          <li>El cliente acerca el celular al NFC o escanea el QR y paga.</li>
+        </ol>
+      </section>
       <section className="flex flex-col gap-4">
         <SectionHeader title="Grabar en NFC" />
         <p className="text-ink-2">Usa NFC Tools de wakdev, en su versión gratuita.</p>
@@ -159,6 +210,25 @@ function ManagePoints() {
         <a href={NFC_GUIDE} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-accent underline">Guía de NFC Tools</a>
       </section>
     </>}>
+      <section className="flex flex-col gap-3" aria-label="Puntos del puesto">
+        <SectionHeader title="Puntos del puesto" />
+        <p className="text-ink-2">Elige un punto para ver su QR. Los estados se actualizan cada 5 segundos.</p>
+        {data.business.demo_data && <div><DataBadge /></div>}
+        {!data.points.length && <p>Aún no tienes puntos. Crea uno con el nombre de tu espacio.</p>}
+        <ul className="divide-y divide-line">{data.points.map((point) => {
+          const Icon = ICONS[point.icon ?? "pin"];
+          const assigned = point.assigned_orders ?? [];
+          return <li key={point.id}><button type="button" aria-pressed={selectedId === point.id}
+            onClick={() => { setSelectedId(point.id); setNotice(""); }}
+            className={`flex min-h-14 w-full flex-wrap items-center justify-between gap-3 rounded-md px-3 py-4 text-left ${selectedId === point.id ? "bg-tint" : ""}`}>
+            <span className="flex items-center gap-3"><Icon size={24} aria-hidden="true" /><strong>{point.label}</strong></span>
+            {!point.active ? <Chip size="sm" tone="bad">Revocado</Chip> : targetOf(point) === "profile" ? <span className="text-ink-2">Página del negocio</span> :
+              assigned.length ? <span className="flex flex-col gap-2">{assigned.map((order) => <span key={order.id} className="flex items-center gap-3">
+                <strong>{pesos(order.amount_cents)}</strong><Chip size="sm" tone={order.status === "paid" ? "ok" : order.status === "pending" ? "warn" : "neutral"}>{statusName(order.status)}</Chip>
+              </span>)}</span> : <span className="text-ink-2">Sin cobro asignado</span>}
+          </button></li>;
+        })}</ul>
+      </section>
       <Surface className="flex min-w-0 flex-col gap-5">
         {selected ? <>
           <div data-point-print className="flex min-w-0 flex-col items-center gap-4 text-center">
@@ -171,34 +241,26 @@ function ManagePoints() {
             <p className="hidden break-all print:block">{url}</p>
           </div>
           {selected.active && <>
-            <div className="flex flex-wrap gap-3"><Button size="sm" onClick={print}><Printer size={20} aria-hidden="true" />Imprimir QR</Button>
+            <div className="flex flex-wrap gap-3"><Button size="sm" variant="secondary" onClick={print}><Printer size={20} aria-hidden="true" />Imprimir QR</Button>
               <Button size="sm" variant="secondary" onClick={() => void copy()}>Copiar URL</Button></div>
             <label className="flex min-w-0 flex-col gap-2">URL del punto<input readOnly className={field} value={url} onFocus={(e) => e.target.select()} /></label>
-            {selected.kind !== "entrance" && <form className="flex flex-col gap-3 border-t border-line pt-5" onSubmit={(e) => {
-              e.preventDefault(); void act(() => api(`/points/${selected.id}/orders`, { method: "POST", body: JSON.stringify({ order_id: orderId }) }), "Cuenta asociada.");
+            {targetOf(selected) === "assigned" && <form className="flex flex-col gap-3 border-t border-line pt-5" onSubmit={(e) => {
+              e.preventDefault(); void act(() => api(`/points/${selected.id}/orders`, { method: "POST", body: JSON.stringify({ order_id: orderId }) }), "Cobro asignado.");
             }}>
-              <label className="flex flex-col gap-2">Cuenta pendiente<select className={field} value={orderId} onChange={(e) => setOrderId(e.target.value)}>
-                <option value="">Selecciona una cuenta</option>{orders.map((order) => <option key={order.id} value={order.id}>{order.concept} ({pesos(order.amount_cents)})</option>)}
+              <label className="flex flex-col gap-2">Cobro pendiente<select className={field} value={orderId} onChange={(e) => setOrderId(e.target.value)}>
+                <option value="">Selecciona un cobro</option>{orders.map((order) => <option key={order.id} value={order.id}>{order.concept} ({pesos(order.amount_cents)})</option>)}
               </select></label>
-              <Button size="sm" variant="secondary" disabled={busy || !orderId}>Asociar cuenta</Button>
-              <p className="text-[length:var(--text-s)] text-ink-2">Si hay dos cuentas, el cliente elige la suya. No se selecciona una automáticamente.</p>
+              <Button size="sm" variant="secondary" disabled={busy || !orderId}>Asignar cobro a este punto</Button>
+              <p className="text-[length:var(--text-s)] text-ink-2">Si hay dos cobros, el cliente elige el suyo. No se selecciona una automáticamente.</p>
             </form>}
             <div className="border-t border-line pt-4"><Button size="sm" variant="ghost" disabled={busy} onClick={() => void act(() => api(`/points/${selected.id}`, { method: "DELETE" }), "Este punto ya no está activo")}>Revocar punto</Button>
               <p className="text-[length:var(--text-s)] text-ink-2">Revocar detiene este enlace. No cancela cobros ya generados.</p></div>
           </>}
         </> : <div className="flex flex-col items-start gap-5"><QrCode size={64} className="text-accent" aria-hidden="true" />
-          <h2 className="text-[length:var(--text-l)]">Crea tu primer punto</h2><p>Su QR abre el perfil del puesto o las cuentas que asocies. La etiqueta NFC guarda el mismo enlace.</p>
+          <h2 className="text-[length:var(--text-l)]">Crea tu primer punto</h2><p>Su QR abre la página del negocio o los cobros que asignes. La etiqueta NFC guarda el mismo enlace.</p>
           {data.business.demo_data && <DataBadge />}</div>}
       </Surface>
       {notice && <p role="status" className="rounded-md bg-tint p-4">{notice}</p>}
-      <section className="flex flex-col gap-3"><SectionHeader title="Puntos del puesto" />
-        <ul className="divide-y divide-line">{data.points.map((point) => <li key={point.id}><button type="button"
-          aria-pressed={selectedId === point.id} onClick={() => { setSelectedId(point.id); setNotice(""); }}
-          className="flex min-h-14 w-full items-center justify-between gap-4 py-3 text-left">
-          <span className="flex items-center gap-3"><MapPin size={24} aria-hidden="true" />{point.label}</span>
-          <Chip size="sm" tone={point.active ? "neutral" : "bad"}>{point.active ? KIND[point.kind] : "Revocado"}</Chip>
-        </button></li>)}</ul>
-      </section>
     </PageLayout>
   </>;
 }
