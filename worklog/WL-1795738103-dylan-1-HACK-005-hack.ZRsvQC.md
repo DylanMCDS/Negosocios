@@ -1,7 +1,7 @@
 # worklog/WL-1795738103-dylan-1-HACK-005-hack.ZRsvQC.md · HACK-005
 
 ## Live summary
-- Done: test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && uak lint exit 0 (LINT_OK); build ok; design-critic SHIP 07eff25; Dylan picked v1
+- Done: Verify exit 0; removed .uak/design from PR (out of Paths)
 - Decision: final direction = R1 v1; no breeding round (pace critical, user chose explicitly)
 - Why: Dylan picked v1 by looking at captures
 - Failing: v1 QA: canvas backing store 350px drawn at 701 at 390 (use devicePixelRatio); 10 font sizes vs limit 6; #000 literal in canvas sampler
@@ -14,3 +14,4 @@
 - 1795738815 | CLAIMED | dylan-1 | checkpoint; next: fill web/DESIGN.md from .uak/templates/DESIGN.template.md with v1 genome; tokens in web/src/index.css; UI kit web/src/lib/ui; App.tsx AppShell; 3 locked screens (Cobrar, Pagar, Cierre) captured 1280+390 to web/public/design-lock/screens; design-critic; uak decision; stop gallery: uak design-gallery --round R1 --stop | Harness: unknown | Model: unknown
 - 1795739182 | CLAIMED | dylan-1 | pending decision HACK-005-1795739182; option: Direction v1 (mono-led, DM Mono + Commissioner, brand duo); Why: Dylan eligió v1 mirando las capturas de R1; sin ronda de cruce por ritmo critical | Harness: unknown | Model: unknown
 - 1795739198 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/7; evidence: test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && uak lint exit 0 (LINT_OK); build ok; design-critic SHIP 07eff25; Dylan picked v1; reviewer: - | Harness: unknown | Model: unknown
+- 1795739211 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/7; evidence: Verify exit 0; removed .uak/design from PR (out of Paths); reviewer: - | Harness: unknown | Model: unknown

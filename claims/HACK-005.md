@@ -9,8 +9,8 @@ Priority: P0
 Paths: web/DESIGN.md, web/src/index.css, web/src/lib/ui/, web/src/App.tsx, web/public/design-lock/
 Depends: HACK-001
 Verify: `test -s web/DESIGN.md && ls web/public/design-lock/screens/*-1280.png && bash .uak/bin/uak lint`
-Lease-Until: 1795753598
-Updated: 1795739198
+Lease-Until: 1795753611
+Updated: 1795739211
 Task-Base: 07eff25e9f961a824e8df5cdd019320367e07d9c
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/7; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/7
