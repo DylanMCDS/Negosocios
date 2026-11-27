@@ -1,5 +1,5 @@
 import { CheckCircle } from "@phosphor-icons/react";
-import { Button, Chip, Stat, Surface } from "..";
+import { Button, Chip, Surface } from "..";
 
 /* Locked "Inicio" (direction R1-v1, tianguis): the hero is the real Cobrar screen turning "Pagado".
    The real landing (features/landing) copies this composition. Copy comes from IDEA.md §1, §2, §4;
@@ -27,7 +27,7 @@ export default function Inicio() {
   return (
     <div className="-mx-4 -mt-6 md:-mx-8">
       <div aria-hidden="true" className="h-11" style={toldo} />
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-6 md:grid-cols-[1fr_380px] md:items-center md:px-8 md:pt-12">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-6 md:grid-cols-[1fr_420px] md:items-center md:px-8 md:pt-12">
         <div className="flex flex-col gap-5">
           <span className="inline-flex items-center gap-2 font-semibold text-ink-2">
             <span aria-hidden="true" className="size-2.5 rounded-full bg-money" />
@@ -44,8 +44,8 @@ export default function Inicio() {
             </Button>
           </div>
         </div>
-        <div className="relative mx-auto grid w-full max-w-[300px] justify-items-center pb-8">
-          <div className="w-[272px] rounded-[32px] bg-surface p-2.5 shadow-lift">
+        <div className="mx-auto flex w-full flex-col items-center">
+          <div className="w-[272px] rounded-[32px] bg-surface p-2.5 shadow-lift md:w-[400px]">
             <div className="relative aspect-[390/586] overflow-hidden rounded-[24px]">
               <img
                 src="/design-lock/screens/cobrar-pagado-390.png"
@@ -57,7 +57,7 @@ export default function Inicio() {
               />
             </div>
           </div>
-          <Surface size="sm" className="absolute -bottom-1 left-0 flex min-w-44 -rotate-3 flex-col gap-0.5 rounded-md">
+          <Surface size="sm" className="-mt-4 flex min-w-44 -rotate-3 flex-col gap-0.5 self-start rounded-md md:ml-6">
             <small className="text-ink-2">Orden de tacos</small>
             <b className="font-display text-[length:var(--text-l)]">100 MXN</b>
             <Chip tone="ok" size="sm">
@@ -68,16 +68,20 @@ export default function Inicio() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-6xl gap-4 px-4 pb-10 md:grid-cols-3 md:px-8">
-        <Surface size="sm">
-          <Stat label="del pago al aviso en el puesto" value="< 3 s" size="sm" />
-        </Surface>
-        <Surface size="sm">
-          <Stat label="de comisión en operaciones CoDi" value="$0" size="sm" note="CoDi requiere internet y cuenta bancaria." />
-        </Surface>
-        <Surface size="sm">
-          <Stat label="pasos, del alta al cierre del día" value="6" size="sm" />
-        </Surface>
+      <div className="mx-auto max-w-6xl px-4 pb-10 md:px-8">
+        <dl className="grid grid-cols-3 divide-x divide-hairline border-y border-hairline py-5">
+          {[
+            ["< 3 s", "del pago al aviso en el puesto"],
+            ["$0", "de comisión en operaciones CoDi"],
+            ["6", "pasos, del alta al cierre del día"],
+          ].map(([figure, caption]) => (
+            <div key={figure} className="flex flex-col gap-1 px-3 first:pl-0 md:px-8">
+              <dt className="font-display text-[length:var(--text-xl)] leading-none">{figure}</dt>
+              <dd className="text-ink-2">{caption}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="pt-3 text-ink-2">CoDi requiere internet y cuenta bancaria.</p>
       </div>
 
       <section id="como" className="mx-auto flex max-w-6xl flex-col gap-4 px-4 pb-12 md:px-8">
