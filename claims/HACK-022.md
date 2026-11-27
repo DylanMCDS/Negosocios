@@ -12,7 +12,7 @@ Verify: `npm --prefix web test -- --run src/test/nav.test.tsx && npm --prefix we
 Lease-Until: 1795774188
 Updated: 1795759788
 Task-Base: f5c18e3bde4365482f83a5203dc72f09fd02f642
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/25; run .uak/bin/smoke
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/25
 Evidence: -
 Thread-Read: 0

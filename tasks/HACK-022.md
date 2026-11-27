@@ -12,11 +12,11 @@ Verify: `npm --prefix web test -- --run src/test/nav.test.tsx && npm --prefix we
 Lease-Until: 1795774188
 Updated: 1795759788
 Task-Base: f5c18e3bde4365482f83a5203dc72f09fd02f642
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/25; run .uak/bin/smoke
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/25
 Evidence: npm --prefix web test -- --run (all web tests incl. 3 new in src/test/nav.test.tsx and earlier nav tests): passed; build exit 0; lint 0 errors; design-critic SHIP 392a88f; measured no horizontal overflow at 1280/390; red at f5c18e3 on assertion · red at f5c18e3: AssertionError: expected [] to deeply equal [ [ 'explorar', 'Explorar' ] ]
-Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve
-Events: 3
+Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown)
+Events: 4
 Checkpoints: 0
 Sessions: 2
 Last-Checkpoint: 0
