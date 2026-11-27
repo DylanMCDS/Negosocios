@@ -9,8 +9,8 @@ Priority: P0
 Paths: app/services/alliances.py, app/routers/alliances.py, app/services/reviews.py, app/routers/reviews.py, app/tests/test_alliances.py, app/tests/test_reviews.py
 Depends: HACK-023
 Verify: `uv run pytest -q app/tests/test_alliances.py app/tests/test_reviews.py`
-Lease-Until: 1795774037
-Updated: 1795759637
+Lease-Until: 1795783323
+Updated: 1795768923
 Task-Base: a61e05a94837ba1c973e316630aa4960e088ecf0
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/24; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/24
