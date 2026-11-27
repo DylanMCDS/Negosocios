@@ -6,7 +6,7 @@
 - Why: Author cannot review own implementation; exact shared API contract followed
 - Failing: None; external QR timeout/crash ambiguity documented
 - Commands: Verify exit0 13; full suite exit0 46; smoke PRODUCT_PASS; Ruff All checks passed; uak done HACK-006 PR6
-- Next: uak next; handle reviews and merge approved tasks
+- Next: Integrated in main: 660b7843143357bdcf8cc79c408332148f4f386d
 
 ## History
 - 1795738569 | CLAIMED | dylan-3 | claim; next: Leer contratos de cobro y escribir Tests; uak red HACK-006 | Harness: unknown | Model: unknown
@@ -16,3 +16,4 @@
 - 1795738944 | REVIEW | dylan-3 | handover; dylan-3 → dylan-4 by dylan-3 | Harness: unknown | Model: unknown
 - 1795739045 | REVIEW | dylan-2 | review; approve; SHA 88dc3286ff3c20f424303bc40a8fb4556def5cb8; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795739057 | REVIEW | dylan-4 | heartbeat; lease until 1795753457 | Harness: unknown | Model: unknown
+- 1795739082 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit 660b7843143357bdcf8cc79c408332148f4f386d; reviewer dylan-2 | Harness: unknown | Model: unknown
