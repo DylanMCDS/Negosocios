@@ -72,7 +72,7 @@ function Simulador() {
                 {`Puedes dar hasta ${result.max_discount_pct.toLocaleString("es-MX")} % de descuento`}
               </p>
               <p className="text-ink-2">
-                {`Cuenta: ${mxn(toCents(values.price))} − (${mxn(toCents(values.cost))} costo + ${mxn(toCents(values.margin))} ganancia) = ${result.max_discount_pct.toLocaleString("es-MX")} % del precio.`}
+                {`Cuenta: ${mxn(toCents(values.price))} − ${mxn(toCents(values.cost) + toCents(values.margin))} (costo + ganancia) = ${mxn(toCents(values.price) - toCents(values.cost) - toCents(values.margin))}, o sea ${result.max_discount_pct.toLocaleString("es-MX")} % del precio.`}
               </p>
               {result.max_uses !== null && (
                 <p>{`Tu presupuesto de ${mxn(result.budget_cents)} alcanza para ${result.max_uses} usos.`}</p>

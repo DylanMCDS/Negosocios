@@ -64,3 +64,18 @@ describe("Cierre del día", () => {
     expect(sent).toMatchObject({ price_cents: 10000, variable_cost_cents: 6000, min_contribution_cents: 3000, budget_cents: 10000 });
   });
 });
+
+describe("Cuenta del simulador", () => {
+  it("shows_the_discount_in_pesos_and_percent_for_any_price", async () => {
+    mockApi(closing, { ...simulation, max_discount_pct: 25, budget_cents: 5000, max_uses: 1 });
+    render(<Cierre />);
+    await screen.findByText("Utilidad estimada");
+    await userEvent.type(screen.getByLabelText("Precio"), "200");
+    await userEvent.type(screen.getByLabelText("Costo"), "100");
+    await userEvent.type(screen.getByLabelText("Ganancia mínima"), "50");
+    await userEvent.type(screen.getByLabelText("Presupuesto"), "50");
+    await userEvent.click(screen.getByRole("button", { name: "Calcular" }));
+    expect(await screen.findByText(/200 − \$150 \(costo \+ ganancia\) = \$50/)).toBeInTheDocument();
+    expect(screen.getByText(/25 % del precio/)).toBeInTheDocument();
+  });
+});
