@@ -21,16 +21,22 @@ function Soon({ title }: { title: string }) {
 }
 
 const icon = (el: ReactNode) => el;
-const views: Array<NavItem & { fallback: ComponentType }> = [
+// "pagar" is the customer's screen: opened from the QR/link (/pagar/<id>), never from the merchant's menu.
+const views: Array<NavItem & { fallback: ComponentType; hidden?: boolean }> = [
+  { id: "landing", label: "Inicio", icon: icon(<House size={24} aria-hidden="true" />), fallback: () => <Soon title="Negosocios" /> },
   { id: "cobrar", label: "Cobrar", icon: icon(<QrCode size={24} aria-hidden="true" />), fallback: Cobrar },
-  { id: "pagar", label: "Pagar", icon: icon(<Wallet size={24} aria-hidden="true" />), fallback: Pagar },
+  { id: "pagar", label: "Pagar", icon: icon(<Wallet size={24} aria-hidden="true" />), fallback: Pagar, hidden: true },
   { id: "cierre", label: "Cierre", icon: icon(<Receipt size={24} aria-hidden="true" />), fallback: Cierre },
   { id: "negocio", label: "Negocio", icon: icon(<Storefront size={24} aria-hidden="true" />), fallback: () => <Soon title="Mi negocio" /> },
   { id: "voz", label: "Voz", icon: icon(<Microphone size={24} aria-hidden="true" />), fallback: () => <Soon title="Gastos por voz" /> },
-  { id: "landing", label: "Inicio", icon: icon(<House size={24} aria-hidden="true" />), fallback: () => <Soon title="Negosocios" /> },
 ];
+const menu = views.filter((v) => !v.hidden);
 
-const read = () => window.location.hash.slice(1);
+// The view comes from the hash ("#cierre", "#pagar/<id>") or from a customer link ("/pagar/<id>").
+const read = () => {
+  if (/^\/pagar(\/|$)/.test(window.location.pathname)) return "pagar";
+  return window.location.hash.slice(1).split("/")[0];
+};
 
 export default function App() {
   const [active, setActive] = useState(() => (views.some((v) => v.id === read()) ? read() : "cobrar"));
@@ -45,7 +51,7 @@ export default function App() {
     <AppShell
       nav={
         <NavBar
-          items={views}
+          items={menu}
           active={active}
           onSelect={(id) => {
             window.location.hash = id;

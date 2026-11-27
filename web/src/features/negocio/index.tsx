@@ -7,7 +7,7 @@ import { Button, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui
 import { getBusinessId, saveBusinessId } from "./businessId";
 
 const field =
-  "h-14 w-full rounded-md border border-line bg-surface px-4 text-[length:var(--text-body)] font-display";
+  "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:tracking-tighter placeholder:text-ink-2";
 
 const publicId = () => new URLSearchParams(window.location.search).get("negocio");
 const profileUrl = (id: string) => `${window.location.origin}/?negocio=${encodeURIComponent(id)}#negocio`;
@@ -59,19 +59,28 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
     }
   }
 
-  const labeled = (id: keyof typeof values, label: string) => (
-    <label className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
-      {label}
-      <input className={field} value={values[id]} onChange={set(id)} />
-    </label>
+  const labeled = (id: keyof typeof values, label: string, placeholder?: string, help?: string) => (
+    <div className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
+      <label className="flex flex-col gap-1">
+        {label}
+        <input
+          className={field}
+          value={values[id]}
+          onChange={set(id)}
+          placeholder={placeholder}
+          aria-describedby={help ? `${id}-help` : undefined}
+        />
+      </label>
+      {help && <p id={`${id}-help`}>{help}</p>}
+    </div>
   );
 
   return (
-    <Surface className="flex max-w-xl flex-col gap-6">
+    <Surface className="mx-auto mt-6 flex w-full max-w-xl flex-col gap-6">
       <form className="flex flex-col gap-4" onSubmit={submit}>
-        {labeled("name", "Nombre del puesto")}
-        {labeled("category", "Giro")}
-        {labeled("zone", "Zona")}
+        {labeled("name", "Nombre del puesto", "Ej. Tacos Lupita")}
+        {labeled("category", "Giro", "Ej. Tacos, Barbería, Abarrotes")}
+        {labeled("zone", "Zona", "Ej. Tianguis de Santa Cruz, Iztapalapa", "La zona es aproximada, no la dirección exacta.")}
         <label className="flex items-start gap-3 text-[length:var(--text-body)]">
           <input type="checkbox" className="mt-1 size-6 accent-accent" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
           <span>Acepto que el nombre, giro y zona de mi puesto aparezcan en un perfil público.</span>
