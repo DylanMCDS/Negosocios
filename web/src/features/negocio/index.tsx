@@ -7,7 +7,7 @@ import { Button, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui
 import { getBusinessId, saveBusinessId } from "./businessId";
 
 const field =
-  "h-14 w-full rounded-md border border-line bg-surface px-4 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:text-ink-2";
+  "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:tracking-tighter placeholder:text-ink-2";
 
 const publicId = () => new URLSearchParams(window.location.search).get("negocio");
 const profileUrl = (id: string) => `${window.location.origin}/?negocio=${encodeURIComponent(id)}#negocio`;
