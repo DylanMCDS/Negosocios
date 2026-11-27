@@ -15,4 +15,4 @@ Task-Base: 9a82c05aa6b69dabb7dc47236ed8927412241dbb
 Next: leer criterios y tests nombrados de Dividir; escribir tests rojos
 PR: -
 Evidence: -
-Thread-Read: 215
+Thread-Read: 239
