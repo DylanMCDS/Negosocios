@@ -12,11 +12,11 @@ Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/t
 Lease-Until: 1795751340
 Updated: 1795736940
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass
+Next: Apply option: Pause edits until one session owns this worktree
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: 7c349db; red: docs assertion failed (1 failed 4 passed); Verify: uv run --no-project --with pytest --with pydantic pytest -q app/tests/test_schemas.py = 6 passed; smoke --affected exit0 SECRET_SCAN_PASS, PRODUCT_UNVERIFIED package-only; advisor GO; all four criteria delivered · red at 892d30a: E       AssertionError: The shared API contract must document the demo endpoints
 Participants: author dylan-3 (unknown); author dylan-3 (gpt-6.1-sol)
-Events: 14
+Events: 15
 Checkpoints: 4
 Sessions: 2
 Last-Checkpoint: 1795736937

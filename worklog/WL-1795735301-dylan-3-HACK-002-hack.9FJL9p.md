@@ -2,11 +2,11 @@
 
 ## Live summary
 - Done: PR4 REVIEW commit 7c349db; Verify 6 passed; next followed: HACK-003 approved exact SHA 6369315, 19 passed
-- Decision: Contract complete; runtime smoke adapter requested from HACK-001 in message14
-- Why: Missing adapter outside contract task Paths
+- Decision: Pause edits until one session owns this worktree
+- Why: Another session created app/tests/test_schemas.py and schema/db stubs during read-only reconnaissance; concurrent-writer warning confirmed
 - Failing: Full smoke exit2 PRODUCT_UNVERIFIED missing .uak/bin/smoke-project; affected exit0
 - Commands: uak red HACK-002; Verify6passed; smoke --affected exit0; smoke exit2; uak next; HACK-003 review approve
-- Next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass
+- Next: Apply option: Pause edits until one session owns this worktree
 
 ## History
 - 1795735301 | CLAIMED | dylan-3 | claim; next: escribir `app/tests/test_schemas.py` con los 4 nombres y `uak red HACK-002`. | Harness: unknown | Model: unknown
@@ -23,3 +23,4 @@
 - 1795736821 | REVIEW | scheduler | deadline decision HACK-002-1795735889; option: Document payment confirm as legacy 409; only signed pey webhook updates paid status; Why: IDEA flow lists confirm but integrity rule and HACK-007 require verified webhooks
 - 1795736937 | REVIEW | dylan-3 | checkpoint; next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass | Harness: codex | Model: gpt-6.1-sol
 - 1795736940 | REVIEW | dylan-3 | handoff; next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass | Harness: codex | Model: gpt-6.1-sol
+- 1795737722 | REVIEW | scheduler | deadline decision HACK-002-1795736001; option: Pause edits until one session owns this worktree; Why: Another session created app/tests/test_schemas.py and schema/db stubs during read-only reconnaissance; concurrent-writer warning confirmed

@@ -12,7 +12,7 @@ Verify: `uv run --no-project --with pytest --with pydantic pytest -q app/tests/t
 Lease-Until: 1795751340
 Updated: 1795736940
 Task-Base: 892d30a2f055efe966560ecd6b29d58f83b80320
-Next: Wait for PR4 review via bash .uak/bin/uak wait HACK-002 --for approve; then merge if approved and gates pass
+Next: Apply option: Pause edits until one session owns this worktree
 PR: https://github.com/DylanMCDS/Negosocios/pull/4
 Evidence: -
 Thread-Read: 11
