@@ -16,7 +16,7 @@ Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/12; run
 PR: https://github.com/DylanMCDS/Negosocios/pull/12
 Evidence: npm --prefix web test -- --run src/features/cierre: 4 passed; build exit 0; critic SHIP fc015d0 · red at 949857e: exit 1 (no assertion line recognized: the reviewer reads the log)
 Participants: author dylan-2 (unknown); reviewer dylan-1 (claude-sonnet-5-5) reject
-Events: 4
+Events: 5
 Checkpoints: 0
 Sessions: 2
 Last-Checkpoint: 0
