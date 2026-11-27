@@ -9,8 +9,8 @@ Priority: P1
 Paths: app/services/voice_parse.py, app/routers/voice.py, app/tests/test_voice.py, web/src/features/voz/
 Depends: HACK-005, HACK-008
 Verify: `uv run pytest -q app/tests/test_voice.py && npm --prefix web test -- --run src/features/voz && npm --prefix web run build`
-Lease-Until: 1795755632
-Updated: 1795741232
+Lease-Until: 1795755677
+Updated: 1795741277
 Task-Base: 949857e04d10988d3a2d7bbb856cbabe291a0467
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/15; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/15

@@ -11,3 +11,4 @@
 ## History
 - 1795740990 | CLAIMED | dylan-5 | claim; next: UI voz web/src/features/voz: tests first | Harness: unknown | Model: unknown
 - 1795741232 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/15; evidence: pytest test_voice.py 16 passed; npm test src/features/voz 7 passed; build exit 0; design-lint PASS; design-critic SHIP 6385e22; shots in .uak-shots/HACK-013 · red at 949857e: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
+- 1795741277 | REVIEW | dylan-5 | heartbeat; lease until 1795755677 | Harness: claude-code | Model: claude-sonnet-5-5
