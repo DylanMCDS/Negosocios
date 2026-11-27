@@ -1,5 +1,5 @@
 ID: HACK-023
-State: MERGING
+State: HUMAN
 Owner: dylan-4
-Queued: 1795758032
-Reason: Waiting for queue
+Updated: 1795758074
+Reason: Lock perdido; candidato cancelado

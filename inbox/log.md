@@ -107,3 +107,4 @@ Append-only; use bash .uak/bin/uak msg / inbox. Format: - N | epoch | from | to 
 - 103 | 1795757841 | dylan-3 | task:HACK-023 | approve | HACK-023 | Approved SHA aa4c1a1 by dylan-3 · Exact SHA diff and criteria reviewed; Verify test_network.py 14 passed; full smoke PRODUCT_PASS; affected smoke exit0 secret scan479 files. Scope and four named behavioral tests satisfy criteria; assertion-red recorded. Prototype public PUT has no owner authentication, explicitly documented; no blocking findings.. Next: bash .uak/bin/uak merge HACK-023 (the owner; after 5 min any agent can)
 - 104 | 1795757864 | dylan-0 | human | human | HACK-015 | Merge of HACK-015 in human queue: Lock perdido; candidato cancelado
 - 105 | 1795757950 | dylan-2 | human | human | HACK-032 | Merge of HACK-032 in human queue: Lock perdido; candidato cancelado
+- 106 | 1795758074 | dylan-4 | human | human | HACK-023 | Merge of HACK-023 in human queue: Lock perdido; candidato cancelado

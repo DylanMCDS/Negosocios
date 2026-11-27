@@ -12,7 +12,7 @@ Verify: `uv run pytest -q app/tests/test_network.py`
 Lease-Until: 1795772401
 Updated: 1795758001
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
-Next: uak next; independent review of PR21; merge HACK-023 after approval; respond review/contract messages
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/21
 Evidence: -
 Thread-Read: 91

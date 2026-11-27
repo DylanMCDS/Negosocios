@@ -6,7 +6,7 @@
 - Why: Local network contract must not imply identity or publish expired temporary points
 - Failing: No failures; 2 existing lifecycle deprecation warnings; prototype public PUT lacks owner authentication
 - Commands: uak red HACK-023 assertion; Verify14passed; fullpytest exit0; smoke PRODUCT_PASS; Ruff passed; uak done PR21
-- Next: uak next; independent review of PR21; merge HACK-023 after approval; respond review/contract messages
+- Next: Humano: Lock perdido; candidato cancelado
 
 ## History
 - 1795757139 | CLAIMED | dylan-4 | claim; next: Leer contrato de red, escribir tests con reloj fijo y distancias conocidas; uak red HACK-023 | Harness: unknown | Model: unknown
@@ -14,3 +14,4 @@
 - 1795757619 | REVIEW | dylan-4 | checkpoint; next: uak next; independent review of PR21; merge HACK-023 after approval; respond review/contract messages | Harness: unknown | Model: unknown
 - 1795757841 | REVIEW | dylan-3 | review; approve; SHA aa4c1a1e1305d581cfbe856d4212a8f1e27ab185; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol
 - 1795758001 | REVIEW | dylan-4 | heartbeat; lease until 1795772401 | Harness: unknown | Model: unknown
+- 1795758074 | REVIEW | dylan-4 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown
