@@ -1,4 +1,5 @@
 import { ArrowRight } from "@phosphor-icons/react";
+import { DataBadge } from "../../lib/ui";
 
 // Facts come from IDEA.md §1/§4 and docs/CONTEXTO-CoDi.md; nothing here is invented.
 const SOURCE = "https://www.codi.org.mx/secundarias/preguntas_frecuentes.html";
@@ -19,7 +20,7 @@ export default function Landing() {
         <h1 className="font-display text-[length:var(--text-2xl)] leading-tight md:text-[length:var(--text-hero)]">
           Cobra con CoDi y sabe cuánto <span className="text-accent">ganaste hoy.</span>
         </h1>
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <div className="order-3 flex flex-col gap-5 md:order-none md:flex-row md:items-center md:justify-between">
           <p className="max-w-2xl text-[length:var(--text-lg)] text-ink-2">
             Para puestos y negocios que cobran en efectivo: cobra con QR, ve la confirmación al instante y cierra el día con tu utilidad.
           </p>
@@ -28,9 +29,9 @@ export default function Landing() {
             <ArrowRight size={24} aria-hidden="true" />
           </a>
         </div>
-        <figure className="flex flex-col gap-3">
+        <figure className="order-2 flex flex-col gap-3 md:order-none">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="relative overflow-hidden rounded-lg border border-ink">
+            <div className="relative hidden overflow-hidden rounded-lg border border-ink md:block">
               <img
                 src="/landing/cobrar-pendiente.png"
                 alt="Pantalla Cobrar con el QR de CoDi listo para escanear"
@@ -41,6 +42,7 @@ export default function Landing() {
               <span className="absolute left-4 top-4 rounded-full border border-ink bg-surface px-4 py-2 font-display text-[length:var(--text-s)]">
                 Pendiente
               </span>
+              <span className="absolute right-4 top-4 rounded-full bg-surface"><DataBadge size="sm" /></span>
             </div>
             <div className="relative overflow-hidden rounded-lg border border-ink">
               <img
@@ -53,6 +55,7 @@ export default function Landing() {
               <span className="absolute left-4 top-4 rounded-full bg-accent px-4 py-2 font-display text-[length:var(--text-s)] text-accent-ink">
                 Pagado 100 MXN
               </span>
+              <span className="absolute right-4 top-4 rounded-full bg-surface"><DataBadge size="sm" /></span>
             </div>
           </div>
           <figcaption className="text-[length:var(--text-s)] text-ink-2">
