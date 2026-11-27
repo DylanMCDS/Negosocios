@@ -1,0 +1,13 @@
+@media print {
+  body[data-print-point] * { visibility: hidden; }
+  body[data-print-point] [data-point-print],
+  body[data-print-point] [data-point-print] * { visibility: visible; }
+  body[data-print-point] [data-point-print] {
+    position: fixed;
+    inset: 0;
+    padding: 16mm;
+    justify-content: center;
+    background: var(--color-surface);
+  }
+  body[data-print-point] [data-point-qr] { width: 80mm; max-width: none; }
+}
