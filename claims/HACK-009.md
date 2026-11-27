@@ -15,4 +15,4 @@ Task-Base: eecac9f9d26f1ced1c44c547ce56e5f6a3ef4ac8
 Next: tests de Cobrar con mock de fetch (docs/API.md), ver rojo, implementar
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 32
