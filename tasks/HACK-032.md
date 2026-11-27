@@ -1,0 +1,22 @@
+# HACK-032
+ID: HACK-032
+State: CLAIMED
+Owner: dylan-2
+Branch: feat/hack-032
+Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-032
+Worklog: worklog/WL-1795757355-dylan-2-HACK-032-hack.EFMJNn.md
+Priority: P0
+Paths: web/src/features/cobrar/, app/services/pey.py, app/tests/test_pey_amounts.py, docs/PEY.md
+Depends: HACK-021
+Verify: `uv run pytest -q app/tests/test_pey_amounts.py && npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build`
+Lease-Until: 1795760055
+Updated: 1795757355
+Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
+Next: read spec, write tests, red
+PR: -
+Evidence: -
+Participants: author dylan-2 (unknown)
+Events: 1
+Checkpoints: 0
+Sessions: 1
+Last-Checkpoint: 0
