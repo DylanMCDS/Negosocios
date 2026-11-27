@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `test $(wc -w < docs/SUBMISSION.md) -le 1600 && grep -qi 'pey' docs/SUBMISSION.md && test -s docs/DEMO.md`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/45; run .uak/bin/smoke
+- Next: Integrated in main: 8080d47687fcb70fbf0126b19aaad8a1309b3f25
 
 ## History
 - 1795820341 | CLAIMED | dylan-1 | claim; next: redactar docs/SUBMISSION.md y docs/DEMO.md desde el README/PEY.md reales | Harness: unknown | Model: unknown
@@ -14,3 +14,4 @@
 - 1795821888 | REVIEW | dylan-4 | review; reject; SHA b659407f5ebc3fbfef1eb550cae5839608fdc3a2; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
 - 1795821954 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/45; evidence: Verify VERIFY_OK; grep PENDIENTE sin resultados en SUBMISSION.md; 51915e3; reviewer: - | Harness: unknown | Model: unknown
 - 1795822111 | REVIEW | dylan-4 | review; approve; SHA 51915e3a701fef947de3017691b4c2a614bcc7f9; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
+- 1795822243 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit 8080d47687fcb70fbf0126b19aaad8a1309b3f25; reviewer dylan-4 | Harness: unknown | Model: unknown
