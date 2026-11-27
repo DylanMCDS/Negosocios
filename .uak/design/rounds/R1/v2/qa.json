@@ -1,0 +1,126 @@
+{
+  "1920": {
+    "w": 1920,
+    "gl": true,
+    "overflow": false,
+    "share": 68,
+    "upscaled": [],
+    "distorted": [],
+    "frameMs": 17,
+    "fps": 59,
+    "longTasks": 0,
+    "heapMB": 10,
+    "texts": 11,
+    "words": 56,
+    "stage": false,
+    "overStage": 0,
+    "overFocal": 0,
+    "sig": {
+      "head": [
+        0.27,
+        0.05,
+        0.48,
+        0.51
+      ],
+      "stage": null,
+      "focal": [
+        0.38,
+        0.28
+      ],
+      "lum": 0.01,
+      "hue": 240,
+      "mass": {
+        "centroid": [
+          0.74,
+          0.1
+        ],
+        "box": [
+          0.51,
+          0.01,
+          0.98,
+          0.15
+        ],
+        "share": 0.1
+      }
+    },
+    "errors": 0,
+    "first": "",
+    "budget_ms": 20,
+    "heavy": false,
+    "dense": false
+  },
+  "1280": {
+    "w": 1280,
+    "gl": true,
+    "overflow": false,
+    "share": 95,
+    "upscaled": [],
+    "distorted": [],
+    "frameMs": 17,
+    "fps": 59,
+    "longTasks": 0,
+    "heapMB": 10,
+    "texts": 10,
+    "words": 48,
+    "stage": false,
+    "overStage": 0,
+    "overFocal": 0,
+    "sig": {
+      "head": [
+        0.03,
+        0.08,
+        0.46,
+        0.56
+      ],
+      "stage": null,
+      "focal": [
+        0.25,
+        0.32
+      ],
+      "lum": 0.01,
+      "hue": 240
+    },
+    "errors": 0,
+    "first": "",
+    "budget_ms": 20,
+    "heavy": false,
+    "dense": false
+  },
+  "390": {
+    "w": 390,
+    "gl": true,
+    "overflow": false,
+    "share": 92,
+    "upscaled": [],
+    "distorted": [],
+    "frameMs": 17,
+    "fps": 59,
+    "longTasks": 0,
+    "heapMB": 10,
+    "texts": 10,
+    "words": 48,
+    "stage": false,
+    "overStage": 0,
+    "overFocal": 0,
+    "sig": {
+      "head": [
+        0.04,
+        0.05,
+        0.96,
+        0.14
+      ],
+      "stage": null,
+      "focal": [
+        0.5,
+        0.1
+      ],
+      "lum": 0.01,
+      "hue": 240
+    },
+    "errors": 0,
+    "first": "",
+    "budget_ms": 20,
+    "heavy": false,
+    "dense": false
+  }
+}

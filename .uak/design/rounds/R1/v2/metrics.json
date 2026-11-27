@@ -1,0 +1,91 @@
+{
+  "variant": "v2",
+  "family": "light",
+  "started": 1795738163,
+  "first_page": 1795738281,
+  "done": 1795738607,
+  "wall_seconds": 444,
+  "passes": 1,
+  "load_start": 5.35,
+  "load_end": 2.96,
+  "tokens": {
+    "value": null,
+    "source": null,
+    "reason": "not reported: the builder runs `bash .uak/bin/uak design done R1 v2 --tokens N` with its usage; `uak tokens` cannot tell one variant's subagent from another's"
+  },
+  "perf": {
+    "budget_ms": 20,
+    "webgl": false,
+    "heavy": false,
+    "frame_ms": {
+      "1920": 17,
+      "1280": 17,
+      "390": 17
+    },
+    "long_tasks": {
+      "1920": 0,
+      "1280": 0,
+      "390": 0
+    },
+    "heap_mb": {
+      "1920": 10,
+      "1280": 10,
+      "390": 10
+    }
+  },
+  "color": {
+    "saturated": 4.4,
+    "dark": 88.5,
+    "dominant": [
+      [
+        "#120D24",
+        53.7
+      ],
+      [
+        "#1E1735",
+        34.7
+      ],
+      [
+        "#ECE5FE",
+        6.4
+      ],
+      [
+        "#853AFE",
+        4.3
+      ]
+    ],
+    "roles": {},
+    "other": null,
+    "clashes": []
+  },
+  "density": {
+    "budget_words": 60,
+    "dense": false,
+    "viewports": {
+      "1920": {
+        "words": 56,
+        "texts": 11,
+        "over_stage": 0,
+        "over_focal": 0,
+        "stage": false,
+        "dense": false
+      },
+      "1280": {
+        "words": 48,
+        "texts": 10,
+        "over_stage": 0,
+        "over_focal": 0,
+        "stage": false,
+        "dense": false
+      },
+      "390": {
+        "words": 48,
+        "texts": 10,
+        "over_stage": 0,
+        "over_focal": 0,
+        "stage": false,
+        "dense": false
+      }
+    }
+  }
+}

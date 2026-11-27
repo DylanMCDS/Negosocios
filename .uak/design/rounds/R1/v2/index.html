@@ -1,0 +1,151 @@
+<!-- motif: the striped awning (toldo) of a tianguis stall, scalloped edge in violet bands, hanging over the "Pagado 100 MXN" ticket -->
+<!-- subject world: toldo de tianguis; QR del punto / sticker NFC; ticket "Pagado 100 MXN"; "gasté 350 en tortillas"; cierre del día en MXN -->
+<!-- stage: no real video exists yet for this project and imagery is "type only"; the stage is a designed still (type + awning), complete under reduced motion. -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negosocios</title>
+<meta name="description" content="Cobro verificable, finanzas explicadas y red de comercios locales.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Sarabun:wght@400;600&display=swap">
+<style>
+:root{
+  --ink:#120D24;
+  --panel:#1E1736;
+  --paper:#EDE6FF;
+  --accent:#863BFF;
+  --deep:#7E14FF;
+  --stripes:repeating-linear-gradient(90deg,var(--accent) 0 64px,var(--paper) 64px 128px);
+  --scallop:radial-gradient(circle 32px at 32px 0,var(--ink) 98%,transparent);
+  --f-s:14px; --f-b:16px; --f-l:18px; --f-m:28px; --f-h2:48px;
+  --f-hero:clamp(40px,6.6vw,96px);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font:400 var(--f-b)/1.55 "Sarabun",system-ui,sans-serif}
+h1,h2,h3,.disp{font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;line-height:1.02}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--paper);outline-offset:3px}
+.muted{opacity:.72}
+.wrap{max-width:1360px;margin:0 auto;padding:0 32px}
+
+/* hero: copy left, stage right, full bleed */
+.hero{min-height:min(100vh,860px);display:grid;grid-template-columns:1fr 1fr;align-items:stretch}
+.copy{display:flex;flex-direction:column;justify-content:center;gap:24px;padding:56px 48px 56px max(32px,calc((100vw - 1360px)/2 + 32px));max-width:760px;margin-left:auto;width:100%}
+.hero h1{font-size:var(--f-hero);letter-spacing:-.01em}
+.hero p.lead{font-size:var(--f-l);max-width:34ch}
+.btn{display:inline-flex;align-items:center;align-self:flex-start;height:48px;padding:0 28px;border-radius:999px;background:var(--accent);color:var(--paper);font:600 var(--f-b)/1 "Sarabun",sans-serif;text-decoration:none}
+.btn:hover{background:var(--deep)}
+.stat{display:flex;gap:16px;align-items:baseline;border-top:2px solid var(--panel);padding-top:16px;max-width:44ch}
+.stat b{font:700 var(--f-m)/1 "Baloo 2",sans-serif;white-space:nowrap}
+.stat span{font-size:var(--f-s)}
+
+/* stage with awning */
+.stage{position:relative;background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
+.awning{height:132px;flex:none;background:var(--stripes);position:relative}
+.awning::after{content:"";position:absolute;left:0;right:0;bottom:-32px;height:32px;
+  background:var(--stripes);
+  -webkit-mask:var(--scallop) 0 0/64px 32px repeat-x;mask:var(--scallop) 0 0/64px 32px repeat-x}
+.ticket{flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:72px 56px 56px}
+.ticket .k{font:600 var(--f-l)/1 "Sarabun",sans-serif}
+.ticket .amt{font-size:var(--f-hero);color:var(--paper)}
+.ticket .amt small{font-size:var(--f-m);margin-left:8px;color:var(--accent)}
+.ticket .t{margin-top:24px;display:flex;align-items:baseline;gap:16px}
+.ticket .t b{font:700 var(--f-h2)/1 "Baloo 2",sans-serif;color:var(--accent)}
+.ticket .t span{font-size:var(--f-b)}
+
+section{padding:88px 0}
+h2{font-size:var(--f-h2);margin-bottom:40px;max-width:20ch}
+.steps{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:0 64px}
+.steps li{display:grid;grid-template-columns:64px 1fr;gap:16px;padding:20px 0;border-top:2px solid var(--panel)}
+.steps .n{font:700 var(--f-h2)/1 "Baloo 2",sans-serif;color:var(--accent)}
+.steps p{font-size:var(--f-b)}
+.steps b{display:block;font-size:var(--f-l);font-weight:600}
+.wow{background:var(--accent);color:var(--paper);border-radius:32px;padding:48px;margin-top:48px}
+.wow .disp{font-size:var(--f-m);max-width:40ch}
+.adv{background:var(--panel)}
+.adv p.big{font:700 var(--f-m)/1.25 "Baloo 2",sans-serif;max-width:36ch}
+.people{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.person{background:var(--panel);border-radius:28px;padding:28px}
+.person h3{font-size:var(--f-m);margin-bottom:12px}
+footer{padding:40px 0;border-top:2px solid var(--panel);font-size:var(--f-s)}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .copy{padding:40px 16px;max-width:none}
+  .hero h1{font-size:40px}
+  .awning{height:88px}
+  .ticket{padding:56px 16px 40px}
+  .ticket .amt{font-size:40px}
+  .wrap{padding:0 16px}
+  section{padding:56px 0}
+  h2{font-size:28px;margin-bottom:24px}
+  .steps{grid-template-columns:1fr}
+  .steps .n{font-size:28px}
+  .steps li{grid-template-columns:40px 1fr}
+  .people{grid-template-columns:1fr}
+  .wow{padding:28px;border-radius:24px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="copy">
+    <h1>Cobro verificable y finanzas explicadas</h1>
+    <p class="lead">El cliente paga desde su celular y en menos de 3 s el puesto recibe la confirmación verificada.</p>
+    <a class="btn" href="#como">Ver cómo funciona</a>
+    <div class="stat">
+      <b>Sin comisión</b>
+      <span class="muted">CoDi requiere internet y cuenta bancaria; operaciones sin comisión. Fuente: codi.org.mx, preguntas frecuentes.</span>
+    </div>
+  </div>
+  <div class="stage" role="img" aria-label="Ticket del puesto: Pagado 100 MXN en menos de 3 segundos, bajo un toldo de tianguis">
+    <div class="awning"></div>
+    <div class="ticket">
+      <div class="k">Pagado</div>
+      <div class="amt disp">100<small>MXN</small></div>
+      <div class="t"><b>&lt; 3 s</b><span class="muted">confirmación verificada</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="como">
+  <div class="wrap">
+    <h2>De alta el puesto al cierre del día</h2>
+    <ol class="steps">
+      <li><span class="n">1</span><p><b>Da de alta tu puesto</b>Nombre, giro y zona. Obtienes perfil público y QR del punto.</p></li>
+      <li><span class="n">2</span><p><b>Crea un cobro</b>Importe y concepto. QR dinámico de la orden, estado "pendiente".</p></li>
+      <li><span class="n">3</span><p><b>El cliente escanea y autoriza</b>Receptor, importe y beneficio antes de pagar.</p></li>
+      <li><span class="n">4</span><p><b>Dicta un gasto</b>"Gasté 350 en tortillas": importe, categoría y fecha para confirmar o corregir.</p></li>
+      <li><span class="n">5</span><p><b>Abre el cierre del día</b>Ventas confirmadas, gastos, utilidad estimada, pendientes y diferencias, con datos faltantes señalados.</p></li>
+      <li><span class="n">6</span><p><b>Simula una promoción</b>Descuento máximo que conserva tu contribución mínima, con la fórmula explicada.</p></li>
+    </ol>
+    <div class="wow"><p class="disp">El teléfono del comerciante suena con "Pagado 100 MXN" y ambos tienen comprobante.</p></div>
+  </div>
+</section>
+
+<section class="adv">
+  <div class="wrap">
+    <h2>No es sólo un QR de cobro</h2>
+    <p class="big">Junta cobro verificable, finanzas explicadas con cálculos con reglas, no inventados por la IA, y una red de comercios locales con promociones que respetan una contribución mínima.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Para quién es</h2>
+    <div class="people">
+      <div class="person"><h3>Doña Rosa</h3><p>Puesto de tacos en tianguis. Cobrar rápido y saber que el pago llegó.</p></div>
+      <div class="person"><h3>Luis</h3><p>Cliente sin efectivo. Encontrar dónde pagar con el celular y ver a quién paga.</p></div>
+      <div class="person"><h3>Doña Rosa, al cerrar</h3><p>Registrar gastos sin escribir y saber cuánto ganó.</p></div>
+      <div class="person"><h3>Doña Rosa, planeando</h3><p>Saber qué promoción puede pagar sin perder.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap muted">Negosocios. Fuente del dato: codi.org.mx, preguntas frecuentes.</div></footer>
+</body>
+</html>

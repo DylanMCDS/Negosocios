@@ -1,0 +1,44 @@
+{
+  "id": "R1-v1",
+  "round": "R1",
+  "variant": 1,
+  "seed": 59194,
+  "screen": "landing",
+  "genes": {
+    "type": "mono-led",
+    "scale": "bold",
+    "color": "brand duo",
+    "layout": "full-bleed media",
+    "components": "hairline",
+    "imagery": "type only",
+    "motion": "still",
+    "voice": "plain",
+    "stage": "three.js scroll-driven"
+  },
+  "recipe": "motionsites",
+  "why": {
+    "type": "spread",
+    "scale": "spread",
+    "color": "spread · project colors #863BFF #EDE6FF #7E14FF",
+    "layout": "spread",
+    "components": "spread",
+    "imagery": "spread · needs none",
+    "motion": "spread",
+    "voice": "spread",
+    "stage": "spread"
+  },
+  "ground": "light",
+  "creativity": 3,
+  "composition": "frame",
+  "motif": {
+    "family": "typographic poster",
+    "text": "a typographic poster where the amount \"100\" at poster scale is built from the same cubes as the payment QR, so the QR becomes the number paid."
+  },
+  "fonts": {
+    "display": "DM Mono",
+    "display_weights": "500",
+    "body": "Commissioner",
+    "body_weights": "400;600",
+    "url": "https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Commissioner:wght@400;600&display=swap"
+  }
+}

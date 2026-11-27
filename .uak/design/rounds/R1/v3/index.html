@@ -1,0 +1,258 @@
+<!-- motif: an enamel payment sign nailed to a tianguis stall: a rounded plate with a double inset border carries the QR that scans and becomes a check, and every button and step number repeats that plate -->
+<!-- subject world: puesto de tacos en tianguis; QR dinámico y sticker NFC; importe en MXN ("Pagado 100 MXN"); comprobante del cliente y del comerciante; cierre del día (ventas, gastos, utilidad). Used visually: the enamel sign with the QR, the MXN unit on the plate, the step plates. -->
+<!-- imagery: illustration (the sign is built from three.js primitives and an SVG still; no product screenshot is faked) -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negosocios</title>
+<meta name="description" content="Cobro verificable, finanzas explicadas y red de comercios locales.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@700&family=Cabin:wght@400;600&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+:root{
+  --field:#240A5C;
+  --field-2:#17063F;
+  --violet:#863BFF;
+  --violet-deep:#7E14FF;
+  --sky:#47BFFF;
+  --paper:#EDE6FF;
+  --fs-hero:56px; --fs-h2:32px; --fs-lead:20px; --fs-body:17px; --fs-small:14px;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--field);color:var(--paper);font:400 var(--fs-body)/1.55 "Cabin",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.plate-label,.btn{font-family:"Quicksand",system-ui,sans-serif;font-weight:700}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+.wrap{width:min(1280px,100% - 32px);margin-inline:auto}
+
+/* sign plate: double inset hairline */
+.plate{background:var(--paper);color:var(--field);border-radius:var(--r);box-shadow:inset 0 0 0 4px var(--paper),inset 0 0 0 5px var(--field)}
+.btn{display:inline-flex;align-items:center;height:48px;padding:0 28px;border-radius:14px;font-size:var(--fs-body);text-decoration:none;background:var(--paper);color:var(--field);box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 4px var(--field);transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--paper);box-shadow:inset 0 0 0 1px var(--paper)}
+
+/* hero */
+.hero{position:relative;min-height:max(100svh,640px);overflow:hidden;background:var(--field)}
+#stage,#still{position:absolute;inset:0;width:100%;height:100%}
+#still{display:block}
+#stage{display:none}
+.hero.gl #stage{display:block}.hero.gl #still{display:none}
+.hero .wrap{position:relative;z-index:2;padding-top:112px;pointer-events:none}
+.hero .wrap>*{pointer-events:auto}
+.brand{position:absolute;z-index:3;top:28px;left:max(16px,(100vw - 1280px)/2);padding:6px 18px;font-size:var(--fs-lead)}
+h1{font-size:var(--fs-hero);line-height:1.04;letter-spacing:-.01em}
+h1 span{display:block;width:max-content}
+h1 span:nth-child(2){margin-left:96px}
+h1 span:nth-child(3){margin-left:192px;color:var(--sky)}
+.hero p.lead{margin:28px 0 0 192px;max-width:30ch;font-size:var(--fs-lead);line-height:1.4}
+.actions{display:flex;gap:12px;margin:28px 0 0 192px;flex-wrap:wrap}
+.badge{position:absolute;z-index:2;right:max(16px,(100vw - 1280px)/2);top:112px;padding:10px 18px;font-size:var(--fs-lead);display:flex;gap:10px;align-items:center}
+.badge i{width:12px;height:12px;border-radius:50%;background:var(--violet-deep);display:inline-block}
+.badge.paid i{background:var(--sky);box-shadow:0 0 0 2px var(--field)}
+.badge small{font-family:"Cabin";font-weight:600;font-size:var(--fs-small)}
+
+/* sections */
+section.s{padding:112px 0;border-top:1px solid var(--violet)}
+section.s:nth-of-type(even){background:var(--field-2)}
+h2{font-size:var(--fs-h2);line-height:1.15}
+.grid2{display:grid;grid-template-columns:5fr 7fr;gap:64px;align-items:start}
+.num{font-family:"Quicksand";font-weight:700;font-size:var(--fs-hero);line-height:1;color:var(--sky)}
+.proof .row{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+.proof p{margin-top:12px;max-width:34ch}
+.src{font-size:var(--fs-small);color:var(--violet);display:block;margin-top:12px}
+.src a{color:var(--paper)}
+ol.steps{list-style:none;padding:0;border-top:1px solid var(--violet)}
+ol.steps li{display:grid;grid-template-columns:56px 1fr;gap:20px;padding:20px 0;border-bottom:1px solid var(--violet)}
+.n{width:48px;height:48px;display:grid;place-items:center;font-family:"Quicksand";font-weight:700;font-size:var(--fs-lead);border-radius:12px;background:var(--paper);color:var(--field);box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 4px var(--field)}
+ol.steps b{font-weight:600}
+ol.steps em{font-style:normal;color:var(--sky)}
+.who{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--violet)}
+.who>div{padding:24px 32px 24px 0;border-bottom:1px solid var(--violet)}
+.who>div:nth-child(odd){border-right:1px solid var(--violet);padding-right:32px}
+.who>div:nth-child(even){padding-left:32px}
+.who h3{font-size:var(--fs-lead);margin-bottom:6px}
+.close p{font-size:var(--fs-lead);line-height:1.5;max-width:46ch}
+.close .actions{margin-left:0}
+footer{padding:32px 0;border-top:1px solid var(--violet);font-size:var(--fs-small);background:var(--field-2)}
+
+/* entrance: one orchestrated moment */
+@media (prefers-reduced-motion:no-preference){
+  h1 span,.hero p.lead,.actions.hero-a,.badge{animation:in .7s cubic-bezier(.2,.7,.2,1) both}
+  h1 span:nth-child(2){animation-delay:.15s}h1 span:nth-child(3){animation-delay:.3s}
+  .hero p.lead{animation-delay:.5s}.actions.hero-a{animation-delay:.6s}.badge{animation-delay:.8s}
+}
+@keyframes in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+@media (max-width:900px){
+  :root{--fs-hero:40px}
+  .hero{min-height:max(100svh,860px)}
+  .hero .wrap{padding-top:96px}
+  h1 span:nth-child(2){margin-left:24px}h1 span:nth-child(3){margin-left:48px}
+  .hero p.lead,.actions{margin-left:0}
+  .badge{top:auto;bottom:24px;right:auto;left:16px}
+  .grid2,.proof .row{grid-template-columns:1fr;gap:32px}
+  section.s{padding:72px 0}
+  .who{grid-template-columns:1fr}
+  .who>div,.who>div:nth-child(odd),.who>div:nth-child(even){border-right:0;padding:20px 0}
+}
+</style>
+</head>
+<body>
+<header class="hero" id="hero">
+  <div class="brand plate plate-label">Negosocios</div>
+  <svg id="still" viewBox="0 0 1000 700" preserveAspectRatio="xMaxYMax meet" role="img" aria-label="Letrero esmaltado con un QR convertido en palomita de pago">
+    <rect x="560" y="60" width="400" height="600" rx="40" fill="#7E14FF"/>
+    <rect x="572" y="72" width="376" height="576" rx="32" fill="none" stroke="#EDE6FF" stroke-width="2"/>
+    <path d="M650 330l70 70 130-150" fill="none" stroke="#47BFFF" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="760" y="580" text-anchor="middle" font-family="Quicksand" font-weight="700" font-size="56" fill="#EDE6FF">100 MXN</text>
+  </svg>
+  <canvas id="stage" aria-hidden="true"></canvas>
+  <div class="badge plate plate-label" id="badge" aria-live="off"><i></i><span id="bt">Pendiente</span></div>
+  <div class="wrap">
+    <h1><span>Pagado</span><span>en menos</span><span>de 3 s</span></h1>
+    <p class="lead">El cliente paga desde su celular y el cierre del día se actualiza solo.</p>
+    <div class="actions hero-a"><a class="btn" href="#como">Crear un cobro</a><a class="btn ghost" href="#quien">Para quién es</a></div>
+  </div>
+</header>
+
+<main>
+<section class="s proof"><div class="wrap"><div class="row">
+  <div><div class="num">3 s</div><p>El puesto recibe la confirmación verificada del pago.</p></div>
+  <div><div class="num">Sin comisión</div><p>CoDi requiere internet y cuenta bancaria; operaciones sin comisión.</p><span class="src">Fuente: <a href="https://www.codi.org.mx/secundarias/preguntas_frecuentes.html">codi.org.mx</a></span></div>
+</div></div></section>
+
+<section class="s" id="como"><div class="wrap grid2">
+  <h2>Del alta al cierre del día, en seis pasos</h2>
+  <ol class="steps">
+    <li><span class="n">1</span><div><b>Da de alta tu puesto</b> (nombre, giro, zona). <em>Perfil público y QR del punto.</em></div></li>
+    <li><span class="n">2</span><div><b>Crea un cobro</b> (importe y concepto). <em>QR dinámico, estado "pendiente".</em></div></li>
+    <li><span class="n">3</span><div><b>El cliente escanea el QR</b> o toca el sticker NFC. <em>Tu teléfono suena con "Pagado 100 MXN" y ambos tienen comprobante.</em></div></li>
+    <li><span class="n">4</span><div><b>Dicta "gasté 350 en tortillas".</b> <em>Importe, categoría y fecha para confirmar o corregir.</em></div></li>
+    <li><span class="n">5</span><div><b>Abre el cierre del día.</b> <em>Ventas, gastos, utilidad estimada y pendientes, con datos faltantes señalados.</em></div></li>
+    <li><span class="n">6</span><div><b>Simula una promoción.</b> <em>Descuento máximo que conserva tu contribución mínima, con la fórmula explicada.</em></div></li>
+  </ol>
+</div></section>
+
+<section class="s" id="quien"><div class="wrap grid2">
+  <h2>Para quien vende y para quien paga</h2>
+  <div class="who">
+    <div><h3>Doña Rosa, puesto de tacos en tianguis</h3><p>Cobrar rápido y saber que el pago llegó.</p></div>
+    <div><h3>Luis, cliente sin efectivo</h3><p>Encontrar dónde pagar con el celular y ver a quién paga.</p></div>
+    <div><h3>Doña Rosa al cerrar</h3><p>Registrar gastos sin escribir y saber cuánto ganó.</p></div>
+    <div><h3>Doña Rosa planeando</h3><p>Saber qué promoción puede pagar sin perder.</p></div>
+  </div>
+</div></section>
+
+<section class="s close"><div class="wrap grid2">
+  <h2>No es sólo un QR de cobro</h2>
+  <div>
+    <p>Junta cobro verificable, finanzas explicadas (cálculos con reglas, no inventados por la IA) y una red de comercios locales con promociones que respetan una contribución mínima.</p>
+    <div class="actions"><a class="btn" href="#como">Crear un cobro</a></div>
+  </div>
+</div></section>
+</main>
+<footer><div class="wrap">Negosocios · Hackatón México · Datos de CoDi: codi.org.mx</div></footer>
+
+<script type="module">
+const hero=document.getElementById('hero'),badge=document.getElementById('badge'),bt=document.getElementById('bt');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let paidShown=null;
+function setBadge(p){if(p===paidShown)return;paidShown=p;badge.classList.toggle('paid',p);bt.textContent=p?'Pagado 100 MXN':'Pendiente';}
+try{
+const THREE=await import('three');
+const canvas=document.getElementById('stage');
+const gl=document.createElement('canvas').getContext('webgl2')||document.createElement('canvas').getContext('webgl');
+if(!gl)throw new Error('nogl');
+const C=h=>new THREE.Color(h);
+const FIELD=C('#240A5C'),PAPER=C('#EDE6FF'),DEEP=C('#7E14FF'),SKY=C('#47BFFF'),VIOLET=C('#863BFF');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true,powerPreference:'low-power'});
+let pr=Math.min(devicePixelRatio,1.5);renderer.setPixelRatio(pr);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(30,1,1,100);camera.position.set(0,0,30);
+scene.add(new THREE.AmbientLight(0xffffff,1.1));
+const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-6,10,14);scene.add(sun);
+const g=new THREE.Group();scene.add(g);
+
+function rr(w,h,r){const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s}
+const PW=11.6,PH=13.6;
+const plateMat=new THREE.MeshLambertMaterial({color:PAPER});
+const plate=new THREE.Mesh(new THREE.ExtrudeGeometry(rr(PW,PH,1.3),{depth:.4,bevelEnabled:false}),plateMat);g.add(plate);
+const ringShape=rr(PW-1,PH-1,1);ringShape.holes.push(rr(PW-1.5,PH-1.5,.8));
+const ring=new THREE.Mesh(new THREE.ShapeGeometry(ringShape),new THREE.MeshLambertMaterial({color:FIELD}));ring.position.z=.42;g.add(ring);
+// amount label
+const cv=document.createElement('canvas');cv.width=800;cv.height=160;const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
+function paintLabel(){const x=cv.getContext('2d');x.clearRect(0,0,800,160);x.fillStyle='#EDE6FF';x.font='700 '+(cv.height*.7)+'px Quicksand, sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('100 MXN',400,84);tex.needsUpdate=true}
+paintLabel();document.fonts&&document.fonts.ready.then(paintLabel);
+const label=new THREE.Mesh(new THREE.PlaneGeometry(7.6,1.52),new THREE.MeshBasicMaterial({map:tex,transparent:true}));label.position.set(0,-5.1,.46);g.add(label);
+// qr modules
+const N=21,S=.4;let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const on=[],finder=(x,y)=>{const f=(a,b)=>{const dx=x-a,dy=y-b;if(dx<0||dy<0||dx>6||dy>6)return null;const e=dx==0||dy==0||dx==6||dy==6,c=dx>=2&&dx<=4&&dy>=2&&dy<=4;return e||c};return f(0,0)??f(14,0)??f(0,14)};
+for(let y=0;y<N;y++)for(let x=0;x<N;x++){let v=finder(x,y);if(v===null){const near=(x<8&&y<8)||(x>12&&y<8)||(x<8&&y>12);v=near?false:rnd()>.52}if(v)on.push({x,y})}
+const check=new Set();
+function seg(ax,ay,bx,by){for(let t=0;t<=1;t+=.04){const cx=ax+(bx-ax)*t,cy=ay+(by-ay)*t;for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)check.add((Math.round(cx)+dx)+','+(Math.round(cy)+dy))}}
+seg(4,11,8,15);seg(8,15,17,6);
+const cells=on.map(c=>({...c,ck:check.has(c.x+','+c.y),d:rnd()*1.2+c.y*.03,d2:rnd()*.4}));
+for(const k of check){const [x,y]=k.split(',').map(Number);if(x>=0&&y>=0&&x<N&&y<N&&!cells.some(c=>c.x==x&&c.y==y))cells.push({x,y,ck:true,d:rnd()*1.2+y*.03,d2:rnd()*.4})}
+const mod=new THREE.InstancedMesh(new THREE.BoxGeometry(S*.92,S*.92,.3),new THREE.MeshLambertMaterial({color:0xffffff}),cells.length);
+mod.instanceMatrix.setUsage(THREE.DynamicDrawUsage);g.add(mod);
+const QY=1.2,off=(N-1)/2*S,dummy=new THREE.Object3D(),col=new THREE.Color();
+const ease=t=>{t=Math.min(1,Math.max(0,t));return 1-Math.pow(1-t,3)};
+const scan=new THREE.Mesh(new THREE.BoxGeometry(N*S+.5,.08,.2),new THREE.MeshBasicMaterial({color:SKY}));scan.position.z=.9;g.add(scan);
+const CYCLE=12;
+function frame(t){
+  const scanY=t<3.5?1:t>6.5?0:1-(t-3.5)/3;// 1 top .. 0 bottom
+  const sy=QY+off+.2-(1-scanY)*(N*S+.2);
+  scan.visible=t>3.4&&t<6.6;scan.position.y=sy;
+  const k=t<6.8?0:ease((t-6.8)/.6),back=t>11?1-ease((t-11)/.9):1;
+  plateMat.color.copy(PAPER).lerp(DEEP,t<11?k:1-ease((t-11)/.9));
+  ring.material.color.copy(FIELD).lerp(PAPER,t<11?k:1-ease((t-11)/.9));
+  cells.forEach((c,i)=>{
+    const p=ease((t-c.d)/.8);
+    let s=p*(c.ck?1:1);
+    const z=(1-p)*5;
+    const y=QY+off-c.y*S;
+    if(t>=7){const q=ease((t-7-c.d2)/.6);s=c.ck?1+.1*q:1-q}
+    s*=back;
+    dummy.position.set(-off+c.x*S,y,.55+z);dummy.scale.setScalar(Math.max(s,.0001));dummy.updateMatrix();mod.setMatrixAt(i,dummy.matrix);
+    const cy=QY+off-c.y*S;
+    if(t>=7&&c.ck)col.copy(SKY);else if(t>3.4&&cy>sy-.1&&t<7)col.copy(DEEP);else if(t>=6.6&&t<7)col.copy(DEEP);else col.copy(FIELD);
+    if(t<3.4)col.copy(FIELD);
+    mod.setColorAt(i,col);
+  });
+  mod.instanceMatrix.needsUpdate=true;mod.instanceColor.needsUpdate=true;
+  setBadge(t>=7&&t<11.4);
+}
+function layout(){
+  const w=hero.clientWidth,h=hero.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  const hh=Math.tan(THREE.MathUtils.degToRad(15))*30,hw=hh*camera.aspect;
+  if(w>900){const s=Math.min(.9,(hh*2*.8)/PH);g.scale.setScalar(s);g.position.set(Math.min(hw*.5,hw-PW*s/2-.8),-hh*.1,0)}
+  else{const s=Math.min(.5,(hw*2*.62)/PW);g.scale.setScalar(s);g.position.set(0,-hh*.5,0)}
+}
+layout();addEventListener('resize',layout);
+hero.classList.add('gl');
+g.rotation.y=-.12;
+if(reduce){frame(8.5);renderer.render(scene,camera)}
+else{
+  let run=true,vis=true,last=0,t0=performance.now(),acc=0,n=0,slowDone=false;
+  const io=new IntersectionObserver(e=>{vis=e[0].isIntersecting;});io.observe(hero);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)last=0});
+  function loop(now){
+    requestAnimationFrame(loop);
+    if(document.hidden||!vis)return;
+    if(now-last<33)return;
+    const dt=now-last;last=now;
+    if(!slowDone&&dt<500){acc+=dt;n++;if(acc>=1000){if(acc/n>40){pr=1;renderer.setPixelRatio(1);layout();slowDone=true}acc=0;n=0}}
+    const t=((now-t0)/1000)%CYCLE;
+    g.rotation.y=-.12+Math.sin(now/2500)*.05;
+    frame(t);renderer.render(scene,camera);
+  }
+  requestAnimationFrame(loop);
+}
+}catch(e){setBadge(true)}
+</script>
+</body>
+</html>

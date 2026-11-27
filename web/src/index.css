@@ -1,5 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Commissioner:wght@400;600&display=swap");
 @import "tailwindcss";
 
+/* Design lock: direction R1-v1 "Mono-led". Tokens only; screens never type a color. */
+:root {
+  --bg: #f8f5ff;
+  --surface: #ffffff;
+  --tint: #ede6ff;
+  --text: #1b1030;
+  --text-2: #5b4f73;
+  --line: #1b1030;
+  --hairline: #d9cff0;
+  --accent: #7e14ff;
+  --accent-hover: #863bff;
+  --accent-ink: #ffffff;
+  --sky: #47bfff;
+  --ok: #d3f1df;
+  --ok-ink: #0a4a29;
+  --warn: #ffe7b0;
+  --warn-ink: #5a3800;
+  --bad: #ffd6da;
+  --bad-ink: #7a0c1c;
+  --disabled: #e7e1f3;
+  --disabled-ink: #5e5475;
+  --shadow: 0 1px 2px rgb(27 16 48 / 0.06), 0 8px 24px rgb(27 16 48 / 0.08);
+}
+
 @theme {
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Mono", ui-monospace, monospace;
+  --font-sans: "Commissioner", system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-tint: var(--tint);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-line: var(--line);
+  --color-hairline: var(--hairline);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-sky: var(--sky);
+  --color-ok: var(--ok);
+  --color-ok-ink: var(--ok-ink);
+  --color-warn: var(--warn);
+  --color-warn-ink: var(--warn-ink);
+  --color-bad: var(--bad);
+  --color-bad-ink: var(--bad-ink);
+  --color-disabled: var(--disabled);
+  --color-disabled-ink: var(--disabled-ink);
+  --shadow-lift: var(--shadow);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  /* Type scale: 14 / 18 / 24 / 32 / 48 / 72 */
+  --text-s: 0.875rem;
+  --text-body: 1.125rem;
+  --text-l: 1.5rem;
+  --text-xl: 2rem;
+  --text-2xl: 3rem;
+  --text-hero: 4.5rem;
+}
+
+html, body { background: var(--bg); color: var(--text); }
+body {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, .font-display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
