@@ -9,10 +9,10 @@ Priority: P0
 Paths: web/src/lib/discount/, web/src/features/aliados/, web/src/features/cierre/, app/services/alliances.py, app/routers/alliances.py, app/tests/test_alliances_demo_accept.py
 Depends: HACK-026, HACK-035
 Verify: `uv run pytest -q app/tests/test_alliances_demo_accept.py && npm --prefix web test -- --run src/features/aliados src/features/cierre src/lib/discount && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795821710
-Updated: 1795819010
+Lease-Until: 1795821808
+Updated: 1795819108
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: test rojo de proposal_to_demo_business_is_auto_accepted en app/tests/test_alliances_demo_accept.py
+Next: frontend: tests rojos fields_show_plain_language_examples, result_sentence_updates_while_typing, active_giver_alliance_shows_copyable_code; componente web/src/lib/discount/ compartido por aliados/index.tsx y cierre/index.tsx
 PR: -
 Evidence: -
 Thread-Read: 210

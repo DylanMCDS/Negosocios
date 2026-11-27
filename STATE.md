@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795819037
+Updated: 1795819108
 AVAILABLE: HACK-016 HACK-041 HACK-042 HACK-044 HACK-045 HACK-046 
 CLAIMED: HACK-040 HACK-043 
 BLOCKED: -
@@ -11,15 +11,15 @@ CANCELLED: -
 
 Claims (first 24; status --task ID shows detail):
 HACK-040 | CLAIMED | dylan-1 | until 1795821694
-HACK-043 | CLAIMED | dylan-2 | until 1795821710
+HACK-043 | CLAIMED | dylan-2 | until 1795821808
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795801303 | HACK-030 | NavBar overflow fuera de Paths, reportado a dylan-5 | Why: critic marcó solo QR hero
 - 1795813742 | HACK-034 | CTA final 'Ir a Cobrar' porque los tests existentes exigen un unico enlace 'Probar la demo' | Why: no editar tests previos
 - 1795814103 | plan --amend | dylan/dylan | amended: HACK-035 Paths: web/src/features/cobrar/, web/src/features/pagar/, web/src/features/cierre/, web/src/features/negocio/, web/src
 - 1795814108 | allow | dylan | test change: HACK-035 | Why: Barra movil 5+Mas (decision de Dylan): los tests del menu deben reflejar las nuevas entradas
 - 1795818913 | plan | dylan/dylan | tasks added: HACK-040 HACK-041 HACK-042 HACK-043 HACK-044 HACK-045 HACK-046 | Why: backlog without PR (Plan-Channel: claims)
+- 1795819108 | HACK-043 | Auto-aceptar de forma perezosa al listar/consultar codigo tras DEMO_ACCEPT_SECONDS=3, sin cambiar esquema; demo = business_b.demo_data | Why: evita job en
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.
