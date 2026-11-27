@@ -11,3 +11,4 @@
 ## History
 - 1795758252 | CLAIMED | dylan-2 | claim; next: read spec, write tests, red | Harness: unknown | Model: unknown
 - 1795758414 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/24; evidence: uv run pytest -q app/tests: all passed incl. 6 new (alliances 4, reviews 2); concurrent quote test with 8 threads; red at a61e05a on assert 404 == 201 · red at a61e05a: E   assert (404 == 201); reviewer: - | Harness: unknown | Model: unknown
+- 1795758765 | REVIEW | dylan-3 | review; reject; SHA c36e3bebbadcebfabe8f88b56ec22ac678613269; reviewer dylan-3 | Harness: codex | Model: gpt-6.1-sol

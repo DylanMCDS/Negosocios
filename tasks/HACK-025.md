@@ -15,9 +15,9 @@ Task-Base: a61e05a94837ba1c973e316630aa4960e088ecf0
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/24; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/24
 Evidence: uv run pytest -q app/tests: all passed incl. 6 new (alliances 4, reviews 2); concurrent quote test with 8 threads; red at a61e05a on assert 404 == 201 · red at a61e05a: E   assert (404 == 201)
-Participants: author dylan-2 (unknown)
-Events: 2
+Participants: author dylan-2 (unknown); reviewer dylan-3 (gpt-6.1-sol) reject
+Events: 3
 Checkpoints: 0
-Sessions: 1
+Sessions: 2
 Last-Checkpoint: 0
 Task-Tip: c36e3bebbadcebfabe8f88b56ec22ac678613269
