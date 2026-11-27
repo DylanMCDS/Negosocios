@@ -155,11 +155,11 @@ function Perfil({ business, owner, extra }: { business: Business; owner: boolean
     </Surface>
   );
   if (!owner) return <PageLayout>{info}</PageLayout>;
-  // QR (the hero) on the left from 1024 px; Mis puestos + info on the right. On a phone the short list comes first.
+  // QR (the hero) first; from 1024 px Mis puestos + info sit in the right column. The QR is capped to the viewport height so Imprimir stays in view.
   return (
     <div className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_400px]">
       <div className="flex min-w-0 flex-col items-center gap-6 rounded-lg bg-tint p-6">
-        <div className="w-full max-w-[480px] rounded-md bg-surface p-4">
+        <div className="w-full max-w-[min(480px,55vh)] rounded-md bg-surface p-4">
           <FixedQr value={profileUrl(business.id)} />
         </div>
         <Button onClick={() => window.print()}>
@@ -167,7 +167,7 @@ function Perfil({ business, owner, extra }: { business: Business; owner: boolean
           Imprimir
         </Button>
       </div>
-      <aside className="order-first flex min-w-0 flex-col gap-6 lg:order-none">
+      <aside className="flex min-w-0 flex-col gap-6">
         {extra}
         {info}
       </aside>
