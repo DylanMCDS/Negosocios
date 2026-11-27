@@ -40,3 +40,6 @@ Una orden pasa a **pagada sólo** con un webhook verificado (o consulta al prove
 - `app.services.pey_webhook.verify_webhook(raw_body, headers, secret)` devuelve el JSON autenticado o lanza `InvalidSignature` (alias de `WebhookVerificationError`). Verifica firma y vigencia del timestamp; **no** guarda eventos. La deduplicación persistente por `webhook-id` corresponde al consumidor HACK-007.
 - Tests offline: `uv run --no-project --with pytest --with httpx --with standardwebhooks pytest -q app/tests/test_pey.py`.
 - Smoke **manual, sólo humano** con `PEY_API_KEY` ya exportada en su entorno: `uv run --no-project --with httpx python scripts/pey_smoke.py`. Crea **un QR real de 1 MXN**, vigente 360 s; stdout contiene sólo su `id`. No carga ni muestra `.env`. No correr en CI; este spike no acredita todavía un cobro real.
+
+## Importes (HACK-032)
+- `HttpPeyClient` envía `amount` redondeado a 2 decimales (`round(amount_mxn, 2)`), nunca `19.990000000000002`. Cobrar admite desde $0.01; si pey o el banco rechazan ese mínimo en producción, registrar aquí el mínimo real.

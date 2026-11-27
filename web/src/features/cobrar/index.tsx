@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, PageLayout, Stat, Surface } from "../../lib/ui";
 import { api } from "../../lib/api";
+import { appendKey, formatCents, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
 
@@ -11,7 +12,7 @@ const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 type Phase = "idle" | "creating" | "pending" | "paid" | "failed";
 
-const pesos = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const pesos = formatCents;
 
 // Sound and vibration are best effort: a phone may block either.
 function celebrate() {
@@ -62,7 +63,7 @@ export default function Cobrar() {
   useEffect(() => {
     if (getBusinessId()) void resolveActiveBusiness().then(setActive);
   }, []);
-  const amountCents = (Number(digits) || 0) * 100;
+  const amountCents = toCents(digits);
 
   const create = useCallback(async () => {
     setPhase("creating");
@@ -130,7 +131,7 @@ export default function Cobrar() {
       <PageLayout
         aside={
           <Surface className="flex flex-col gap-6">
-            <Stat label="Importe" value={String(order ? order.amount_cents / 100 : Number(digits) || 0)} unit="MXN" hero />
+            <Stat label="Importe" value={pesos(order ? order.amount_cents : amountCents)} unit="MXN" hero />
             {showOrder ? (
               <>
                 <p className="text-ink-2">{order.concept}</p>
@@ -193,14 +194,14 @@ export default function Cobrar() {
         ) : (
           <div className="grid max-w-[420px] grid-cols-3 gap-3" role="group" aria-label="Teclado numérico">
             {KEYS.map((k) => (
-              <Button key={k} variant="secondary" onClick={() => setDigits((d) => (d + k).slice(0, 6))}>
+              <Button key={k} variant="secondary" onClick={() => setDigits((d) => appendKey(d, k))}>
                 {k}
               </Button>
             ))}
-            <Button variant="secondary" onClick={() => setDigits("")} aria-label="Borrar todo">
-              C
+            <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "."))} aria-label=".">
+              .
             </Button>
-            <Button variant="secondary" onClick={() => setDigits((d) => (d === "" ? d : d + "0").slice(0, 6))}>
+            <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "0"))}>
               0
             </Button>
             <Button variant="secondary" onClick={() => setDigits((d) => d.slice(0, -1))} aria-label="Borrar">

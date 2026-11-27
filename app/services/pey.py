@@ -61,7 +61,7 @@ class HttpPeyClient:
             response = client.post(
                 "https://api.pey.mx/codi/qr",
                 headers={"Authorization": f"Bearer {self._api_key}"},
-                json={"amount": amount_mxn, "concept": concept, "numRef": num_ref,
+                json={"amount": round(amount_mxn, 2), "concept": concept, "numRef": num_ref,
                       "expiration": expiration_s, "generateImage": False},
                 timeout=10.0, follow_redirects=False,
             )
