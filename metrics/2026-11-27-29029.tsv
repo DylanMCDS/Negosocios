@@ -3,6 +3,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -263,3 +264,49 @@
 1795738752	map	-	0	-	0	dylan-3	codex
 1795738752	red	HACK-006	0	-	2000	dylan-3	codex
 1795738723	hook-heartbeat	HACK-002	0	-	2000	dylan-3	other
+1795738948	bb	-	0	-	4000	dylan-3	codex
+1795738755	hook-pr-sync	HACK-003	0	-	2000	dylan-4	other
+1795738755	hook-heartbeat	HACK-003	0	-	2000	dylan-4	other
+1795738756	hook-inbox	-	0	-	2000	dylan-3	other
+1795738755	hook-inbox	-	0	-	4000	dylan-4	other
+1795738756	hook-pr-sync	HACK-002	0	-	3000	dylan-3	other
+1795738757	hook-status	-	0	-	3000	dylan-4	other
+1795738759	hook-status	-	0	-	2000	dylan-3	other
+1795738791	status	HACK-008	0	-	3000	dylan-3	codex
+1795738790	msg	-	0	-	4000	dylan-3	codex
+1795738796	msg	-	0	-	4000	dylan-3	codex
+1795738802	hook-pr-sync	HACK-001	0	-	3000	dylan-1	claude-code
+1795738804	hook-status	-	0	-	0	dylan-1	claude-code
+1795738804	status	HACK-008	0	-	0	dylan-3	codex
+1795738802	hook-heartbeat	HACK-001	0	-	5000	dylan-1	claude-code
+1795738804	hook-inbox	-	0	-	2000	dylan-4	other
+1795738802	hook-inbox	-	0	-	5000	dylan-1	claude-code
+1795738806	checkpoint	HACK-006	0	-	4000	dylan-3	codex
+1795738815	checkpoint	HACK-005	0	-	4000	dylan-1	claude-code
+1795738948	design-gallery	-	-	-	-	dylan-1	claude-code
+1795738818	hook-inbox	-	0	-	2000	dylan-3	other
+1795738825	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795738827	hook-inbox	-	0	-	1000	dylan-4	other
+1795738840	hook-inbox	-	0	-	2000	dylan-3	other
+1795738862	done	HACK-006	0	-	6000	dylan-3	codex
+1795738868	checkpoint	HACK-006	0	-	5000	dylan-3	codex
+1795738873	next	-	0	-	0	dylan-3	codex
+1795738875	hook-inbox	-	0	-	2000	dylan-4	other
+1795738884	hook-inbox	-	0	-	1000	dylan-3	other
+1795738881	review	HACK-008	0	-	6000	dylan-3	codex
+1795738887	status	HACK-008	0	-	0	dylan-3	codex
+1795738887	status	-	0	-	1000	dylan-3	codex
+1795738895	hook-inbox	-	0	-	2000	dylan-4	other
+1795738894	review	HACK-008	0	-	6000	dylan-3	codex
+1795738900	review	HACK-008	0	-	3000	dylan-3	codex
+1795738903	next	-	0	-	4000	dylan-3	codex
+1795738904	hook-inbox	-	0	-	4000	dylan-3	other
+1795738904	status	HACK-008	0	-	6000	dylan-3	codex
+1795738918	hook-inbox	-	0	-	4000	dylan-4	other
+1795738948
+1795738922	next	-	1	-	0	dylan-1	claude-code
+1795738923	hook-inbox	-	0	-	2000	dylan-1	claude-code
+1795738926	next	-	0	-	2000	dylan-3	codex
+1795738928	status	HACK-008	0	-	1000	dylan-3	codex
+1795738940	hook-inbox	-	0	-	1000	dylan-3	other
+1795738944	handover	HACK-006	0	-	4000	dylan-3	codex
