@@ -226,7 +226,7 @@ export default function Cobrar() {
       {/* Mobile: amount on top, keypad under it, Cobrar fixed above the bottom nav (bottom-16 = nav height). pb leaves room for both. */}
       <div data-cobrar-page className="grid gap-6 py-6 pb-28 md:gap-8 md:py-8 md:pb-0 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex min-w-0 flex-col gap-6">
-          <Surface className="flex flex-col gap-4">
+          <Surface className={showOrder ? "order-2 flex flex-col gap-4" : "flex flex-col gap-4"}>
             <Stat label="Importe" value={pesos(order ? order.amount_cents : amountCents)} unit="MXN" hero />
             {showOrder && (
               <>
@@ -238,7 +238,7 @@ export default function Cobrar() {
             )}
           </Surface>
           {showOrder && order.qr_string ? (
-            <div className="relative flex justify-center rounded-lg border border-line bg-tint p-6 md:p-12">
+            <div className="order-1 relative flex justify-center rounded-lg border border-line bg-tint p-3 md:p-12">
               <QrCubes value={order.qr_string} dim={phase === "paid"} />
             </div>
           ) : (
@@ -256,8 +256,8 @@ export default function Cobrar() {
               {phase === "pending" && <PushToPhone orderId={order.id} />}
               {phase === "paid" && (
                 <div role="status" className="fixed inset-0 z-20 flex flex-col items-center justify-center gap-8 bg-bg p-6 text-center">
-                  <CheckCircle size={96} weight="fill" aria-hidden="true" className="text-accent" />
-                  <p className="font-display text-[length:var(--text-hero)] text-accent">Pagado</p>
+                  <CheckCircle size={96} weight="fill" aria-hidden="true" className="text-ok-ink" />
+                  <p className="font-display text-[length:var(--text-hero)] text-ok-ink">Pagado</p>
                   <p className="font-display text-[length:var(--text-2xl)]">{pesos(order.amount_cents)}</p>
                   <Button className="w-full max-w-sm" onClick={reset}>
                     Cobrar otra orden
