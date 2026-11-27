@@ -344,8 +344,8 @@ function PartsView({ orderId, split, demo }: { orderId: string; split: Split; de
         <PageHeader title="Cobro completo" lead="Todas las partes están pagadas." action={demo ? <DataBadge /> : undefined} />
       ) : (
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-display text-[length:var(--text-xl)] leading-tight">{`Faltan ${split.missing.length} de ${split.parts.length}`}</h1>
-          {demo && <DataBadge />}
+          <h1 className="min-w-0 font-display text-[length:var(--text-l)] leading-tight md:text-[length:var(--text-xl)]">{`Faltan ${split.missing.length} de ${split.parts.length}`}</h1>
+          {demo && <span className="shrink-0 whitespace-nowrap"><DataBadge /></span>}
         </div>
       )}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
