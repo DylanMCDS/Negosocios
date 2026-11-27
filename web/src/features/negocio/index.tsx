@@ -84,36 +84,34 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
 }
 
 function Perfil({ business, owner }: { business: Business; owner: boolean }) {
-  return (
-    <PageLayout
-      aside={
-        <Surface className="flex flex-col gap-4">
-          <a href="#cobrar" className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4">
-            Paga aquí con CoDi
-          </a>
-          <p className="text-ink-2">Abre tu app del banco, elige CoDi y escanea el QR del puesto.</p>
-          {business.demo_data ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <p>Horario: lunes a sábado, 9:00 a 18:00</p>
-              <DataBadge />
-            </div>
-          ) : (
-            <p className="text-ink-2">Horario: aún no registrado</p>
-          )}
-        </Surface>
-      }
-    >
-      {owner && (
-        <div className="flex flex-col items-center gap-6 rounded-lg bg-tint p-6">
-          <div className="w-full max-w-[480px] rounded-md bg-surface p-4">
-            <FixedQr value={profileUrl(business.id)} />
-          </div>
-          <Button onClick={() => window.print()}>
-            <Printer size={20} aria-hidden="true" />
-            Imprimir
-          </Button>
+  const info = (
+    <Surface className="flex max-w-xl flex-col gap-4">
+      <a href="#cobrar" className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4">
+        Paga aquí con CoDi
+      </a>
+      <p className="text-ink-2">Abre tu app del banco, elige CoDi y escanea el QR del puesto.</p>
+      {business.demo_data ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <p>Horario: lunes a sábado, 9:00 a 18:00</p>
+          <DataBadge />
         </div>
+      ) : (
+        <p className="text-ink-2">Horario: aún no registrado</p>
       )}
+    </Surface>
+  );
+  if (!owner) return <PageLayout>{info}</PageLayout>;
+  return (
+    <PageLayout aside={info}>
+      <div className="flex flex-col items-center gap-6 rounded-lg bg-tint p-6">
+        <div className="w-full max-w-[480px] rounded-md bg-surface p-4">
+          <FixedQr value={profileUrl(business.id)} />
+        </div>
+        <Button onClick={() => window.print()}>
+          <Printer size={20} aria-hidden="true" />
+          Imprimir
+        </Button>
+      </div>
     </PageLayout>
   );
 }
