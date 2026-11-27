@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 
 from fastapi import HTTPException
 
+from app.services import payout_accounts
 from app.services.pey import PeyClient, PeyError
 
 MAX_PARTS = 20
@@ -99,18 +100,27 @@ def create_split(conn: sqlite3.Connection, order_id: str, parts: int | None, amo
         plan = plan_amounts(order["amount_cents"], parts, amounts)
     except ValueError as error:
         raise HTTPException(422, str(error)) from None
+    # Same rule as a normal charge: a business with a real pey account collects directly, and a client
+    # that cannot send bankAccountId must never create platform-account QRs for it.
+    bank_account_id = payout_accounts.real_bank_account_id(conn, order["business_id"])
+    if bank_account_id and not payout_accounts.supports_bank_account_id(type(pey)):
+        raise HTTPException(503, payout_accounts.DIRECT_UNAVAILABLE)
+    extra = {"bank_account_id": bank_account_id} if bank_account_id else {}
     total = len(plan)
     for idx, cents in enumerate(plan, start=1):
         num_ref = _next_num_ref(conn)
         concept = f"{order['concept']} {idx}/{total}"[:40]
         try:
-            qr = pey.create_qr(cents / 100, concept, str(num_ref), 600)
+            qr = pey.create_qr(cents / 100, concept, str(num_ref), 600, **extra)
         except PeyError:
             raise HTTPException(502, "No se pudo crear el cobro de una parte; revisa pey antes de reintentar") from None
         conn.execute(
             "INSERT INTO order_splits (id, order_id, idx, amount_cents, num_ref, codi_qr_id, qr_string) VALUES (?, ?, ?, ?, ?, ?, ?)",
             (f"{order_id}-{idx}", order_id, idx, cents, str(num_ref), qr.id, qr.qr_string),
         )
+    # The full QR must not stay on screen: parts are the only way to pay now. A payment made from a QR
+    # shown before the split is still matched by codi_qr_id and flagged for reconciliation.
+    conn.execute("UPDATE orders SET qr_string = NULL WHERE id = ?", (order_id,))
     conn.commit()
     return get_split(conn, order_id)  # type: ignore[return-value]
 

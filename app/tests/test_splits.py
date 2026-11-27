@@ -133,3 +133,67 @@ def test_wrong_amount_or_full_qr_on_a_split_order_is_flagged_not_paid(api):
     assert client.get(f"/api/orders/{order['id']}/split").json()["missing"] == [1, 2]
     pay(client, order["codi_qr_id"], 10001, "full")  # the original QR must not mark a split order paid
     assert status(client, order["id"])["status"] == "pending"
+
+
+class RecordingPey:
+    """Fake pey that can send bankAccountId and records what each QR was asked for."""
+
+    def __init__(self):
+        self.calls = []
+
+    def create_qr(self, amount_mxn, concept, num_ref, expiration_s, bank_account_id=None):
+        from app.services.pey import QrResult
+
+        self.calls.append({"bank_account_id": bank_account_id, "amount": amount_mxn})
+        return QrResult(f"rq-{len(self.calls)}", f"demo_data:true:rq-{len(self.calls)}")
+
+
+BBVA = "012180015678901230"  # valid CLABE
+
+
+def _api_with(fake, tmp_path, name):
+    settings = Settings(database_path=str(tmp_path / name), pey_webhook_secret=SECRET)
+    application = create_app(web_dist=None)
+    application.dependency_overrides[get_settings] = lambda: settings
+    application.dependency_overrides[get_pey_client] = lambda: fake
+    return application, settings
+
+
+def test_split_sends_the_business_bank_account_id_like_a_normal_charge(tmp_path):
+    fake = RecordingPey()
+    application, _ = _api_with(fake, tmp_path, "real.db")
+    with TestClient(application) as client:
+        biz = client.post("/api/businesses", json={"name": "N", "category": "C", "zone": "Z"}).json()["id"]
+        assert client.put(f"/api/businesses/{biz}/payout-account", json={"clabe": BBVA, "mode": "pey", "pey_bank_account_id": "ba-7"}).status_code == 200
+        order = make_order(client, biz, 10001)
+        assert client.post(f"/api/orders/{order['id']}/split", json={"parts": 2}).status_code == 201
+    assert [c["bank_account_id"] for c in fake.calls] == ["ba-7", "ba-7", "ba-7"]  # the order's own QR plus both parts
+
+
+def test_split_never_charges_a_real_account_with_a_client_that_cannot_send_it(tmp_path):
+    fake = FakePeyClient()  # today's client: no bank_account_id parameter
+    application, settings = _api_with(fake, tmp_path, "legacy.db")
+    with TestClient(application) as client:
+        biz = client.post("/api/businesses", json={"name": "N", "category": "C", "zone": "Z"}).json()["id"]
+        order = make_order(client, biz, 10001)
+        conn = sqlite3.connect(settings.database_path)
+        conn.execute("INSERT INTO payout_accounts (business_id, bank, last4, mode, pey_bank_account_id, updated_at) VALUES (?, 'BBVA', '1230', 'pey', 'ba-9', 'x')", (biz,))
+        conn.commit()
+        conn.close()
+        before = len(fake.requests)
+        r = client.post(f"/api/orders/{order['id']}/split", json={"parts": 2})
+        assert r.status_code == 503 and "cobro directo" in r.text.lower()
+        assert len(fake.requests) == before  # no part QR was created on the platform account
+        assert client.get(f"/api/orders/{order['id']}/split").status_code == 404
+
+
+def test_split_retires_the_full_qr_so_nobody_is_asked_to_pay_it(api):
+    client, _, _, biz = api
+    order = make_order(client, biz, 10001)
+    assert client.get(f"/api/orders/{order['id']}").json()["order"]["qr_string"]  # payable before the split
+    client.post(f"/api/orders/{order['id']}/split", json={"parts": 2})
+    after = client.get(f"/api/orders/{order['id']}").json()["order"]
+    assert after["qr_string"] is None and after["status"] == "pending"
+    pay(client, order["codi_qr_id"], 10001, "late-full")  # a payment from a QR shown before the split
+    flagged = status(client, order["id"])
+    assert flagged["status"] == "pending" and flagged["reconciliation_required"] is True
