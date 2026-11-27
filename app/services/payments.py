@@ -1,10 +1,12 @@
 """Procesa webhooks verificados de pey: única vía para marcar una orden `paid`."""
+import logging
 import sqlite3
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 
 PAYMENT_EVENT = "codi.qr.payment_received"
+log = logging.getLogger(__name__)
 
 
 def _cents(amount) -> int | None:
@@ -18,7 +20,8 @@ def _cents(amount) -> int | None:
 def process_event(conn: sqlite3.Connection, webhook_id: str, event: dict) -> None:
     """Evento, Payment y transición de orden en una sola transacción; idempotente por webhook_id."""
     kind = event.get("type")
-    data = event.get("data") or {}
+    # El payload real de pey es PLANO. `data` anidado sólo por compatibilidad: nunca existió en pey.
+    data = event if "codiQrId" in event or "data" not in event else (event.get("data") or {})
     conn.execute("BEGIN IMMEDIATE")
     try:
         order = None
@@ -30,6 +33,9 @@ def process_event(conn: sqlite3.Connection, webhook_id: str, event: dict) -> Non
         ).rowcount
         if inserted and order is not None:
             _apply_payment(conn, order, webhook_id, data)
+        elif inserted and kind == PAYMENT_EVENT:
+            # Sólo tipo y QR (sin concepto, metadata ni datos del pagador) para diagnosticar.
+            log.warning("pago pey sin orden: type=%s codiQrId=%s", kind, data.get("codiQrId"))
         conn.commit()
     except BaseException:
         conn.rollback()
