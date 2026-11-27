@@ -1,15 +1,17 @@
-import { useEffect, useState, type ComponentType, type ReactNode } from "react";
-import { Microphone, QrCode, Receipt, Storefront, Wallet, House } from "@phosphor-icons/react";
-import { AppShell, NavBar, PageHeader, Surface, type NavItem } from "./lib/ui";
+import { useEffect, useState, type ComponentType } from "react";
+import { AppShell, PageHeader, Surface } from "./lib/ui";
+import { buildMenu, MenuBar, type FeatureNav } from "./lib/ui/NavBar";
 import Cobrar from "./lib/ui/locked/Cobrar";
 import Pagar from "./lib/ui/locked/Pagar";
 import Cierre from "./lib/ui/locked/Cierre";
 
-// Each feature is web/src/features/<name>/index.tsx with `export default`. It replaces the locked screen of the same id.
+// Each feature is web/src/features/<name>/index.tsx with `export default` (its screen) and nav.ts with `export const nav`
+// (its menu entry). A new feature appears in the menu by adding those files: App.tsx does not change.
 type FeatureModule = { default: ComponentType };
 const modules = import.meta.glob<FeatureModule>("./features/*/index.tsx", { eager: true });
 const features: Record<string, ComponentType> = {};
 for (const [path, mod] of Object.entries(modules)) features[path.split("/")[2]] = mod.default;
+const menu = buildMenu(import.meta.glob<{ nav: FeatureNav }>("./features/*/nav.ts", { eager: true }));
 
 function Soon({ title }: { title: string }) {
   return (
@@ -20,17 +22,9 @@ function Soon({ title }: { title: string }) {
   );
 }
 
-const icon = (el: ReactNode) => el;
-// "pagar" is the customer's screen: opened from the QR/link (/pagar/<id>), never from the merchant's menu.
-const views: Array<NavItem & { fallback: ComponentType; hidden?: boolean }> = [
-  { id: "landing", label: "Inicio", icon: icon(<House size={24} aria-hidden="true" />), fallback: () => <Soon title="Negosocios" /> },
-  { id: "cobrar", label: "Cobrar", icon: icon(<QrCode size={24} aria-hidden="true" />), fallback: Cobrar },
-  { id: "pagar", label: "Pagar", icon: icon(<Wallet size={24} aria-hidden="true" />), fallback: Pagar, hidden: true },
-  { id: "cierre", label: "Cierre", icon: icon(<Receipt size={24} aria-hidden="true" />), fallback: Cierre },
-  { id: "negocio", label: "Negocio", icon: icon(<Storefront size={24} aria-hidden="true" />), fallback: () => <Soon title="Mi negocio" /> },
-  { id: "voz", label: "Voz", icon: icon(<Microphone size={24} aria-hidden="true" />), fallback: () => <Soon title="Gastos por voz" /> },
-];
-const menu = views.filter((v) => !v.hidden);
+// Screens that existed before their feature did (locked design); a feature's own index.tsx replaces them.
+const fallbacks: Record<string, ComponentType> = { cobrar: Cobrar, pagar: Pagar, cierre: Cierre };
+const views = menu.all;
 
 // The view comes from the hash ("#cierre", "#pagar/<id>") or from a customer link ("/pagar/<id>").
 const read = () => {
@@ -46,12 +40,12 @@ export default function App() {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
   const view = views.find((v) => v.id === active)!;
-  const Screen = features[view.id] ?? view.fallback;
+  const Screen = features[view.id] ?? fallbacks[view.id];
   return (
     <AppShell
       nav={
-        <NavBar
-          items={menu}
+        <MenuBar
+          menu={menu}
           active={active}
           onSelect={(id) => {
             window.location.hash = id;
@@ -60,7 +54,7 @@ export default function App() {
         />
       }
     >
-      <Screen />
+      {Screen ? <Screen /> : <Soon title={view.label} />}
     </AppShell>
   );
 }
