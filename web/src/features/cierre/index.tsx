@@ -4,8 +4,9 @@ import { api } from "../../lib/api";
 import type { CampaignSimulation, Closing } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat, Surface } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
+import { getBusinessId } from "../negocio/businessId";
 
-const BUSINESS_ID = "rosa"; // negocio de la jornada de ejemplo hasta que exista el alta (HACK-012)
+const DEMO_BUSINESS_ID = "rosa"; // negocio de la jornada de ejemplo cuando aún no hay alta en este navegador
 
 const MISSING_TEXT: Record<string, string> = {
   sales: "Faltan tus ventas cobradas",
@@ -92,7 +93,7 @@ export default function Cierre() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    api<Closing>(`/closing/today?business_id=${BUSINESS_ID}`).then(setClosing, () => setFailed(true));
+    api<Closing>(`/closing/today?business_id=${encodeURIComponent(getBusinessId() ?? DEMO_BUSINESS_ID)}`).then(setClosing, () => setFailed(true));
   }, []);
 
   const demo = closing?.pending.some((o) => o.demo_data) ?? false;

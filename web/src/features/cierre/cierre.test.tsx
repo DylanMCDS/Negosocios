@@ -79,3 +79,22 @@ describe("Cuenta del simulador", () => {
     expect(screen.getByText(/25 % del precio/)).toBeInTheDocument();
   });
 });
+
+describe("Negocio del cierre", () => {
+  afterEach(() => localStorage.clear());
+
+  it("uses_the_business_id_from_the_signup", async () => {
+    localStorage.setItem("negosocios.business_id", "b-123");
+    const calls = mockApi(closing);
+    render(<Cierre />);
+    await screen.findByText("Utilidad estimada");
+    expect(calls[0].url).toBe("/api/closing/today?business_id=b-123");
+  });
+
+  it("falls_back_to_the_demo_business_without_signup", async () => {
+    const calls = mockApi(closing);
+    render(<Cierre />);
+    await screen.findByText("Utilidad estimada");
+    expect(calls[0].url).toBe("/api/closing/today?business_id=rosa");
+  });
+});
