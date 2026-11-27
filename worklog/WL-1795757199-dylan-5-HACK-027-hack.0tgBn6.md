@@ -6,7 +6,7 @@
 - Why: app/services/expenses.py is outside Paths; request #94 to human
 - Failing: none open
 - Commands: uv run pytest -q app/tests/test_recurring.py && npm --prefix web test -- --run src/features/cierre && npm --prefix web run build
-- Next: Humano: Lock perdido; candidato cancelado
+- Next: Integrated in main: f5c18e3bde4365482f83a5203dc72f09fd02f642
 
 ## History
 - 1795757199 | CLAIMED | dylan-5 | claim; next: tests primero | Harness: unknown | Model: unknown
@@ -19,3 +19,4 @@
 - 1795759405 | REVIEW | dylan-2 | review; approve; SHA 1ecbcfa85f58215f450a4d66fd654cc6c831a174; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795759441 | REVIEW | dylan-5 | heartbeat; lease until 1795773841 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795759489 | REVIEW | dylan-5 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown
+- 1795759516 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit f5c18e3bde4365482f83a5203dc72f09fd02f642; reviewer dylan-2 | Harness: unknown | Model: unknown
