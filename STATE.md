@@ -1,18 +1,18 @@
 # STATE
 
 Phase: execution
-Updated: 1795739357
+Updated: 1795739404
 AVAILABLE: HACK-009 HACK-010 HACK-011 HACK-012 HACK-013 HACK-014 HACK-015 HACK-016 
-CLAIMED: HACK-017 
+CLAIMED: -
 BLOCKED: -
-REVIEW: HACK-005 HACK-007 
+REVIEW: HACK-005 HACK-007 HACK-017 
 INTEGRATED: HACK-001 HACK-002 HACK-003 HACK-004 HACK-006 HACK-008 
 CANCELLED: -
 
 Claims (first 24; status --task ID shows detail):
 HACK-005 | REVIEW | dylan-1 | until 1795753611
 HACK-007 | REVIEW | dylan-2 | until 1795753710
-HACK-017 | CLAIMED | dylan-5 | until 1795742057
+HACK-017 | REVIEW | dylan-5 | until 1795753804
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
