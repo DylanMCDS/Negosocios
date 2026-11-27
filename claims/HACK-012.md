@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/features/negocio/
 Depends: HACK-005, HACK-006
 Verify: `npm --prefix web test -- --run src/features/negocio && npm --prefix web run build`
-Lease-Until: 1795755347
-Updated: 1795740947
+Lease-Until: 1795755575
+Updated: 1795741175
 Task-Base: 949857e04d10988d3a2d7bbb856cbabe291a0467
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/13; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/13
