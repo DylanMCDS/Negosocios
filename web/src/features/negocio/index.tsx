@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import QRCode from "qrcode";
-import { Printer } from "@phosphor-icons/react";
+import { Printer, WarningCircle } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business } from "../../lib/types";
 import { Button, DataBadge, PageHeader, PageLayout, Surface } from "../../lib/ui";
 import { getBusinessId, saveBusinessId } from "./businessId";
+import { clabeComplete, clabeError } from "./clabe";
 
 const field =
   "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:tracking-tighter placeholder:text-ink-2";
@@ -33,16 +34,20 @@ function FixedQr({ value }: { value: string }) {
 
 function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
   const [values, setValues] = useState({ name: "", category: "", zone: "" });
+  const [clabe, setClabe] = useState("");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState(false);
+  const [clabeSaveFailed, setClabeSaveFailed] = useState<Business | null>(null);
   const [saving, setSaving] = useState(false);
   const set = (key: keyof typeof values) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setValues((v) => ({ ...v, [key]: e.target.value }));
   const complete = Object.values(values).every((v) => v.trim() !== "");
+  const clabeMessage = clabeError(clabe);
+  const clabeOk = clabe.trim() === "" || clabeComplete(clabe);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    if (!consent || !complete || saving) return;
+    if (!consent || !complete || !clabeOk || saving) return;
     setSaving(true);
     setError(false);
     try {
@@ -51,6 +56,17 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
         body: JSON.stringify({ name: values.name.trim(), category: values.category.trim(), zone: values.zone.trim() }),
       });
       saveBusinessId(created.id);
+      if (clabe.trim() !== "") {
+        try {
+          await api(`/businesses/${encodeURIComponent(created.id)}/payout-account`, {
+            method: "PUT",
+            body: JSON.stringify({ clabe: clabe.trim() }),
+          });
+        } catch {
+          setClabeSaveFailed(created); // the puesto exists already: let the owner continue
+          return;
+        }
+      }
       onCreated(created);
     } catch {
       setError(true);
@@ -81,13 +97,40 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
         {labeled("name", "Nombre del puesto", "Ej. Tacos Lupita")}
         {labeled("category", "Giro", "Ej. Tacos, Barbería, Abarrotes")}
         {labeled("zone", "Zona", "Ej. Tianguis de Santa Cruz, Iztapalapa", "La zona es aproximada, no la dirección exacta.")}
+        <div className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
+          <label className="flex flex-col gap-1">
+            CLABE donde recibes tus cobros (opcional)
+            <input
+              className={clabeMessage ? `${field} border-2 border-bad` : field}
+              inputMode="numeric"
+              value={clabe}
+              onChange={(e) => setClabe(e.target.value)}
+              placeholder="18 dígitos"
+              aria-describedby="clabe-help"
+              aria-invalid={clabeMessage !== ""}
+            />
+          </label>
+          <p id="clabe-help">Simulado en esta demo: los cobros llegan a la cuenta de la plataforma y la liquidación al puesto queda pendiente. Guardamos solo el banco y los últimos 4 dígitos.</p>
+          {clabeMessage && (
+            <p role="alert" className="flex items-start gap-2 font-semibold text-bad-ink">
+              <WarningCircle size={20} weight="fill" aria-hidden="true" className="mt-0.5 shrink-0" />
+              {clabeMessage}
+            </p>
+          )}
+        </div>
         <label className="flex items-start gap-3 text-[length:var(--text-body)]">
           <input type="checkbox" className="mt-1 size-6 accent-accent" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
           <span>Acepto que el nombre, giro y zona de mi puesto aparezcan en un perfil público.</span>
         </label>
-        <Button type="submit" disabled={!consent || !complete || saving}>Guardar</Button>
+        <Button type="submit" disabled={!consent || !complete || !clabeOk || saving}>Guardar</Button>
       </form>
       {error && <p role="alert">No pudimos guardar tu puesto. Intenta de nuevo.</p>}
+      {clabeSaveFailed && (
+        <div role="alert" className="flex flex-col gap-3">
+          <p>Tu puesto se guardó, pero no pudimos registrar la CLABE. Podrás intentarlo más tarde.</p>
+          <Button onClick={() => onCreated(clabeSaveFailed)}>Continuar</Button>
+        </div>
+      )}
     </Surface>
   );
 }
@@ -138,7 +181,7 @@ export default function Negocio() {
 
   const lead = business
     ? [business.category, business.zone, business.temporary_location && `Hoy: ${business.temporary_location}`].filter(Boolean).join(" · ")
-    : "Tres datos y listo.";
+    : "Tus datos y listo.";
   return (
     <>
       <PageHeader title={business ? business.name : "Alta de tu puesto"} lead={lead} />
