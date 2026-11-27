@@ -13,3 +13,4 @@
 - 1795797789 | CLAIMED | dylan-4 | heartbeat; lease until 1795800489 | Harness: unknown | Model: unknown
 - 1795797876 | CLAIMED | dylan-4 | heartbeat; lease until 1795800576 | Harness: unknown | Model: unknown
 - 1795798002 | CLAIMED | dylan-4 | checkpoint; next: Sync origin/main; capture overflow DOM diagnostics; fix owned UI or request scoped fix; capture390/1280/PDF, designcritic, commitpush PR and done | Harness: unknown | Model: unknown
+- 1795799405 | CLAIMED | dylan | handover; dylan-4 → dylan-2 by dylan | Harness: claude-code | Model: claude-opus-5-5
