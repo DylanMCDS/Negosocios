@@ -152,8 +152,8 @@ export default function Explorar() {
                 ))}
               </div>
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-[length:var(--text-s)]">
-                <label className="flex items-center gap-2"><input type="checkbox" className="size-5 accent-accent" checked={openNow} onChange={(e) => setOpenNow(e.target.checked)} />Abierto ahora</label>
-                <label className="flex items-center gap-2"><input type="checkbox" className="size-5 accent-accent" checked={allied} onChange={(e) => setAllied(e.target.checked)} />Con promoción de aliado</label>
+                <label className="flex min-h-11 items-center gap-2"><input type="checkbox" className="size-5 accent-accent" checked={openNow} onChange={(e) => setOpenNow(e.target.checked)} />Abierto ahora</label>
+                <label className="flex min-h-11 items-center gap-2"><input type="checkbox" className="size-5 accent-accent" checked={allied} onChange={(e) => setAllied(e.target.checked)} />Con promoción de aliado</label>
               </div>
               <Button variant="secondary" size="sm" onClick={locate}><NavigationArrow size={20} aria-hidden="true" />Cerca de mí</Button>
               {note && <p className="text-ink-2">{note}</p>}

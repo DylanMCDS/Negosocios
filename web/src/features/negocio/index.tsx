@@ -118,7 +118,7 @@ function AltaForm({ onCreated }: { onCreated: (b: Business) => void }) {
             </p>
           )}
         </div>
-        <label className="flex items-start gap-3 text-[length:var(--text-body)]">
+        <label className="flex min-h-11 items-start gap-3 text-[length:var(--text-body)]">
           <input type="checkbox" className="mt-1 size-6 accent-accent" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
           <span>Acepto que el nombre, giro y zona de mi puesto aparezcan en un perfil público.</span>
         </label>
