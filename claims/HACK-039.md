@@ -15,4 +15,4 @@ Task-Base: b214729f48bc336505f2cc4c1e7c8bf57568b527
 Next: Reproducir la assertion obsoleta con uak red; preparar patch de la prueba sin editar assertions hasta autorización humana
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 184
