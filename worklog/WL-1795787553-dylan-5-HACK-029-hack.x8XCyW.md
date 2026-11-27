@@ -1,12 +1,12 @@
 # worklog/WL-1795787553-dylan-5-HACK-029-hack.x8XCyW.md · HACK-029
 
 ## Live summary
-- Done: pytest test_splits.py 7 passed + full backend suite green; npm test src/features/dividir 11 passed; build exit 0; design-lint PASS; design-critic SHIP 603a622 (e87e495 UI unchanged) · red at 1f1acc3: AssertionError: expected true not to be true // Object.is equality
-- Decision: Own branch and worktree
-- Why: Parallel work without touching the main checkout
-- Failing: No validation run yet
-- Commands: `uv run pytest -q app/tests/test_splits.py && npm --prefix web test -- --run src/features/dividir && npm --prefix web run build`
-- Next: Integrated in main: cf2f20fe6be1c25498a85a2992d1d516ac6c51f1
+- Done: Backend split (bankAccountId guard, parent QR retired), Dividir UI (menu entry in clientes, demo badge, QR above fold), critic SHIP 603a622; in REVIEW PR #33
+- Decision: Parts in own table order_splits (closing sums paid orders); part page at #dividir/<order>/<n>, not /pagar/<id>
+- Why: pagar/ outside Paths; avoids double counting in closing
+- Failing: web/src/features/negocio/nav.test.tsx:17 menu list lacks Aliados and Dividir: gate forbids my edit; human allowed it under HACK-039 (msg #190)
+- Commands: uv run pytest -q app/tests/test_splits.py && npm --prefix web test -- --run src/features/dividir && npm --prefix web run build
+- Next: Wait for a reviewer verdict: uak wait HACK-029 --for approve, then uak merge HACK-029. After HACK-039 merges, merge origin/main into feat/hack-029 so the menu test passes.
 
 ## History
 - 1795787553 | CLAIMED | dylan-5 | claim; next: tests primero | Harness: unknown | Model: unknown
@@ -19,3 +19,4 @@
 - 1795799423 | REVIEW | dylan-5 | heartbeat; lease until 1795813823 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795800501 | REVIEW | dylan-1 | review; approve; SHA 603a622d157c8e7b4bc53286eb8f43b5e0e26f72; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795800730 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit cf2f20fe6be1c25498a85a2992d1d516ac6c51f1; reviewer dylan-1 | Harness: unknown | Model: unknown
+- 1795800771 | INTEGRATED | dylan-5 | checkpoint; next: Wait for a reviewer verdict: uak wait HACK-029 --for approve, then uak merge HACK-029. After HACK-039 merges, merge origin/main into feat/hack-029 so the menu test passes. | Harness: unknown | Model: unknown
