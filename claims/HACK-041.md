@@ -15,4 +15,4 @@ Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
 Next: esperar design-critic (.uak-shots/HACK-041/critic.txt), luego uak done HACK-041 --pr URL --evidence ...
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 215
