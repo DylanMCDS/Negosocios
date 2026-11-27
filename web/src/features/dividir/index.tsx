@@ -262,13 +262,6 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
   const go = (i: number) => setCurrent(Math.min(n - 1, Math.max(0, i)));
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-display text-[length:var(--text-l)]" aria-live="polite">{`Parte ${current + 1} de ${n}`}</p>
-        <div className="hidden gap-2 md:flex">
-          <Button size="sm" variant="secondary" aria-label="Parte anterior" disabled={current === 0} onClick={() => go(current - 1)}><CaretLeft size={20} aria-hidden="true" /></Button>
-          <Button size="sm" variant="secondary" aria-label="Parte siguiente" disabled={current === n - 1} onClick={() => go(current + 1)}><CaretRight size={20} aria-hidden="true" /></Button>
-        </div>
-      </div>
       {notice && <p role="status" className="rounded-md bg-ok p-3 font-display text-ok-ink">{notice}</p>}
       <div
         role="region"
@@ -300,7 +293,7 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
                   ) : (
                     p.qr_string && (
                       <div className="w-full rounded-md bg-surface p-3">
-                        <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="mx-auto max-w-[280px] md:max-w-[340px]" />
+                        <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="mx-auto max-w-[240px] md:max-w-[340px]" />
                       </div>
                     )
                   )}
@@ -310,7 +303,11 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
           })}
         </div>
       </div>
-      <div className="flex justify-center gap-1">
+      <div className="flex items-center justify-center gap-2">
+        <Button size="sm" variant="secondary" aria-label="Parte anterior" className="hidden md:inline-flex" disabled={current === 0} onClick={() => go(current - 1)}><CaretLeft size={20} aria-hidden="true" /></Button>
+        <div className="flex flex-col items-center">
+        <p className="font-display text-[length:var(--text-body)]" aria-live="polite">{`Parte ${current + 1} de ${n}`}</p>
+        <div className="flex justify-center gap-1">
         {split.parts.map((p, i) => (
           <button
             key={p.idx}
@@ -323,6 +320,9 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
             <span className={`block rounded-full ${i === current ? "size-4" : "size-3"} ${p.status === "paid" ? "bg-money" : i === current ? "bg-accent" : "bg-line"}`} />
           </button>
         ))}
+        </div>
+        </div>
+        <Button size="sm" variant="secondary" aria-label="Parte siguiente" className="hidden md:inline-flex" disabled={current === n - 1} onClick={() => go(current + 1)}><CaretRight size={20} aria-hidden="true" /></Button>
       </div>
       {split.parts[current].status !== "paid" && (
         <div key={current} className="flex flex-col items-center gap-1">
@@ -339,12 +339,15 @@ function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
 function PartsView({ orderId, split, demo }: { orderId: string; split: Split; demo: boolean }) {
   const done = split.missing.length === 0;
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
-      <PageHeader
-        title={done ? "Cobro completo" : `Faltan ${split.missing.length} de ${split.parts.length}`}
-        lead={done ? "Todas las partes están pagadas." : "Cada parte se paga con su propio QR; el cobro se completa al pagar todas."}
-        action={demo ? <DataBadge /> : undefined}
-      />
+    <div className="mx-auto flex max-w-4xl flex-col gap-6 py-2">
+      {done ? (
+        <PageHeader title="Cobro completo" lead="Todas las partes están pagadas." action={demo ? <DataBadge /> : undefined} />
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-[length:var(--text-xl)] leading-tight">{`Faltan ${split.missing.length} de ${split.parts.length}`}</h1>
+          {demo && <DataBadge />}
+        </div>
+      )}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
         {done ? (
           <section className="flex flex-col items-center gap-3 rounded-lg bg-ok p-8 text-ok-ink">
