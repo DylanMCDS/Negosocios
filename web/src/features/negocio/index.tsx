@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import QRCode from "qrcode";
 import { CheckCircle, Printer, WarningCircle } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
@@ -9,7 +9,7 @@ import { BUSINESS_CHANGED, DEMO_BUSINESS_NAME, listMyBusinesses, setActiveBusine
 import { clabeComplete, clabeError } from "./clabe";
 
 const field =
-  "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:tracking-tighter placeholder:font-normal placeholder:text-ink-2";
+  "h-14 w-full rounded-md border border-line bg-surface px-2 text-[length:var(--text-body)] font-display placeholder:text-[length:var(--text-s)] placeholder:font-sans placeholder:font-normal placeholder:tracking-normal placeholder:text-ink-2";
 
 const publicId = () => new URLSearchParams(window.location.search).get("negocio");
 const profileUrl = (id: string) => `${window.location.origin}/?negocio=${encodeURIComponent(id)}#negocio`;
@@ -137,7 +137,7 @@ function AltaForm({ onCreated, onCancel }: { onCreated: (b: Business) => void; o
   );
 }
 
-function Perfil({ business, owner }: { business: Business; owner: boolean }) {
+function Perfil({ business, owner, extra }: { business: Business; owner: boolean; extra?: ReactNode }) {
   const info = (
     <Surface className="flex max-w-xl flex-col gap-4">
       <a href="#cobrar" className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4">
@@ -155,9 +155,10 @@ function Perfil({ business, owner }: { business: Business; owner: boolean }) {
     </Surface>
   );
   if (!owner) return <PageLayout>{info}</PageLayout>;
+  // QR (the hero) on the left from 1024 px; Mis puestos + info on the right. On a phone the short list comes first.
   return (
-    <PageLayout aside={info}>
-      <div className="flex flex-col items-center gap-6 rounded-lg bg-tint p-6">
+    <div className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_400px]">
+      <div className="flex min-w-0 flex-col items-center gap-6 rounded-lg bg-tint p-6">
         <div className="w-full max-w-[480px] rounded-md bg-surface p-4">
           <FixedQr value={profileUrl(business.id)} />
         </div>
@@ -166,7 +167,11 @@ function Perfil({ business, owner }: { business: Business; owner: boolean }) {
           Imprimir
         </Button>
       </div>
-    </PageLayout>
+      <aside className="order-first flex min-w-0 flex-col gap-6 lg:order-none">
+        {extra}
+        {info}
+      </aside>
+    </div>
   );
 }
 
@@ -175,7 +180,7 @@ function MisPuestos({ activeId, onNew }: { activeId: string | null; onNew: () =>
   const mine = listMyBusinesses();
   const rows = [...mine.map((b) => ({ id: b.id as string | null, name: b.name })), { id: null as string | null, name: DEMO_BUSINESS_NAME }];
   return (
-    <Surface className="mx-auto mt-6 flex w-full max-w-xl flex-col gap-4">
+    <Surface className="flex flex-col gap-4">
       <h2 className="font-display text-[length:var(--text-l)]">Mis puestos</h2>
       <ul className="flex flex-col divide-y divide-hairline">
         {rows.map((r) => {
@@ -191,7 +196,7 @@ function MisPuestos({ activeId, onNew }: { activeId: string | null; onNew: () =>
           );
         })}
       </ul>
-      <Button variant="secondary" onClick={onNew}>+ Dar de alta otro puesto</Button>
+      <Button variant="secondary" className="self-start" onClick={onNew}>+ Dar de alta otro puesto</Button>
     </Surface>
   );
 }
@@ -231,9 +236,9 @@ export default function Negocio() {
     <>
       <PageHeader title={business ? business.name : "Alta de tu puesto"} lead={lead} />
       {failed && <p role="alert">No encontramos ese puesto.</p>}
-      {hasMine && <MisPuestos activeId={ownId} onNew={() => setCreating(true)} />}
+      {hasMine && !business && (!lookup || failed) && <div className="mx-auto mt-6 w-full max-w-xl"><MisPuestos activeId={ownId} onNew={() => setCreating(true)} /></div>}
       {business ? (
-        <Perfil business={business} owner={!viewId && business.id === ownId} />
+        <Perfil business={business} owner={!viewId && business.id === ownId} extra={hasMine ? <MisPuestos activeId={ownId} onNew={() => setCreating(true)} /> : undefined} />
       ) : (
         !lookup && !hasMine && <AltaForm onCreated={setBusiness} />
       )}
