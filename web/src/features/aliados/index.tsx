@@ -175,10 +175,10 @@ export default function Aliados() {
               const m = metrics[a.id];
               return (
                 <li key={a.id} className="flex flex-col gap-1 py-3">
-                  <div className="flex items-center gap-3">
-                    <p className="flex-1 font-semibold">{a.partner_name}</p>
-                    {a.demo && <DataBadge size="sm" />}
+                  <p className="font-semibold">{a.partner_name}</p>
+                  <div className="flex flex-wrap items-center gap-2">
                     <Chip size="sm" tone={a.status === "active" ? "ok" : "warn"}>{STATUS[a.status]}</Chip>
+                    {a.demo && <DataBadge size="sm" />}
                   </div>
                   <p className="text-ink-2">{a.role === "giver" ? `Tú das ${a.discount_pct} % de descuento a sus clientes` : `Te refiere clientes con ${a.discount_pct} % de descuento`}</p>
                   <p className="text-[length:var(--text-s)] text-ink-2">{`Quedan ${a.max_uses - a.uses} usos y ${mxn(a.budget_cents - a.budget_used_cents)} de presupuesto`}</p>

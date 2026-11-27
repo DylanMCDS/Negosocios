@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
 import { api } from "../api";
 import type { CampaignSimulation } from "../types";
 import { Button, SectionHeader, Surface } from "../ui";
@@ -33,8 +33,8 @@ const fieldOk = (key: DiscountKey, v: DiscountValues) =>
 /* Every field is always in the DOM. On a phone only the current step shows (one question at a time);
    from md up they all show. */
 export function DiscountFields({
-  values, onChange, keys,
-}: { values: DiscountValues; onChange: (key: DiscountKey, value: string) => void; keys: DiscountKey[] }) {
+  values, onChange, keys, finalAction,
+}: { values: DiscountValues; onChange: (key: DiscountKey, value: string) => void; keys: DiscountKey[]; finalAction?: ReactNode }) {
   const base = useId();
   const [step, setStep] = useState(0);
   const last = keys.length - 1;
@@ -61,15 +61,21 @@ export function DiscountFields({
           );
         })}
       </div>
-      <div className="flex gap-3 md:hidden">
-        <Button type="button" variant="secondary" size="sm" disabled={step === 0} onClick={() => setStep(step - 1)}>
-          Atrás
-        </Button>
-        <Button type="button" variant="secondary" size="sm" disabled={step === last || !fieldOk(keys[step], values)} onClick={() => setStep(step + 1)}>
-          Siguiente
-        </Button>
-        <span className="self-center text-[length:var(--text-s)] text-ink-2">{`Paso ${step + 1} de ${keys.length}`}</span>
+      <div className="flex items-center gap-3 md:hidden">
+        {step > 0 && (
+          <Button type="button" variant="secondary" size="sm" onClick={() => setStep(step - 1)}>
+            Atrás
+          </Button>
+        )}
+        {step < last && (
+          <Button type="button" disabled={!fieldOk(keys[step], values)} onClick={() => setStep(step + 1)}>
+            Siguiente
+          </Button>
+        )}
+        <span className="text-[length:var(--text-s)] text-ink-2">{`Paso ${step + 1} de ${keys.length}`}</span>
       </div>
+      {/* Always in the DOM; on a phone it only shows on the last step, so there is one primary action at a time. */}
+      {finalAction && <div className={`${step === last ? "flex" : "hidden"} flex-col md:flex`}>{finalAction}</div>}
     </div>
   );
 }
@@ -162,11 +168,15 @@ export function PromoSimulator() {
         <SectionHeader title="Simulador de promoción" size="sm" />
         <p className="pt-2 font-display text-[length:var(--text-l)]">¿Cuánto descuento puedo dar sin perder?</p>
       </div>
-      <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); refresh(); }}>
-        <DiscountFields values={values} keys={["price", "cost", "margin", "budget"]} onChange={(k, v) => setValues((o) => ({ ...o, [k]: v }))} />
-        <Button type="submit" disabled={!ready}>Calcular</Button>
-      </form>
       <PromoResult values={values} sim={sim} error={error} />
+      <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); refresh(); }}>
+        <DiscountFields
+          values={values}
+          keys={["price", "cost", "margin", "budget"]}
+          onChange={(k, v) => setValues((o) => ({ ...o, [k]: v }))}
+          finalAction={<Button type="submit" disabled={!ready}>Calcular</Button>}
+        />
+      </form>
     </Surface>
   );
 }

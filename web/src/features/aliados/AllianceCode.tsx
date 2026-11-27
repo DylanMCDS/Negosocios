@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { ShareNetwork } from "@phosphor-icons/react";
 import QRCode from "qrcode";
-import { Button } from "../../lib/ui";
 
 // Same pattern as the other QR screens, copied here so this feature does not import another task's folder.
 function CodeQr({ value }: { value: string }) {
@@ -34,7 +33,13 @@ export default function AllianceCode({ code }: { code: string }) {
         <p className="text-[length:var(--text-s)] text-ink-2">Código para tus clientes</p>
         <p className="break-all font-display text-[length:var(--text-xl)] tracking-wide">{code}</p>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" size="sm" onClick={() => void copy()}>{copied ? "Copiado" : "Copiar"}</Button>
+          <button
+            type="button"
+            onClick={() => void copy()}
+            className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-surface px-4 font-display text-[length:var(--text-s)] text-accent hover:bg-hairline"
+          >
+            {copied ? "Copiado" : "Copiar"}
+          </button>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(text)}`}
             target="_blank"
