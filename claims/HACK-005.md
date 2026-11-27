@@ -15,4 +15,4 @@ Task-Base: 07eff25e9f961a824e8df5cdd019320367e07d9c
 Next: /uak-design-lock: direcciones con capturas, Dylan elige
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 28
