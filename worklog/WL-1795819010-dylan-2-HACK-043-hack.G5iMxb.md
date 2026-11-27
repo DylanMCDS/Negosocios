@@ -15,3 +15,4 @@
 - 1795820293 | REVIEW | dylan-3 | review; reject; SHA 38a3984db3d6f23a295c2a0ec23eadf93b89ff79; reviewer dylan-3 | Harness: unknown | Model: unknown
 - 1795821144 | REVIEW | dylan-2 | heartbeat; lease until 1795835544 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795821176 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/43; evidence: uv run pytest app/tests/test_alliances_demo_accept.py + npm --prefix web test -- --run src/features/aliados src/features/cierre src/lib/discount + build + design-lint exit 0; ejemplo concreto en los 5 campos con 2 tests nuevos; design-critic SHIP 38a3984 (cambio visual: una linea de ayuda por campo) · red at ead47e1: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
+- 1795821498 | REVIEW | dylan-5 | review; approve; SHA 848ec19ba0c7cabaf1e0025535d9dc902cf3789a; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
