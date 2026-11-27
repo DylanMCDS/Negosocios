@@ -52,7 +52,7 @@ function PushToPhone({ orderId }: { orderId: string }) {
     }
   };
   if (!open) {
-    return <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>Enviar al celular del cliente</Button>;
+    return <Button variant="secondary" size="sm" aria-label="Enviar al celular del cliente" onClick={() => setOpen(true)}>Pedir por celular</Button>;
   }
   return (
     <div className="flex flex-col gap-2">
@@ -61,8 +61,8 @@ function PushToPhone({ orderId }: { orderId: string }) {
         <input className="min-h-14 rounded-lg border border-line bg-white px-4 text-ink" inputMode="numeric" value={phone} maxLength={14} onChange={(e) => setPhone(e.target.value)} />
       </label>
       <Button variant="secondary" size="sm" onClick={() => void send()} disabled={digits.length !== 10}>Enviar</Button>
-      {state.kind === "sent" && <p aria-live="polite">{`Enviamos el cobro al celular terminado en ${state.last4}. Tu cliente lo aprueba en su app.`}</p>}
-      {state.kind === "error" && <p role="alert">No pudimos enviar el cobro al celular. Muestra el QR.</p>}
+      {state.kind === "sent" && <p aria-live="polite" className="rounded-md bg-ok p-3 text-ok-ink">{`Enviamos el cobro al celular terminado en ${state.last4}. Tu cliente lo aprueba en su app.`}</p>}
+      {state.kind === "error" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">No pudimos enviar el cobro al celular. Muestra el QR.</p>}
     </div>
   );
 }
