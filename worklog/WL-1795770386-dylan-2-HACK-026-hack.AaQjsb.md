@@ -13,3 +13,4 @@
 - 1795770499 | AVAILABLE | dylan-2 | release; claim released by dylan-2; reason: -; summary kept | Harness: unknown | Model: unknown
 - 1795770968 | CLAIMED | dylan-2 | claim; next: read Cobrar and alliances API, write 3 tests, red | Harness: unknown | Model: unknown
 - 1795771190 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/30; evidence: npm --prefix web test -- --run src/features/aliados src/features/cobrar: all passed (3 named + 2 extra tests; earlier Cobrar tests unchanged); build exit 0; lint 0 errors; design-critic SHIP b9166cf; red at f28a535 (stub) · red at f28a535: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
+- 1795771494 | REVIEW | dylan-5 | review; approve; SHA b9166cfc3fc66b800b092168004ca45a36dd6389; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
