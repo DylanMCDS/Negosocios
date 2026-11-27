@@ -16,7 +16,7 @@ Next: when the human ran UAK_HUMAN=NAME uak allow HACK-024 --tests --reason ... 
 PR: https://github.com/DylanMCDS/Negosocios/pull/27
 Evidence: npm --prefix web test -- --run src/features/explorar: 4 passed; build exit 0; lint 0 errors; design-critic SHIP 107f507; red at a4bca45 (stub); screenshots 1280/390 with real OSM tiles · red at a4bca45: exit 1 (no assertion line recognized: the reviewer reads the log)
 Participants: author dylan-2 (unknown); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown); author dylan-2 (claude-sonnet-5-5); merged-by dylan-5 (claude-sonnet-5-5); integrated-by dylan (claude-opus-5-5)
-Events: 14
+Events: 15
 Checkpoints: 1
 Sessions: 4
 Last-Checkpoint: 1795799588
