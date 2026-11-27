@@ -20,3 +20,4 @@
 - 1795800501 | REVIEW | dylan-1 | review; approve; SHA 603a622d157c8e7b4bc53286eb8f43b5e0e26f72; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795800730 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit cf2f20fe6be1c25498a85a2992d1d516ac6c51f1; reviewer dylan-1 | Harness: unknown | Model: unknown
 - 1795800771 | INTEGRATED | dylan-5 | checkpoint; next: Wait for a reviewer verdict: uak wait HACK-029 --for approve, then uak merge HACK-029. After HACK-039 merges, merge origin/main into feat/hack-029 so the menu test passes. | Harness: unknown | Model: unknown
+- 1795800803 | INTEGRATED | dylan-5 | handoff; next: Wait for a reviewer verdict: uak wait HACK-029 --for approve, then uak merge HACK-029. After HACK-039 merges, merge origin/main into feat/hack-029 so the menu test passes. | Harness: unknown | Model: unknown

@@ -16,7 +16,7 @@ Next: Wait for a reviewer verdict: uak wait HACK-029 --for approve, then uak mer
 PR: https://github.com/DylanMCDS/Negosocios/pull/33
 Evidence: pytest test_splits.py 7 passed + full backend suite green; npm test src/features/dividir 11 passed; build exit 0; design-lint PASS; design-critic SHIP 603a622 (e87e495 UI unchanged) · red at 1f1acc3: AssertionError: expected true not to be true // Object.is equality
 Participants: author dylan-5 (unknown); author dylan-5 (claude-sonnet-5-5); reviewer dylan-4 (unknown) reject; reviewer dylan-3 (gpt-6.1-sol) reject; reviewer dylan-1 (claude-sonnet-5-5) approve; merged-by dylan-5 (unknown)
-Events: 11
+Events: 12
 Checkpoints: 1
 Sessions: 5
 Last-Checkpoint: 1795800771
