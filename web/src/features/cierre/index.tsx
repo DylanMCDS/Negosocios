@@ -5,6 +5,7 @@ import type { CampaignSimulation, Closing } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat, Surface } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
 import { getBusinessId } from "../negocio/businessId";
+import Recomendaciones from "./Recomendaciones";
 
 const DEMO_BUSINESS_ID = "rosa"; // negocio de la jornada de ejemplo cuando aún no hay alta en este navegador
 
@@ -148,6 +149,7 @@ export default function Cierre() {
                 Los pendientes no suman a tus ventas.
               </p>
             </section>
+            <Recomendaciones businessId={getBusinessId() ?? DEMO_BUSINESS_ID} />
           </>
         )}
       </PageLayout>

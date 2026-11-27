@@ -1,0 +1,11 @@
+{
+  "demo_data": true,
+  "note": "Historial demo en días relativos a la fecha de carga (days_ago). La renta cubre ~12 semanas para tener 3 pagos mensuales; lo demás cabe en 6 semanas.",
+  "business_id": "rosa",
+  "expenses": [
+    {"description": "Renta del local", "category": "Puesto", "amount_cents": 120000, "days_ago": [86, 55, 25]},
+    {"description": "Tortillas", "category": "Insumos", "amounts_cents": [10000, 10000, 10000, 10000, 10000, 11800], "days_ago": [35, 28, 21, 14, 7, 0]},
+    {"description": "Hielo", "category": "Insumos", "amount_cents": 4500, "days_ago": [41, 34, 27, 20, 13, 6]},
+    {"description": "Gas", "category": "Insumos", "amount_cents": 28000, "days_ago": [40, 26, 12]}
+  ]
+}
