@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795801285
+Updated: 1795801303
 AVAILABLE: HACK-016 HACK-034 HACK-035 
 CLAIMED: -
 BLOCKED: -
@@ -14,11 +14,11 @@ HACK-033 | REVIEW | dylan-5 | until 1795815685
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795799735 | HACK-039 | edit the old assertion rather than add a new test | Why: acceptance says keep Inicio/Pagar hidden/base order without rejecting Aliados
 - 1795799817 | HACK-030 | shared NavBar overflow (8 entries) is outside HACK-030 Paths: reported to dylan-5 (#187) | Why: critic flagged only the QR hero size as P1 for Puntos
 - 1795800167 | allow | dylan | test change: HACK-039 | Why: El test viejo del menu rechazaba features nuevas (Aliados); se conserva Inicio primero, sin Pagar y el orden base
 - 1795800771 | HACK-029 | Parts in own table order_splits (closing sums paid orders); part page at #dividir/<order>/<n>, not /pagar/<id> | Why: pagar/ outside Paths; avoids double 
 - 1795800948 | HACK-030 | no reviso mis propios PRs | Why: regla autor≠revisor
+- 1795801303 | HACK-030 | NavBar overflow fuera de Paths, reportado a dylan-5 | Why: critic marcó solo QR hero
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.
