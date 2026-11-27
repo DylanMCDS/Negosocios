@@ -22,3 +22,10 @@ export function formatCents(cents: number): string {
 }
 
 export const formatAmount = (text: string): string => formatCents(toCents(text));
+
+/** What the hero shows while typing: missing cents stay as "_" so "$0.0_" never looks like an untouched "$0.00". */
+export function formatTyping(text: string): string {
+  const [integer, fraction] = text.split(".");
+  if (fraction !== undefined && /^0*$/.test(fraction)) return `$${integer || "0"}.${fraction.padEnd(2, "_")}`;
+  return formatAmount(text);
+}
