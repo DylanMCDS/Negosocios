@@ -1,0 +1,160 @@
+"""Alianzas entre negocios: descuento acotado por finance.max_discount, presupuesto y usos reservados atómicamente.
+
+Un descuento nunca puede dejar al negocio que lo da por debajo de su contribución mínima. Las métricas
+muestran correlación observada (compras pagadas con un código de alianza), no causalidad.
+"""
+import secrets
+import sqlite3
+import uuid
+from datetime import UTC, datetime
+from decimal import ROUND_FLOOR, Decimal
+
+from fastapi import HTTPException
+
+from app.services import finance
+
+NOTE = "Estimación basada en una correlación observada entre la alianza y compras pagadas; no demuestra causalidad."
+
+
+def ensure_tables(conn: sqlite3.Connection) -> None:
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS alliances (
+            id TEXT PRIMARY KEY NOT NULL,
+            business_a TEXT NOT NULL REFERENCES businesses(id),
+            business_b TEXT NOT NULL REFERENCES businesses(id),
+            giver TEXT NOT NULL REFERENCES businesses(id),
+            status TEXT NOT NULL DEFAULT 'proposal' CHECK (status IN ('proposal', 'active', 'closed')),
+            discount_pct REAL NOT NULL CHECK (discount_pct > 0 AND discount_pct <= 100),
+            price_cents INTEGER NOT NULL, variable_cost_cents INTEGER NOT NULL, min_contribution_cents INTEGER NOT NULL,
+            budget_cents INTEGER NOT NULL, budget_used_cents INTEGER NOT NULL DEFAULT 0,
+            max_uses INTEGER NOT NULL, uses INTEGER NOT NULL DEFAULT 0,
+            referral_code TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL,
+            CHECK (business_a <> business_b)
+        );
+        CREATE TABLE IF NOT EXISTS referrals (
+            id TEXT PRIMARY KEY NOT NULL,
+            alliance_id TEXT NOT NULL REFERENCES alliances(id),
+            order_id TEXT NOT NULL,
+            original_cents INTEGER NOT NULL, discount_cents INTEGER NOT NULL, total_cents INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            UNIQUE (alliance_id, order_id)
+        );
+    """)
+
+
+def _get(conn, alliance_id: str) -> sqlite3.Row:
+    row = conn.execute("SELECT * FROM alliances WHERE id = ?", (alliance_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404, "Alianza no encontrada")
+    return row
+
+
+def _view(row: sqlite3.Row) -> dict:
+    return dict(row)
+
+
+def propose(conn, data: dict) -> dict:
+    a, b, giver = data["business_a"], data["business_b"], data["giver"]
+    if a == b:
+        raise HTTPException(422, "Una alianza necesita dos negocios distintos")
+    if giver not in (a, b):
+        raise HTTPException(422, "El negocio que da el descuento debe ser parte de la alianza")
+    for bid in (a, b):
+        if conn.execute("SELECT 1 FROM businesses WHERE id = ?", (bid,)).fetchone() is None:
+            raise HTTPException(404, "Negocio no encontrado")
+    limit = finance.max_discount(data["price_cents"], data["variable_cost_cents"], data["min_contribution_cents"])
+    pct = data["discount_pct"]
+    if not limit["ok"] or pct > limit["max_discount_pct"]:
+        top = limit["max_discount_pct"]
+        message = (f"Un descuento de {pct} % deja al negocio por debajo de su contribución mínima; "
+                   + (f"el máximo es {top} %." if limit["ok"] else limit["message"] + "."))
+        raise HTTPException(422, {
+            "message": message, "max_discount_pct": top, "formula": finance_formula(),
+            "price_cents": data["price_cents"], "variable_cost_cents": data["variable_cost_cents"],
+            "min_contribution_cents": data["min_contribution_cents"],
+        })
+    row = {**data, "id": f"al-{uuid.uuid4().hex[:10]}", "referral_code": secrets.token_hex(4).upper(),
+           "created_at": datetime.now(UTC).isoformat()}
+    conn.execute(
+        "INSERT INTO alliances (id, business_a, business_b, giver, discount_pct, price_cents, variable_cost_cents,"
+        " min_contribution_cents, budget_cents, max_uses, referral_code, created_at) VALUES (:id, :business_a,"
+        " :business_b, :giver, :discount_pct, :price_cents, :variable_cost_cents, :min_contribution_cents,"
+        " :budget_cents, :max_uses, :referral_code, :created_at)", row)
+    conn.commit()
+    return _view(_get(conn, row["id"]))
+
+
+def finance_formula() -> str:
+    return "100 * (1 - (variable_cost_cents + min_contribution_cents) / price_cents)"
+
+
+def accept(conn, alliance_id: str) -> dict:
+    conn.execute("BEGIN IMMEDIATE")
+    row = _get(conn, alliance_id)
+    if row["status"] != "proposal":
+        conn.rollback()
+        raise HTTPException(409, "Sólo una propuesta se puede aceptar")
+    conn.execute("UPDATE alliances SET status = 'active' WHERE id = ?", (alliance_id,))
+    conn.commit()
+    return _view(_get(conn, alliance_id))
+
+
+def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
+    """Reserva el beneficio una sola vez por orden; presupuesto y usos se descuentan en la misma transacción."""
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        row = _get(conn, alliance_id)
+        if row["status"] != "active":
+            raise HTTPException(409, "La alianza no está activa")
+        prior = conn.execute(
+            "SELECT * FROM referrals WHERE alliance_id = ? AND order_id = ?", (alliance_id, order_id)).fetchone()
+        if prior is not None:
+            return _result(row, True, prior["original_cents"], prior["discount_cents"], None)
+        discount = int((Decimal(amount_cents) * Decimal(str(row["discount_pct"])) / 100).to_integral_value(ROUND_FLOOR))
+        reason = None
+        if row["uses"] >= row["max_uses"]:
+            reason = "Se agotaron los usos de la alianza"
+        elif row["budget_used_cents"] + discount > row["budget_cents"]:
+            reason = "El presupuesto de la alianza no alcanza para este descuento"
+        if reason is not None:
+            return _result(row, False, amount_cents, 0, reason)
+        conn.execute(
+            "INSERT INTO referrals (id, alliance_id, order_id, original_cents, discount_cents, total_cents, created_at)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (f"rf-{uuid.uuid4().hex[:10]}", alliance_id, order_id, amount_cents, discount, amount_cents - discount,
+             datetime.now(UTC).isoformat()))
+        conn.execute("UPDATE alliances SET uses = uses + 1, budget_used_cents = budget_used_cents + ? WHERE id = ?",
+                     (discount, alliance_id))
+        fresh = _get(conn, alliance_id)
+        return _result(fresh, True, amount_cents, discount, None)
+    finally:
+        conn.commit()
+
+
+def _result(row, applied: bool, original: int, discount: int, reason: str | None) -> dict:
+    return {
+        "applied": applied, "original_cents": original, "discount_cents": discount, "total_cents": original - discount,
+        "budget_remaining_cents": row["budget_cents"] - row["budget_used_cents"],
+        "uses_remaining": row["max_uses"] - row["uses"], "reason": reason, "currency": "MXN",
+    }
+
+
+def metrics(conn, alliance_id: str) -> dict:
+    row = _get(conn, alliance_id)
+    refs = conn.execute("SELECT * FROM referrals WHERE alliance_id = ?", (alliance_id,)).fetchall()
+    paid_total = paid_count = contribution = 0
+    for ref in refs:
+        order = conn.execute(
+            "SELECT amount_cents FROM orders WHERE business_id = ? AND status = 'paid' AND (id = ? OR idempotency_key = ?)",
+            (row["giver"], ref["order_id"], ref["order_id"])).fetchone()
+        if order is None:
+            continue
+        paid_count += 1
+        paid_total += order["amount_cents"]
+        cost = row["variable_cost_cents"] * ref["original_cents"] // row["price_cents"]
+        contribution += order["amount_cents"] - cost
+    return {
+        "alliance_id": alliance_id, "referrals": len(refs), "paid_purchases": paid_count,
+        "paid_sales_cents": paid_total, "benefit_cost_cents": sum(r["discount_cents"] for r in refs),
+        "estimated_contribution_cents": contribution, "currency": "MXN", "note": NOTE,
+    }
