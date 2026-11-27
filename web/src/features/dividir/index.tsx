@@ -194,33 +194,38 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
 
 function PartsView({ orderId, split }: { orderId: string; split: Split }) {
   const done = split.missing.length === 0;
+  // The next part to pay is the hero: one big QR; the rest are compact rows.
+  const hero = split.parts.find((p) => p.status !== "paid" && p.qr_string);
   return (
     <div className={shell}>
       <PageHeader
         title={done ? "Cobro completo" : `Faltan ${split.missing.length} de ${split.parts.length}`}
         lead={done ? "Todas las partes están pagadas." : "Cada parte se paga con su propio QR; el cobro se completa al pagar todas."}
       />
-      <Stat label="Pagado hasta ahora" value={mxn(split.paid_cents)} unit={`de ${mxn(split.total_cents)}`} hero />
-      <ul className="flex flex-col gap-6">
+      {hero && hero.qr_string && (
+        <section className="flex flex-col items-center gap-4 rounded-lg bg-tint p-6">
+          <p className="text-[length:var(--text-s)] text-ink-2">{`Ahora: parte ${hero.idx}`}</p>
+          <p className="font-display text-[length:var(--text-xl)] leading-none">{mxn(hero.amount_cents)}</p>
+          <div className="w-full rounded-md bg-surface p-4">
+            <QrCubes value={hero.qr_string} label={`Código QR de la parte ${hero.idx}`} className="mx-auto max-w-[360px]" />
+          </div>
+          <a className="underline underline-offset-4" href={`#dividir/${orderId}/${hero.idx}`}>Abrir página de pago</a>
+        </section>
+      )}
+      <Stat label="Pagado hasta ahora" value={mxn(split.paid_cents)} unit={`de ${mxn(split.total_cents)}`} size="sm" />
+      <ul className="flex flex-col divide-y divide-hairline">
         {split.parts.map((p) => (
-          <li key={p.idx}>
-            <Surface className="flex flex-col gap-4">
-              <div className="flex items-center gap-4">
-                <p className="flex-1 font-semibold">{`Parte ${p.idx}`}</p>
-                <p className="font-display">{mxn(p.amount_cents)}</p>
-                {p.status === "paid" ? (
-                  <Chip tone="ok" size="sm"><CheckCircle size={16} className="mr-1" aria-hidden="true" />Pagado</Chip>
-                ) : (
-                  <Chip size="sm">Pendiente</Chip>
-                )}
-              </div>
-              {p.status !== "paid" && p.qr_string && (
-                <div className="flex flex-col items-center gap-3 rounded-lg bg-tint p-4">
-                  <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} />
-                  <a className="underline underline-offset-4" href={`#dividir/${orderId}/${p.idx}`}>Abrir página de pago</a>
-                </div>
-              )}
-            </Surface>
+          <li key={p.idx} className="flex min-h-16 items-center gap-4 py-3">
+            {p.status !== "paid" && p.qr_string && p.idx !== hero?.idx ? (
+              <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="max-w-[88px] shrink-0" />
+            ) : null}
+            <p className="flex-1 font-semibold">{`Parte ${p.idx}`}</p>
+            <p className="font-display">{mxn(p.amount_cents)}</p>
+            {p.status === "paid" ? (
+              <Chip tone="ok" size="sm"><CheckCircle size={16} className="mr-1" aria-hidden="true" />Pagado</Chip>
+            ) : (
+              <Chip size="sm">Pendiente</Chip>
+            )}
           </li>
         ))}
       </ul>
