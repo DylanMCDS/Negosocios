@@ -92,3 +92,15 @@ describe("Horario del perfil público", () => {
     expect(screen.getByRole("link", { name: "Paga aquí con CoDi" })).toHaveAttribute("href", "#cobrar");
   });
 });
+
+describe("Mis puestos", () => {
+  it("can_register_a_second_business", async () => {
+    localStorage.setItem(BUSINESS_KEY, business.id);
+    localStorage.setItem("negosocios.businesses", JSON.stringify([{ id: business.id, name: business.name }]));
+    render(<Negocio />);
+    expect(await screen.findByText(/Mis puestos/)).toBeInTheDocument();
+    expect(screen.getByText(/Tacos de Doña Rosa \(demo\)/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Dar de alta otro puesto/ }));
+    expect(screen.getByLabelText("Nombre del puesto")).toHaveValue("");
+  });
+});

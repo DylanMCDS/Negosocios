@@ -1,8 +1,9 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle, Clock, Warning } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
-import type { CampaignSimulation, Closing } from "../../lib/types";
-import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat, Surface } from "../../lib/ui";
+import { PromoSimulator } from "../../lib/discount";
+import type { Closing } from "../../lib/types";
+import { Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
 import { getBusinessId } from "../negocio/businessId";
 import Recomendaciones from "./Recomendaciones";
@@ -13,81 +14,6 @@ const MISSING_TEXT: Record<string, string> = {
   sales: "Faltan tus ventas cobradas",
   expenses: "Faltan tus gastos",
 };
-
-const toCents = (pesos: string) => Math.round(Number(pesos.replace(",", ".")) * 100);
-const field =
-  "h-14 w-full rounded-md border border-line bg-surface px-4 text-[length:var(--text-body)] font-display";
-
-function Simulador() {
-  const [values, setValues] = useState({ price: "", cost: "", margin: "", budget: "" });
-  const [result, setResult] = useState<CampaignSimulation | null>(null);
-  const [error, setError] = useState(false);
-  const set = (key: keyof typeof values) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setValues((v) => ({ ...v, [key]: e.target.value }));
-  const valid = Object.values(values).every((v) => v.trim() !== "" && Number.isFinite(toCents(v))) && toCents(values.price) > 0;
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    setError(false);
-    try {
-      setResult(
-        await api<CampaignSimulation>("/campaigns/simulate", {
-          method: "POST",
-          body: JSON.stringify({
-            price_cents: toCents(values.price),
-            variable_cost_cents: toCents(values.cost),
-            min_contribution_cents: toCents(values.margin),
-            budget_cents: toCents(values.budget),
-            currency: "MXN",
-          }),
-        }),
-      );
-    } catch {
-      setResult(null);
-      setError(true);
-    }
-  }
-
-  const labeled = (id: keyof typeof values, label: string) => (
-    <label className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
-      {label}
-      <input className={field} inputMode="decimal" value={values[id]} onChange={set(id)} />
-    </label>
-  );
-
-  return (
-    <Surface className="flex flex-col gap-6">
-      <SectionHeader title="Simulador de promoción" size="sm" />
-      <form className="grid grid-cols-2 gap-4" onSubmit={submit}>
-        {labeled("price", "Precio")}
-        {labeled("cost", "Costo")}
-        {labeled("margin", "Ganancia mínima")}
-        {labeled("budget", "Presupuesto")}
-        <Button type="submit" className="col-span-2" disabled={!valid}>Calcular</Button>
-      </form>
-      {error && <p role="alert">No pudimos calcular. Intenta de nuevo.</p>}
-      {result && (
-        <div className="flex flex-col gap-2" aria-live="polite">
-          {result.ok && result.max_discount_pct !== null ? (
-            <>
-              <p className="font-display text-[length:var(--text-l)]">
-                {`Puedes dar hasta ${result.max_discount_pct.toLocaleString("es-MX")} % de descuento`}
-              </p>
-              <p className="text-ink-2">
-                {`Cuenta: ${mxn(toCents(values.price))} − ${mxn(toCents(values.cost) + toCents(values.margin))} (costo + ganancia) = ${mxn(toCents(values.price) - toCents(values.cost) - toCents(values.margin))}, o sea ${result.max_discount_pct.toLocaleString("es-MX")} % del precio.`}
-              </p>
-              {result.max_uses !== null && (
-                <p>{`Tu presupuesto de ${mxn(result.budget_cents)} alcanza para ${result.max_uses} usos.`}</p>
-              )}
-            </>
-          ) : (
-            <p className="font-display text-[length:var(--text-body)]">{result.message ?? "No hay descuento posible."}</p>
-          )}
-        </div>
-      )}
-    </Surface>
-  );
-}
 
 export default function Cierre() {
   const [closing, setClosing] = useState<Closing | null>(null);
@@ -101,7 +27,7 @@ export default function Cierre() {
   return (
     <>
       <PageHeader title="Cierre del día" lead="Cobros con CoDi y gastos de hoy" action={demo ? <DataBadge /> : undefined} />
-      <PageLayout aside={<Simulador />}>
+      <PageLayout aside={<PromoSimulator />}>
         {failed && <p role="alert">No pudimos cargar tu cierre. Intenta de nuevo.</p>}
         {!closing && !failed && <p className="text-ink-2">Cargando tu día…</p>}
         {closing && (
