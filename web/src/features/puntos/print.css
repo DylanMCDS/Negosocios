@@ -1,8 +1,7 @@
 @media print {
-  body[data-print-point] * { visibility: hidden; }
-  body[data-print-point] [data-point-print],
-  body[data-print-point] [data-point-print] * { visibility: visible; }
-  body[data-print-point] [data-point-print] {
+  body[data-print-point] > :not([data-point-print-copy]) { display: none !important; }
+  body[data-print-point] > [data-point-print-copy] {
+    display: flex !important;
     position: fixed;
     inset: 0;
     padding: 16mm;

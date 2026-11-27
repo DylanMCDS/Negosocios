@@ -51,4 +51,20 @@ describe("Puntos", () => {
     await waitFor(() => expect(document.querySelector("[data-point-print]")).toHaveTextContent("Tacos de Rosa"));
     print.mockRestore();
   });
+
+  it("prints_one_isolated_sticker_and_cleans_up_after_printing", async () => {
+    vi.mocked(api).mockImplementation(async (path) => path.startsWith("/points/pending-orders") ? [] : { business, points: [point] });
+    const print = vi.spyOn(window, "print").mockImplementation(() => undefined);
+    try {
+      render(<Puntos />);
+      await screen.findByRole("img", { name: "QR del punto Caja principal" });
+      fireEvent.click(screen.getByRole("button", { name: "Imprimir QR" }));
+      expect(document.querySelectorAll("[data-point-print-copy]")).toHaveLength(1);
+      expect(document.querySelector("[data-point-print-copy]")).toHaveTextContent("Tacos de Rosa");
+      fireEvent(window, new Event("afterprint"));
+      expect(document.querySelectorAll("[data-point-print-copy]")).toHaveLength(0);
+      expect(document.body.dataset.printPoint).toBeUndefined();
+      expect(screen.getByRole("img", { name: "QR del punto Caja principal" })).toBeInTheDocument();
+    } finally { print.mockRestore(); }
+  });
 });

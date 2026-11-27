@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.db import connect, init_db
 from app.main import create_app
+from app.routers import points as points_router
 from app.routers.points import get_now
 
 NOW = datetime(2026, 11, 27, 18, tzinfo=UTC)
@@ -162,3 +163,14 @@ def test_identifiers_are_random_and_validation_is_strict(api):
     listed = client.get("/api/points", params={"business_id": BUSINESS})
     assert listed.status_code == 200
     assert {p["id"] for p in listed.json()["points"]} == {first["id"], second["id"]}
+
+
+def test_payment_destination_serves_existing_spa_shell(api, tmp_path, monkeypatch):
+    client, _ = api
+    index = tmp_path / "index.html"
+    index.write_text("<html><body>existing-payment-screen</body></html>")
+    monkeypatch.setattr(points_router, "SPA_INDEX", index, raising=False)
+    response = client.get("/pagar/point-order")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    assert "existing-payment-screen" in response.text

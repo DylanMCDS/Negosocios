@@ -1,15 +1,17 @@
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Annotated
 from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 
 from app.config import Settings, get_settings
 from app.services import points
 from app.services.points import PointCreate, PointOrder
 
 router = APIRouter()
+SPA_INDEX = Path(__file__).resolve().parents[2] / "web" / "dist" / "index.html"
 
 
 def get_now():
@@ -63,3 +65,13 @@ def open_point(point_id: str, settings: Annotated[Settings, Depends(get_settings
             raise
         destination = f"/#puntos/{quote(point_id, safe='')}"
     return RedirectResponse(destination, status_code=303, headers=points.NO_STORE)
+
+
+@router.get("/pagar/{order_id}", include_in_schema=False)
+def payment_screen(order_id: str):
+    # StaticFiles does not serve SPA deep links. The existing Pagar component
+    # reads this path and loads the order/receiver through its normal API.
+    # The path parameter never selects a file: only this fixed shell is served.
+    if not SPA_INDEX.is_file():
+        raise HTTPException(503, "Esta pantalla no está disponible. Pide al negocio otro enlace.")
+    return FileResponse(SPA_INDEX, headers=points.NO_STORE)

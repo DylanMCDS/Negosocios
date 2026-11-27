@@ -16,6 +16,10 @@ const KIND: Record<Kind, string> = { entrance: "Entrada", cashier: "Caja", table
 const pesos = (cents: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(cents / 100);
 const NFC_GUIDE = "https://www.wakdev.com/en/knowledge-base/how-to-guides/how-to-write-a-link-url-on-an-nfc-chip.html";
 const field = "h-14 w-full min-w-0 rounded-md border border-line bg-surface px-4 text-ink";
+const clearPrint = () => {
+  document.querySelectorAll("[data-point-print-copy]").forEach((node) => node.remove());
+  delete document.body.dataset.printPoint;
+};
 
 function PointQr({ value, label }: { value: string; label: string }) {
   const { size, data } = useMemo(() => QRCode.create(value, { errorCorrectionLevel: "M" }).modules, [value]);
@@ -93,9 +97,8 @@ function ManagePoints() {
     return () => { alive = false; };
   }, []);
   useEffect(() => {
-    const cleanupPrint = () => { delete document.body.dataset.printPoint; };
-    window.addEventListener("afterprint", cleanupPrint);
-    return () => { window.removeEventListener("afterprint", cleanupPrint); cleanupPrint(); };
+    window.addEventListener("afterprint", clearPrint);
+    return () => { window.removeEventListener("afterprint", clearPrint); clearPrint(); };
   }, []);
   const selected = data?.points.find((p) => p.id === selectedId);
   const url = selected ? new URL(selected.path, window.location.origin).href : "";
@@ -113,8 +116,15 @@ function ManagePoints() {
     }, "Punto creado. Puedes imprimirlo o grabarlo en NFC.");
   };
   const print = () => {
+    clearPrint();
+    const source = document.querySelector("[data-point-print]");
+    if (!source) return;
+    const copy = source.cloneNode(true) as HTMLElement;
+    copy.setAttribute("data-point-print-copy", "");
+    copy.style.display = "none";
+    document.body.append(copy);
     document.body.dataset.printPoint = "true";
-    try { window.print(); } catch { delete document.body.dataset.printPoint; setNotice("Usa la opción Imprimir de tu navegador."); }
+    try { window.print(); } catch { clearPrint(); setNotice("Usa la opción Imprimir de tu navegador."); }
   };
   const copy = async () => {
     if (!navigator.clipboard) { setNotice("Selecciona y copia el enlace."); return; }
