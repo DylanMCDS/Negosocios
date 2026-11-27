@@ -1,6 +1,6 @@
 # HACK-008
 ID: HACK-008
-State: CLAIMED
+State: REVIEW
 Owner: dylan-2
 Branch: feat/hack-008
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-008
@@ -9,14 +9,15 @@ Priority: P0
 Paths: app/routers/expenses.py, app/routers/closing.py, app/routers/campaigns.py, app/services/expenses.py, app/tests/test_closing.py
 Depends: HACK-001, HACK-002, HACK-004
 Verify: `uv run pytest -q app/tests/test_closing.py`
-Lease-Until: 1795740820
-Updated: 1795738120
+Lease-Until: 1795752585
+Updated: 1795738185
 Task-Base: 07eff25e9f961a824e8df5cdd019320367e07d9c
-Next: write Tests and red
-PR: -
-Evidence: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/5; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/5
+Evidence: uv run pytest -q app/tests (38 passed incl. 5 new in test_closing.py); red at 07eff25 on 404 assertion · red at 07eff25: E   assert 404 == 201
 Participants: author dylan-2 (unknown)
-Events: 1
+Events: 2
 Checkpoints: 0
 Sessions: 1
 Last-Checkpoint: 0
+Task-Tip: 29a8cdf44233444a6b563f8bd751552f9e1830b4
