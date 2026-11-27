@@ -265,7 +265,18 @@ export default function Cobrar() {
       {/* Mobile: amount on top, keypad under it, Cobrar fixed above the bottom nav (bottom-16 = nav height). pb leaves room for both. */}
       <div data-cobrar-page className="grid gap-6 py-6 pb-28 md:gap-8 md:py-8 md:pb-0 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex min-w-0 flex-col gap-6">
-          <Surface className={showOrder ? "order-2 flex flex-col gap-4" : "flex flex-col gap-4"}>
+              {waiting.length > 0 && (
+                <Surface className="flex flex-col gap-2 p-4" aria-live="polite">
+                  <p className="font-display">{waiting.length === 1 ? "Tienes 1 cobro pendiente" : `Tienes ${waiting.length} cobros pendientes`}</p>
+                  {waiting.map((o) => (
+                    <Button key={o.id} variant="secondary" onClick={() => openWaiting(o)}>
+                      {`${pesos(o.amount_cents)} · ${o.concept}`}
+                    </Button>
+                  ))}
+                  <a className="inline-flex min-h-11 items-center text-ink-2 underline" href="#cierre">Ir a Cierre</a>
+                </Surface>
+              )}
+          <Surface className={showOrder ? "order-2 flex flex-col gap-4 lg:order-1" : "flex flex-col gap-4"}>
             <Stat label="Importe" value={order ? pesos(order.amount_cents) : formatTyping(digits)} unit="MXN" hero />
             {showOrder && (
               <>
@@ -277,7 +288,7 @@ export default function Cobrar() {
             )}
           </Surface>
           {showOrder && order.qr_string ? (
-            <div className="order-1 relative flex justify-center rounded-lg border border-line bg-tint p-3 md:p-12">
+            <div className="order-1 relative flex justify-center rounded-lg lg:order-2 border border-line bg-tint p-3 md:p-12">
               <QrCubes value={order.qr_string} dim={phase === "paid"} />
             </div>
           ) : (
@@ -311,17 +322,6 @@ export default function Cobrar() {
             </>
           ) : (
             <>
-              {waiting.length > 0 && (
-                <Surface className="flex flex-col gap-3" aria-live="polite">
-                  <p className="font-display">{waiting.length === 1 ? "Tienes 1 cobro pendiente" : `Tienes ${waiting.length} cobros pendientes`}</p>
-                  {waiting.map((o) => (
-                    <Button key={o.id} variant="secondary" onClick={() => openWaiting(o)}>
-                      {`${pesos(o.amount_cents)} · ${o.concept}`}
-                    </Button>
-                  ))}
-                  <a className="inline-flex min-h-11 items-center text-ink-2 underline" href="#cierre">Ir a Cierre</a>
-                </Surface>
-              )}
               <Surface className="flex flex-col gap-4">
                 <label className="flex flex-col gap-2 text-ink-2">
                   Concepto
