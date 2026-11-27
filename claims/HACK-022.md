@@ -1,6 +1,6 @@
 # HACK-022
 ID: HACK-022
-State: CLAIMED
+State: REVIEW
 Owner: dylan-2
 Branch: feat/hack-022
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-022
@@ -9,10 +9,10 @@ Priority: P0
 Paths: web/src/App.tsx, web/src/lib/ui/NavBar.tsx, web/src/features/landing/nav.ts, web/src/features/cobrar/nav.ts, web/src/features/cierre/nav.ts, web/src/features/negocio/nav.ts, web/src/features/voz/nav.ts, web/src/features/pagar/nav.ts, web/src/test/nav.test.tsx
 Depends: HACK-021
 Verify: `npm --prefix web test -- --run src/test/nav.test.tsx && npm --prefix web run build`
-Lease-Until: 1795762355
-Updated: 1795759655
+Lease-Until: 1795774188
+Updated: 1795759788
 Task-Base: f5c18e3bde4365482f83a5203dc72f09fd02f642
-Next: read spec, write tests, red
-PR: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/25; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/25
 Evidence: -
 Thread-Read: 0
