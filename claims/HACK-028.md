@@ -9,10 +9,10 @@ Priority: P1
 Paths: app/services/pey.py, app/services/payments.py, app/routers/push.py, app/tests/test_push.py, web/src/features/cobrar/, docs/PEY.md
 Depends: HACK-026
 Verify: `uv run pytest -q app/tests/test_push.py app/tests/test_webhooks.py && npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build`
-Lease-Until: 1795791160
-Updated: 1795776760
+Lease-Until: 1795791175
+Updated: 1795776775
 Task-Base: 4eb7730a01de38afbafde0afe084538681d2a136
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/31; run .uak/bin/smoke
+Next: wait for HACK-028 review then uak merge HACK-028; then retry uak merge HACK-024 once the human ran uak allow HACK-024 --tests; take reviews first; claim available tasks only per uak next
 PR: https://github.com/DylanMCDS/Negosocios/pull/31
 Evidence: -
 Thread-Read: 0
