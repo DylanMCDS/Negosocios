@@ -4,8 +4,9 @@ import { api } from "../../lib/api";
 import type { CampaignSimulation, Closing } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat, Surface } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
+import { getBusinessId } from "../negocio/businessId";
 
-const BUSINESS_ID = "rosa"; // negocio de la jornada de ejemplo hasta que exista el alta (HACK-012)
+const DEMO_BUSINESS_ID = "rosa"; // negocio de la jornada de ejemplo cuando aún no hay alta en este navegador
 
 const MISSING_TEXT: Record<string, string> = {
   sales: "Faltan tus ventas cobradas",
@@ -72,7 +73,7 @@ function Simulador() {
                 {`Puedes dar hasta ${result.max_discount_pct.toLocaleString("es-MX")} % de descuento`}
               </p>
               <p className="text-ink-2">
-                {`Cuenta: ${mxn(toCents(values.price))} − (${mxn(toCents(values.cost))} costo + ${mxn(toCents(values.margin))} ganancia) = ${result.max_discount_pct.toLocaleString("es-MX")} % del precio.`}
+                {`Cuenta: ${mxn(toCents(values.price))} − ${mxn(toCents(values.cost) + toCents(values.margin))} (costo + ganancia) = ${mxn(toCents(values.price) - toCents(values.cost) - toCents(values.margin))}, o sea ${result.max_discount_pct.toLocaleString("es-MX")} % del precio.`}
               </p>
               {result.max_uses !== null && (
                 <p>{`Tu presupuesto de ${mxn(result.budget_cents)} alcanza para ${result.max_uses} usos.`}</p>
@@ -92,7 +93,7 @@ export default function Cierre() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    api<Closing>(`/closing/today?business_id=${BUSINESS_ID}`).then(setClosing, () => setFailed(true));
+    api<Closing>(`/closing/today?business_id=${encodeURIComponent(getBusinessId() ?? DEMO_BUSINESS_ID)}`).then(setClosing, () => setFailed(true));
   }, []);
 
   const demo = closing?.pending.some((o) => o.demo_data) ?? false;
