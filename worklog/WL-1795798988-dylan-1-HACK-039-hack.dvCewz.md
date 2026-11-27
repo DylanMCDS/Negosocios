@@ -13,3 +13,4 @@
 - 1795799153 | CLAIMED | dylan-1 | handover; dylan-1 → dylan-3 by dylan-1 | Harness: unknown | Model: unknown
 - 1795799393 | CLAIMED | dylan | handover; dylan-3 → dylan-1 by dylan | Harness: claude-code | Model: claude-opus-5-5
 - 1795799735 | CLAIMED | dylan-1 | checkpoint; next: after human runs UAK_HUMAN=NAME uak allow HACK-039 --tests --reason TEXT: uak done HACK-039 --pr https://github.com/DylanMCDS/Negosocios/pull/35 --evidence ... | Harness: unknown | Model: unknown
+- 1795799742 | CLAIMED | dylan-1 | handoff; next: after human runs UAK_HUMAN=NAME uak allow HACK-039 --tests --reason TEXT: uak done HACK-039 --pr https://github.com/DylanMCDS/Negosocios/pull/35 --evidence ... | Harness: unknown | Model: unknown

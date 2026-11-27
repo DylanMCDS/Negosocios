@@ -9,14 +9,14 @@ Priority: P1
 Paths: web/src/features/negocio/
 Depends: HACK-012
 Verify: `npm --prefix web test -- --run src/features/negocio && npm --prefix web run build`
-Lease-Until: 1795802435
-Updated: 1795799735
+Lease-Until: 1795802442
+Updated: 1795799742
 Task-Base: b214729f48bc336505f2cc4c1e7c8bf57568b527
 Next: after human runs UAK_HUMAN=NAME uak allow HACK-039 --tests --reason TEXT: uak done HACK-039 --pr https://github.com/DylanMCDS/Negosocios/pull/35 --evidence ...
 PR: -
 Evidence: -
 Participants: author dylan-1 (unknown); human dylan (claude-opus-5-5)
-Events: 4
+Events: 5
 Checkpoints: 1
 Sessions: 3
 Last-Checkpoint: 1795799735
