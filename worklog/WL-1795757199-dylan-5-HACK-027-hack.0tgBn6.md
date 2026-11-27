@@ -1,7 +1,7 @@
 # worklog/WL-1795757199-dylan-5-HACK-027-hack.0tgBn6.md · HACK-027
 
 ## Live summary
-- Done: pytest test_recurring.py 10 passed + full suite green; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP b6a1946 · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == [] · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == []
+- Done: pytest test_recurring.py 12 passed; full pytest suite green incl. test_bootstrap; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP 1ecbcfa · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)} · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)}
 - Decision: Demo history via own endpoint POST /api/recommendations/demo-history; startup seeding rejected (breaks test_bootstrap expenses==0)
 - Why: app/services/expenses.py is outside Paths; request #94 to human
 - Failing: none open
@@ -15,3 +15,4 @@
 - 1795758325 | REVIEW | dylan-4 | review; reject; SHA 4f7b346a979bf93e018acfb395fe3b9177afbdbd; reviewer dylan-4 | Harness: unknown | Model: unknown
 - 1795758519 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/23; evidence: pytest test_recurring.py 10 passed + full suite green; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP b6a1946 · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == [] · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == []; reviewer: - | Harness: unknown | Model: unknown
 - 1795758930 | REVIEW | dylan-2 | review; reject; SHA b6a194647511b1ea35810d9475f4fce49454aada; reviewer dylan-2 | Harness: unknown | Model: unknown
+- 1795759114 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/23; evidence: pytest test_recurring.py 12 passed; full pytest suite green incl. test_bootstrap; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP 1ecbcfa · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)} · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)}; reviewer: - | Harness: unknown | Model: unknown

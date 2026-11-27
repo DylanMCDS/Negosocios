@@ -9,15 +9,15 @@ Priority: P1
 Paths: app/services/recurring.py, app/routers/recommendations.py, app/fixtures/expenses_history_demo.json, app/tests/test_recurring.py, web/src/features/cierre/
 Depends: HACK-008
 Verify: `uv run pytest -q app/tests/test_recurring.py && npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
-Lease-Until: 1795772919
-Updated: 1795758519
+Lease-Until: 1795773514
+Updated: 1795759114
 Task-Base: 64d1e070e6d584e40e38f0496767ec8961a8d302
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/23; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/23
-Evidence: pytest test_recurring.py 10 passed + full suite green; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP b6a1946 · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == [] · red at 4f7b346: E   AssertionError: assert [{'kind': 're...onthly', ...}] == []
+Evidence: pytest test_recurring.py 12 passed; full pytest suite green incl. test_bootstrap; npm test src/features/cierre green; build exit 0; design-lint PASS; design-critic SHIP 1ecbcfa · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)} · red at b6a1946: E   AssertionError: assert ('recurring_proposal', 'renta del local') in {('best_margin', None)}
 Participants: author dylan-5 (unknown); reviewer dylan-4 (unknown) reject; reviewer dylan-2 (unknown) reject
-Events: 6
+Events: 7
 Checkpoints: 1
 Sessions: 3
 Last-Checkpoint: 1795757787
-Task-Tip: b6a194647511b1ea35810d9475f4fce49454aada
+Task-Tip: 1ecbcfa85f58215f450a4d66fd654cc6c831a174
