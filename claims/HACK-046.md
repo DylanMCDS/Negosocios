@@ -9,10 +9,10 @@ Priority: P1
 Paths: app/services/profile.py, app/routers/profile.py, app/tests/test_profile.py, app/fixtures/population/profiles.json, web/src/features/perfil/, web/src/features/mipagina/, web/src/features/explorar/
 Depends: HACK-024, HACK-036
 Verify: `uv run pytest -q app/tests/test_profile.py && npm --prefix web test -- --run src/features/perfil src/features/mipagina src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795823165
-Updated: 1795820465
+Lease-Until: 1795824835
+Updated: 1795822135
 Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
-Next: Apply option: Mantener modelo de edición del prototipo existente; contrato público allowlist sin datos bancarios. Horario canónico en network_profiles compartido con Explorar.
+Next: Terminar smoke y suite web; browser real persistencia+capturas; commit, critic SHIP, push PR y done
 PR: -
 Evidence: -
 Thread-Read: 0
