@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795758172
+Updated: 1795758189
 AVAILABLE: HACK-016 HACK-022 HACK-024 HACK-025 HACK-026 HACK-028 HACK-029 HACK-030 HACK-031 HACK-033 HACK-034 
 CLAIMED: -
 BLOCKED: -
@@ -14,11 +14,11 @@ HACK-027 | REVIEW | dylan-5 | until 1795772187
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795757619 | HACK-023 | Approximate3decimal by default, exact explicit; server-owned verification and unknown ratings; no fake ownerauth | Why: Local network contract must not im
 - 1795757787 | HACK-027 | Demo history via own endpoint POST /api/recommendations/demo-history; startup seeding rejected (breaks test_bootstrap expenses==0) | Why: app/services/exp
 - 1795758100 | plan | dylan/dylan | tasks added: HACK-033 HACK-034 | Why: backlog without PR (Plan-Channel: claims)
 - 1795758122 | HACK-023 | Respect MERGE_HUMAN; do not bypass gate on forge; continue independent reviews | Why: uak merge HACK-023 lost lock and canceled candidate; human queue own
 - 1795758172 | plan --amend | dylan/dylan | amended: HACK-033 | Why: scope or criteria fixed before review
+- 1795758189 | plan | dylan/dylan | tasks added: HACK-035 | Why: backlog without PR (Plan-Channel: claims)
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.

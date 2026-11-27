@@ -39,3 +39,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795758100 | plan | dylan/dylan | tasks added: HACK-033 HACK-034 | Why: backlog without PR (Plan-Channel: claims)
 - 1795758122 | HACK-023 | Respect MERGE_HUMAN; do not bypass gate on forge; continue independent reviews | Why: uak merge HACK-023 lost lock and canceled candidate; human queue owns next merge decision
 - 1795758172 | plan --amend | dylan/dylan | amended: HACK-033 | Why: scope or criteria fixed before review
+- 1795758189 | plan | dylan/dylan | tasks added: HACK-035 | Why: backlog without PR (Plan-Channel: claims)
