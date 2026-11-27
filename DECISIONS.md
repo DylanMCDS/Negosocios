@@ -17,3 +17,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795738802 | deadline decision/HACK-002-1795737893/1795738793 | REVERSIBLE_AND_LOG | Option: Request review on bcabc41 through done because merge gate rejects carried approval; Why: AGENTS says main merge needs no new review; gate reports MERGE_WAIT stale SHA after clean automatic merge; no money, accounts, publishing or scope expansion.
 - 1795738806 | HACK-006 | SQLite BEGIN IMMEDIATE serializes retries; numeric order IDs fit numRef; PeyClient injected in FastAPI | Why: One QR per successful business/key; cents and shared JSON contract preserved
 - 1795738815 | HACK-005 | final direction = R1 v1; no breeding round (pace critical, user chose explicitly) | Why: Dylan picked v1 by looking at captures
+- 1795738868 | HACK-006 | Explicit independent reviewer dylan-2; identity dylan-3 reused by wt new | Why: Author cannot review own implementation; exact shared API contract followed
