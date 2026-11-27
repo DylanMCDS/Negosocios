@@ -185,3 +185,36 @@ def metrics(conn, alliance_id: str) -> dict:
         "paid_sales_cents": paid_total, "benefit_cost_cents": sum(r["discount_cents"] for r in refs),
         "estimated_contribution_cents": contribution, "currency": "MXN", "note": NOTE,
     }
+
+
+def _business_name(conn, business_id: str) -> str:
+    row = conn.execute("SELECT name FROM businesses WHERE id = ?", (business_id,)).fetchone()
+    return row["name"] if row else business_id
+
+
+def list_for(conn, business_id: str) -> list[dict]:
+    """Alianzas de un negocio, con el socio y su papel (quien da el descuento o quien refiere)."""
+    if conn.execute("SELECT 1 FROM businesses WHERE id = ?", (business_id,)).fetchone() is None:
+        raise HTTPException(404, "Negocio no encontrado")
+    rows = conn.execute(
+        "SELECT * FROM alliances WHERE business_a = ? OR business_b = ? ORDER BY created_at DESC",
+        (business_id, business_id)).fetchall()
+    items = []
+    for row in rows:
+        partner = row["business_b"] if row["business_a"] == business_id else row["business_a"]
+        items.append({**_view(row), "partner_id": partner, "partner_name": _business_name(conn, partner),
+                      "role": "giver" if row["giver"] == business_id else "referrer"})
+    return items
+
+
+def by_code(conn, code: str) -> dict:
+    """Lo mínimo que Cobrar necesita para aplicar un código; costos y contribución mínima no se exponen."""
+    row = conn.execute("SELECT * FROM alliances WHERE referral_code = ?", (code.upper(),)).fetchone()
+    if row is None:
+        raise HTTPException(404, "Código de referido no encontrado")
+    return {
+        "id": row["id"], "status": row["status"], "giver": row["giver"], "giver_name": _business_name(conn, row["giver"]),
+        "discount_pct": row["discount_pct"], "referral_code": row["referral_code"],
+        "budget_remaining_cents": row["budget_cents"] - row["budget_used_cents"],
+        "uses_remaining": row["max_uses"] - row["uses"],
+    }

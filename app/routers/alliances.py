@@ -61,3 +61,17 @@ def metrics(alliance_id: str, settings: Annotated[Settings, Depends(get_settings
     with _db(settings) as conn:
         reviews.ensure_all(conn)
         return alliances.metrics(conn, alliance_id)
+
+
+@router.get("/api/alliances")
+def list_alliances(business_id: str, settings: Annotated[Settings, Depends(get_settings)]):
+    with _db(settings) as conn:
+        reviews.ensure_all(conn)
+        return alliances.list_for(conn, business_id)
+
+
+@router.get("/api/alliances/code/{code}")
+def alliance_by_code(code: str, settings: Annotated[Settings, Depends(get_settings)]):
+    with _db(settings) as conn:
+        reviews.ensure_all(conn)
+        return alliances.by_code(conn, code)

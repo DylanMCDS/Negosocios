@@ -136,3 +136,29 @@ def test_discount_never_leaves_less_than_minimum_contribution_in_cents(api):
     # A small amount rounds against the giver: the discount is capped so the minimum still holds.
     small = client.post(f"/api/alliances/{alliance['id']}/quote", json={"amount_cents": 3, "order_id": "tiny"}).json()
     assert small["total_cents"] >= -(-(60000 + 33333) * 3 // 100000)
+
+
+def test_lists_alliances_of_a_business_with_partner_and_role(api):
+    client, _ = api
+    alliance = active(client)
+    mine = client.get("/api/alliances", params={"business_id": "cafe"})
+    assert mine.status_code == 200
+    [item] = mine.json()
+    assert item["id"] == alliance["id"] and item["status"] == "active"
+    assert (item["partner_id"], item["partner_name"], item["role"]) == ("taqueria", "taqueria", "referrer")
+    [theirs] = client.get("/api/alliances", params={"business_id": "taqueria"}).json()
+    assert (theirs["partner_id"], theirs["role"]) == ("cafe", "giver")
+    assert client.get("/api/alliances", params={"business_id": "ghost"}).status_code == 404
+    assert client.get("/api/alliances").status_code == 422
+
+
+def test_resolves_alliance_by_referral_code(api):
+    client, _ = api
+    alliance = active(client)
+    found = client.get(f"/api/alliances/code/{alliance['referral_code']}")
+    assert found.status_code == 200
+    body = found.json()
+    assert (body["id"], body["status"], body["giver"], body["discount_pct"]) == (alliance["id"], "active", "taqueria", 10)
+    assert body["giver_name"] == "taqueria" and "price_cents" not in body and "variable_cost_cents" not in body  # costs stay private
+    assert client.get(f"/api/alliances/code/{alliance['referral_code'].lower()}").status_code == 200
+    assert client.get("/api/alliances/code/NOPE0000").status_code == 404
