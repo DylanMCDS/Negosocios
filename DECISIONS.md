@@ -41,3 +41,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795758172 | plan --amend | dylan/dylan | amended: HACK-033 | Why: scope or criteria fixed before review
 - 1795758189 | plan | dylan/dylan | tasks added: HACK-035 | Why: backlog without PR (Plan-Channel: claims)
 - 1795758203 | HACK-014 | stop: pace critical (5h 72%); every AVAILABLE task is blocked by a dependency | Why: limit + deps
+- 1795758298 | plan | dylan/dylan | tasks added: HACK-036 | Why: backlog without PR (Plan-Channel: claims)
