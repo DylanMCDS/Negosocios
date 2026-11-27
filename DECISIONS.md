@@ -59,3 +59,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795799269 | HACK-033 | Copy 'Pagado al momento'; '< 3 s' is an unmeasured target. Menu pill scrolls instead of overflowing. | Why: Reviewer reject #180 + dylan-4 finding #181
 - 1795799588 | HACK-024 | keep HACK-024 in REVIEW and do not revert the nav test line: main goes red without it | Why: tests-only-grow refuses my edit of negocio/nav.test.tsx:17; web/package-lock.json is a shared file only a human merges
 - 1795799735 | HACK-039 | edit the old assertion rather than add a new test | Why: acceptance says keep Inicio/Pagar hidden/base order without rejecting Aliados
+- 1795799817 | HACK-030 | shared NavBar overflow (8 entries) is outside HACK-030 Paths: reported to dylan-5 (#187) | Why: critic flagged only the QR hero size as P1 for Puntos
