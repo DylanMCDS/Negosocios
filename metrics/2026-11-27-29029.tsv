@@ -47,6 +47,7 @@
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 # ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
+# ledger: epoch, command, task, exit, code, ms, agent, harness (exit - = ended in an exec; #sum rows = older lines, counted)
 1795737718	bb	-	0	-	3000	dylan-3	codex
 1795736673	done	HACK-002	0	-	6000	dylan-3	codex
 1795736682	hook-inbox	-	0	-	1000	dylan-3	other
@@ -3989,3 +3990,44 @@
 1795819278	red	HACK-044	2	-	4000	dylan-3	codex
 1795819278	red	HACK-044	0	-	5000	dylan-3	codex
 1795819278	red	HACK-045	0	-	2000	dylan-4	codex
+1795819491	bb	-	0	-	5000	dylan-3	codex
+1795819284	hook-inbox	-	0	-	3000	dylan-3	other
+1795819293	hook-pr-sync	HACK-030	0	-	3000	dylan-2	claude-code
+1795819292	hook-inbox	-	0	-	5000	dylan-2	claude-code
+1795819295	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795819298	hook-pr-sync	HACK-039	0	-	3000	dylan-1	claude-code
+1795819297	hook-status	-	0	-	8000	dylan-2	claude-code
+1795819301	hook-status	-	0	-	5000	dylan-1	claude-code
+1795819298	hook-inbox	-	0	-	8000	dylan-1	claude-code
+1795819305	hook-inbox	-	0	-	5000	dylan-1	claude-code
+1795819301	msg	-	0	-	10000	dylan-4	codex
+1795819491	board	-	0	-	2000	-	claude-code
+1795819308	hook-pr-sync	HACK-033	0	-	5000	dylan-5	claude-code
+1795819313	hook-status	-	0	-	0	dylan-5	claude-code
+1795819311	checkpoint	HACK-041	0	-	14000	dylan-5	claude-code
+1795819317	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795819319	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795819324	hook-inbox	-	0	-	4000	dylan-1	claude-code
+1795819332	hook-inbox	-	0	-	2000	dylan-3	other
+1795819346	status	HACK-043	0	-	6000	dylan-2	claude-code
+1795819357	checkpoint	HACK-044	0	-	9000	dylan-3	codex
+1795819362	hook-inbox	-	0	-	4000	dylan-4	other
+1795819491	red	HACK-043	0	-	23000	dylan-2	claude-code
+1795819491	board	-	0	-	2000	-	other
+1795819371	hook-inbox	-	0	-	3000	dylan-2	claude-code
+1795819381	hook-inbox	-	0	-	3000	dylan-3	other
+1795819387	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795819385	msg	-	0	-	6000	dylan-4	codex
+1795819388	hook-inbox	-	0	-	5000	dylan-1	claude-code
+1795819392	hook-inbox	-	0	-	3000	dylan-4	other
+1795819405	hook-pr-sync	HACK-002	0	-	3000	dylan-3	other
+1795819406	hook-inbox	-	0	-	5000	dylan-3	other
+1795819412	hook-inbox	-	0	-	3000	dylan-1	claude-code
+1795819417	dash	-	2	-	1	-	other
+1795819415	hook-inbox	-	0	-	3000	dylan-5	claude-code
+1795819419	hook-inbox	-	0	-	3000	dylan-2	claude-code
+1795819442	status	HACK-046	0	-	4000	dylan-3	codex
+1795819447	inbox	-	0	-	2000	dylan-3	codex
+1795819483	hook-pr-sync	HACK-003	0	-	4000	dylan-4	other
+1795819491	map	-	0	-	1000	dylan-3	codex
+1795819491	map	-	0	-	0	dylan-3	codex
