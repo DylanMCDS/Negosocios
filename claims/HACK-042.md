@@ -9,10 +9,10 @@ Priority: P0
 Paths: web/src/features/dividir/
 Depends: HACK-029, HACK-028
 Verify: `npm --prefix web test -- --run src/features/dividir && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795822812
-Updated: 1795820112
+Lease-Until: 1795824060
+Updated: 1795821360
 Task-Base: 9a82c05aa6b69dabb7dc47236ed8927412241dbb
-Next: leer criterios y tests nombrados de Dividir; escribir tests rojos
+Next: capturas 390/1280, design-critic, uak done
 PR: -
 Evidence: -
 Thread-Read: 239
