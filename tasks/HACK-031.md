@@ -15,9 +15,9 @@ Task-Base: a61e05a94837ba1c973e316630aa4960e088ecf0
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/28; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/28
 Evidence: pytest test_payout_accounts.py test_orders.py + full suite green; npm test negocio+pagar green; build exit 0; design-lint PASS; design-critic SHIP 0b3dc89. OPEN: app/services/pey.py (HACK-003 owner, outside Paths) must send bankAccountId in POST /codi/qr; requested msg #143; PEY.md says real mode must stay off until then · red at 6a821da: AssertionError: expected <p class="max-w-[48ch] text-ink-2"></p> to be null
-Participants: author dylan-5 (unknown)
-Events: 5
+Participants: author dylan-5 (unknown); reviewer dylan-2 (unknown) reject
+Events: 6
 Checkpoints: 1
-Sessions: 2
+Sessions: 3
 Last-Checkpoint: 1795758579
 Task-Tip: 0b3dc8955ce7826a97c506e47645ab1c6365eec5
