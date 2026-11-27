@@ -14,3 +14,15 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** parses_amount_and_item_from_spanish_phrase, parses_amount_written_with_pesos_word, parses_amount_in_words, flags_ambiguous_amount, parse_endpoint_does_not_save_expense
 - **Verify:** `uv run pytest -q app/tests/test_voice.py`
 - **Next step:** tabla de frases de ejemplo en `app/tests/test_voice.py` y `uak red HACK-017`.
+
+## HACK-018 · Cierre: la línea Cuenta mezcla pesos y % (200 − (100+50) = 25 %); mostrar 200 − 150 = 50 (25 % del precio) y tomar business_id del alta (follow-up of HACK-011)
+
+- **Type:** follow-up
+- **Priority:** P1
+- **Depends on:** HACK-011
+- **Follow-up of:** HACK-011
+- **Paths:** web/src/features/cierre/
+- **Freeze-Allowed:** no
+- **Acceptance:**
+  - Cierre: la línea Cuenta mezcla pesos y % (200 − (100+50) = 25 %); mostrar 200 − 150 = 50 (25 % del precio) y tomar business_id del alta
+- **Verify:** `npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
