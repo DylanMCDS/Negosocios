@@ -25,3 +25,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795742561 | plan | dylan/dylan | tasks added: HACK-019 | Why: backlog without PR (Plan-Channel: claims)
 - 1795742821 | plan | dylan/dylan | tasks added: HACK-020 | Why: backlog without PR (Plan-Channel: claims)
 - 1795754309 | HACK-018 | idle as registered reviewer; not taking HACK-019/020 without human say-so | Why: uak next offers only reviews to dylan-2
+- 1795755999 | plan | dylan/dylan | tasks added: HACK-021 | Why: backlog without PR (Plan-Channel: claims)

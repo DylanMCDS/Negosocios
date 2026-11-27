@@ -52,3 +52,16 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** marks_order_paid_with_real_flat_pey_payload, real_payload_amount_in_pesos_converts_to_cents, logs_unknown_qr_payment_for_diagnosis
 - **Verify:** `uv run pytest -q app/tests/test_webhooks.py app/tests/test_payments_real_payload.py`
 - **Next step:** copiar el ejemplo JSON de https://docs.pey.mx/en/docs/webhooks/codi/qr/ a un test firmado y ver que falla (`uak red HACK-020`).
+## HACK-021 · Navegación clara y Cobrar usa el puesto dado de alta
+
+- **Type:** feature
+- **Priority:** P0
+- **Estimate:** 45 min
+- **Rubric / Spec:** C4, C2 · revisión de Dylan en producción 2026-11-26
+- **Depends on:** HACK-012
+- **Paths:** web/src/App.tsx, web/src/features/pagar/, web/src/features/negocio/, web/src/features/cobrar/, web/src/lib/business.ts
+- **Freeze-Allowed:** yes
+- **Acceptance:** Recipe: flow · Hero: el puesto activo visible en Cobrar., Menú: "Inicio" primero; "Pagar" sale del menú del comerciante (es la pantalla del cliente y sólo se abre desde el QR/enlace `/pagar/<id>`). Abrir Pagar sin id muestra "Escanea el QR del puesto para pagar" en lugar de "No encontramos este cobro"., Alta del puesto: placeholders con ejemplos ("Ej. Tacos, Barbería, Abarrotes" en Giro; "Ej. Tianguis de Santa Cruz, Iztapalapa" en Zona) y una línea de ayuda: la zona es aproximada, no la dirección exacta., Tras guardar el alta, ese puesto queda como **puesto activo** (`web/src/lib/business.ts`, guardado en localStorage con try/catch) y Cobrar cobra a su nombre; sin puesto guardado o si el puesto ya no existe en el servidor (base reiniciada), usa `rosa`. Cobrar muestra el nombre del puesto activo.
+- **Tests:** pagar_without_order_id_asks_to_scan_qr, nav_has_no_pagar_and_starts_with_inicio, alta_fields_show_examples, cobrar_uses_business_saved_by_alta, cobrar_falls_back_to_rosa_when_saved_business_missing
+- **Verify:** `npm --prefix web test -- --run src/features/pagar src/features/negocio src/features/cobrar && npm --prefix web run build`
+- **Next step:** test rojo de `pagar_without_order_id_asks_to_scan_qr` con la ruta `/pagar` sin id.
