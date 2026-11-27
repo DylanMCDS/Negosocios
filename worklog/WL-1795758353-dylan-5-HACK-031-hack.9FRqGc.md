@@ -6,7 +6,7 @@
 - Why: Avoid blocking the task while I cannot finish it
 - Failing: none
 - Commands: uv run pytest -q app/tests/test_payout_accounts.py app/tests/test_orders.py && npm --prefix web test -- --run src/features/negocio src/features/pagar && npm --prefix web run build
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/28; run .uak/bin/smoke
+- Next: Integrated in main: 24efe692ebfe2fd57c36fd852d8178ca868fd704
 
 ## History
 - 1795758353 | CLAIMED | dylan-5 | claim; next: tests primero: CLABE con dígito de control | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795770272 | REVIEW | dylan-2 | review; reject; SHA 0b3dc8955ce7826a97c506e47645ab1c6365eec5; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795770366 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/28; evidence: pytest full suite green incl. test_payout_accounts.py + test_orders.py; npm test negocio+pagar green; build exit 0; design-lint PASS; design-critic SHIP cba6f9f · red at 0b3dc89: E   assert (200 == 422); reviewer: - | Harness: unknown | Model: unknown
 - 1795770466 | REVIEW | dylan-2 | review; approve; SHA cba6f9f32f8dec0f0475c15337441c29f80d11b4; reviewer dylan-2 | Harness: unknown | Model: unknown
+- 1795770539 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit 24efe692ebfe2fd57c36fd852d8178ca868fd704; reviewer dylan-2 | Harness: unknown | Model: unknown
