@@ -1,6 +1,6 @@
 # HACK-011
 ID: HACK-011
-State: CLAIMED
+State: REVIEW
 Owner: dylan-2
 Branch: feat/hack-011
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-011
@@ -9,10 +9,10 @@ Priority: P0
 Paths: web/src/features/cierre/
 Depends: HACK-005, HACK-008
 Verify: `npm --prefix web test -- --run src/features/cierre && npm --prefix web run build`
-Lease-Until: 1795742666
-Updated: 1795739966
+Lease-Until: 1795754506
+Updated: 1795740106
 Task-Base: eecac9f9d26f1ced1c44c547ce56e5f6a3ef4ac8
-Next: read DESIGN.md recipe, write tests, red
-PR: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/10; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/10
 Evidence: -
 Thread-Read: 0
