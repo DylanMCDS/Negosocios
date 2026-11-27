@@ -97,7 +97,7 @@ function Proposal({ me, partner, onDone }: { me: string; partner: Partner; onDon
         {labeled("uses", "Usos")}
         <label className="col-span-2 flex flex-col gap-2 text-[length:var(--text-s)] text-ink-2">
           <span>Descuento</span>
-          <input type="range" min={0} max={max} step={0.1} value={value} disabled={max <= 0} onChange={(e) => setDiscount(Math.min(Number(e.target.value), max))} aria-label="Descuento" aria-valuetext={`${value} %`} />
+          <input type="range" className="accent-accent" min={0} max={max} step={0.1} value={value} disabled={max <= 0} onChange={(e) => setDiscount(Math.min(Number(e.target.value), max))} aria-label="Descuento" aria-valuetext={`${value} %`} />
           <span className="font-display text-[length:var(--text-l)] text-ink">{`${value} %`}</span>
         </label>
         {sim?.ok && max > 0 && (
