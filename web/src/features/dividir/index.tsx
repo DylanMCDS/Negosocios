@@ -211,7 +211,17 @@ function PartPush({ orderId, idx }: { orderId: string; idx: number }) {
       setState({ kind: "error" });
     }
   }
-  if (!open) return <Button size="sm" variant="secondary" onClick={() => setOpen(true)}>Pedir por celular</Button>;
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-surface px-5 font-display text-[length:var(--text-s)] text-accent hover:bg-hairline"
+      >
+        Pedir por celular
+      </button>
+    );
+  }
   return (
     <div className="flex w-full flex-col gap-2">
       <label className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
@@ -333,7 +343,7 @@ function PartsView({ orderId, split, demo }: { orderId: string; split: Split; de
         lead={done ? "Todas las partes están pagadas." : "Cada parte se paga con su propio QR; el cobro se completa al pagar todas."}
         action={demo ? <DataBadge /> : undefined}
       />
-      <div className="grid gap-8 md:grid-cols-[360px_1fr] md:items-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[360px_1fr] md:items-start">
         {done ? (
           <section className="flex flex-col items-center gap-3 rounded-lg bg-ok p-8 text-ok-ink">
             <CheckCircle size={72} weight="fill" className="text-money" aria-hidden="true" />
