@@ -240,3 +240,37 @@ def test_redeem_rejects_existing_paid_and_expired_orders(api):
         assert redeem(client, token, key=identifier).status_code == 409
     assert client.get(f"/api/coupons/{token}").json()["status"] == "valid"
     assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (alliance["id"],)).fetchone()) == (0, 0)
+
+
+def test_coupon_reservation_blocks_later_legacy_code(api):
+    client, _ = api
+    token, _ = coupon(api)
+    legacy = client.post("/api/alliances", json={
+        "business_a": "cafe", "business_b": "taqueria", "giver": "cafe",
+        "discount_pct": 10, "budget_cents": 10000, "max_uses": 5,
+        "price_cents": 10000, "variable_cost_cents": 6000, "min_contribution_cents": 3000,
+    }).json()
+    client.post(f'/api/alliances/{legacy["id"]}/accept')
+    assert redeem(client, token).status_code == 200
+    response = client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": "next", "amount_cents": 10000})
+    assert response.status_code == 409
+    assert "cupón" in response.json()["detail"]
+
+
+def test_coupon_and_legacy_code_concurrent_reservations_allow_one_benefit(api):
+    client, conn = api
+    token, coupon_alliance = coupon(api)
+    legacy = client.post("/api/alliances", json={
+        "business_a": "cafe", "business_b": "taqueria", "giver": "cafe",
+        "discount_pct": 10, "budget_cents": 10000, "max_uses": 5,
+        "price_cents": 10000, "variable_cost_cents": 6000, "min_contribution_cents": 3000,
+    }).json()
+    client.post(f'/api/alliances/{legacy["id"]}/accept')
+    with ThreadPoolExecutor(2) as pool:
+        coupon_result = pool.submit(redeem, client, token)
+        legacy_result = pool.submit(client.post, f'/api/alliances/{legacy["id"]}/quote', json={"order_id": "next", "amount_cents": 10000})
+        responses = [coupon_result.result(), legacy_result.result()]
+    assert sorted(response.status_code for response in responses) == [200, 409]
+    rows = conn.execute("SELECT SUM(uses),SUM(budget_used_cents) FROM alliances WHERE id IN (?,?)",
+                        (coupon_alliance["id"], legacy["id"])).fetchone()
+    assert tuple(rows) == (1, 1000)

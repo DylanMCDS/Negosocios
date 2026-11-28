@@ -147,6 +147,12 @@ def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
             raise HTTPException(409, "La alianza no está activa")
         canonical, names = _identities(conn, row["giver"], order_id)
         marks = ",".join("?" * len(names))
+        if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='coupons'").fetchone():
+            reserved = conn.execute(
+                f"SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key IN ({marks}) AND redeemed_at IS NOT NULL",
+                (row["giver"], *names)).fetchone()
+            if reserved:
+                raise HTTPException(409, "Este cobro ya tiene el beneficio de un cupón")
         prior = conn.execute(
             f"SELECT * FROM referrals WHERE alliance_id = ? AND order_id IN ({marks})", (alliance_id, *names)).fetchone()
         if prior is not None:

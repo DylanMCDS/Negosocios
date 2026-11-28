@@ -39,6 +39,9 @@ Respuesta 201: la misma vista pública de abajo. Sin compra pagada elegible,
 o con una compra de otro negocio, 409 con motivo en español. Una segunda
 reclamación del mismo comprobante devuelve 409. Un punto revocado devuelve 410.
 Los campos no reconocidos y cuerpos incompletos se rechazan con 422.
+La reclamación no es un reintento idempotente: el consumidor debe conservar el
+token de la respuesta. Si esa respuesta se pierde después de emitirlo, esta API
+no ofrece recuperación del token ni libera la compra para reclamar otro.
 
 El modo por punto sigue el contrato público del prototipo: conocer un punto
 no demuestra la identidad del comprador, y puede reclamar una compra pagada
@@ -119,9 +122,11 @@ Las reservas de cupones no se insertan en `referrals`, porque la atribución de
 esa tabla corresponde al `giver` del flujo legado, con dirección distinta.
 
 Antes de un canje se revisan otros cupones y las reservas de códigos legados
-para el negocio y los alias ID/clave de esa compra. El control recíproco del
-endpoint legado debe impedir aplicar un código después de reservar un cupón;
-se coordinó por mensaje con el propietario de alianzas.
+para el negocio y los alias ID/clave de esa compra. El endpoint legado también
+comprueba, bajo su bloqueo SQLite, si la compra ya reservó un cupón y rechaza
+un segundo beneficio con 409. Cuando no existe la tabla de cupones, mantiene
+el flujo previo. La comprobación respeta el negocio: una clave igual en otro
+negocio no identifica la misma compra.
 
 ## Verificación
 
@@ -133,3 +138,5 @@ Reloj fijo, compras en SQLite temporal y `FakePeyClient`; ninguna prueba emite
 un QR real ni llama a un proveedor externo. Se prueban vencimiento exacto,
 concurrencia, negocios, presupuesto, usos, redondeo entero, privacidad,
 reintentos con ID/clave y creación de un QR de ejemplo al total descontado.
+También se prueban ambos órdenes de cupón/código y la carrera entre los dos
+endpoints: sólo una reserva puede consumir usos y presupuesto.
