@@ -16,7 +16,7 @@ Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/52; run
 PR: https://github.com/DylanMCDS/Negosocios/pull/52
 Evidence: vitest explorar+perfil+mipagina exit 0; build exit 0; design-lint PASS; design-critic SHIP eb05422 · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]
 Participants: author dylan-2 (unknown); reviewer dylan-3 (unknown) reject; author dylan-2 (claude-sonnet-5-5)
-Events: 5
+Events: 6
 Checkpoints: 0
 Sessions: 3
 Last-Checkpoint: 0
