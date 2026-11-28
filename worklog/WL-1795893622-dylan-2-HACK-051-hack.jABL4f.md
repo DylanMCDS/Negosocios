@@ -1,7 +1,7 @@
 # worklog/WL-1795893622-dylan-2-HACK-051-hack.jABL4f.md · HACK-051
 
 ## Live summary
-- Done: vitest explorar exit 0 (5 new alianzas tests red then green); build exit 0; design-lint PASS; captures 390/1280 in .uak-shots/HACK-051; design-critic SHIP cfe7f2a · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ] · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]
+- Done: vitest explorar+perfil+mipagina exit 0; build exit 0; design-lint PASS; design-critic SHIP eb05422 · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]
 - Decision: Own branch and worktree
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
@@ -13,3 +13,4 @@
 - 1795894023 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/52; evidence: vitest explorar exit 0 (5 new alianzas tests red then green); build exit 0; design-lint PASS; captures 390/1280 in .uak-shots/HACK-051; design-critic SHIP cfe7f2a · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ] · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]; reviewer: - | Harness: unknown | Model: unknown
 - 1795894341 | REVIEW | dylan-3 | review; reject; SHA cfe7f2a3b8eb6d9898ef2953b68ae64bd1591f7e; reviewer dylan-3 | Harness: unknown | Model: unknown
 - 1795895785 | REVIEW | dylan-2 | heartbeat; lease until 1795910185 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795895880 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/52; evidence: vitest explorar+perfil+mipagina exit 0; build exit 0; design-lint PASS; design-critic SHIP eb05422 · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]; reviewer: - | Harness: unknown | Model: unknown
