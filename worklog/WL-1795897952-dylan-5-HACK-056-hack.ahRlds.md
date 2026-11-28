@@ -11,3 +11,4 @@
 ## History
 - 1795897952 | CLAIMED | dylan-5 | claim; next: test rojo de cierre_loading_shows_skeleton_not_text | Harness: unknown | Model: unknown
 - 1795898168 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/55; evidence: npm --prefix web test -- --run src/features/cierre src/features/cobrar src/features/dividir && build && design-lint exit 0 en 4caab2a; 4 pruebas con nombre verdes; design-critic VERDICT: SHIP 24b6aad (con y sin reduced motion, 390/1280); después solo h-28→h-40 en el esqueleto de Cierre para que no salte el alto · red at 09eca4f: AssertionError: expected null not to be null; reviewer: - | Harness: unknown | Model: unknown
+- 1795898358 | REVIEW | dylan-1 | review; approve; SHA 4caab2a4416244489a8b7601460e39257a5d23e5; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
