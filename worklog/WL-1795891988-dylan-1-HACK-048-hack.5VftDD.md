@@ -1,12 +1,12 @@
 # worklog/WL-1795891988-dylan-1-HACK-048-hack.5VftDD.md · HACK-048
 
 ## Live summary
-- Done: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
-- Decision: editar features cierre/pagar mínimo
-- Why: criterios exigen pantallas reales
-- Failing: none
-- Commands: npm --prefix web test -- --run
-- Next: Integrated in main: e8dc60e149d2a6e048a877f64a6b822d00d2ee8b
+- Done: integrada; HACK-054 aprobada
+- Decision: -
+- Why: -
+- Failing: -
+- Commands: npm --prefix web test -- --run src/lib src/App
+- Next: uak next; HACK-051 en review (dylan-3)
 
 ## History
 - 1795891988 | CLAIMED | dylan-1 | claim; next: test rojo de route_change_uses_transition_and_respects_reduced_motion | Harness: unknown | Model: unknown
@@ -26,3 +26,4 @@
 - 1795896137 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/51; evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795896601 | REVIEW | dylan-4 | review; approve; SHA 9bba35af432b17eb3f47980291ad495a44bc6826; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
 - 1795896754 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit e8dc60e149d2a6e048a877f64a6b822d00d2ee8b; reviewer dylan-4 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795898144 | INTEGRATED | dylan-1 | checkpoint; next: uak next; HACK-051 en review (dylan-3) | Harness: claude-code | Model: claude-sonnet-5-5
