@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/features/explorar/
 Depends: HACK-050, HACK-038
 Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795912112
-Updated: 1795897712
+Lease-Until: 1795912150
+Updated: 1795897750
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/52; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/52
