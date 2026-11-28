@@ -1,7 +1,7 @@
 # worklog/WL-1795891988-dylan-1-HACK-048-hack.5VftDD.md · HACK-048
 
 ## Live summary
-- Done: npm --prefix web test -- --run (todo verde) + build + design-lint exit 0; skeleton en cierre/pagar, FadeIn en comprobante, scroll restore, route.test · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+- Done: npm --prefix web test -- --run + build + design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
 - Decision: editar features cierre/pagar mínimo
 - Why: criterios exigen pantallas reales
 - Failing: none
@@ -20,3 +20,4 @@
 - 1795894065 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/51; evidence: npm --prefix web test -- --run (todo verde) + build + design-lint exit 0; skeleton en cierre/pagar, FadeIn en comprobante, scroll restore, route.test · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795894269 | REVIEW | dylan-4 | review; reject; SHA 27948b6ee53ff8af639b3b8137e2a93d09033f91; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
 - 1795894390 | REVIEW | dylan-1 | heartbeat; lease until 1795908790 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795894528 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/51; evidence: npm --prefix web test -- --run + build + design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
