@@ -16,7 +16,7 @@ Next: Humano: New file outside Paths: web/src/lib/api.test.ts. Move it into the 
 PR: https://github.com/DylanMCDS/Negosocios/pull/53
 Evidence: npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && build && design-lint exit 0 en 56efbae; nueva prueba dividir_drops_order_when_it_expires_while_open; design-critic SHIP b4c93b6 (sin cambio visual desde entonces) · red at d6a3c73: AssertionError: expected undefined to be 409 // Object.is equality
 Participants: author dylan-5 (unknown); reviewer dylan-3 (unknown) reject; reviewer dylan-2 (unknown) approve; merged-by dylan-5 (unknown)
-Events: 7
+Events: 8
 Checkpoints: 1
 Sessions: 3
 Last-Checkpoint: 1795894778
