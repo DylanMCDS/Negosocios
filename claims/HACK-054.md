@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/features/cobrar/
 Depends: HACK-053, HACK-052
 Verify: `npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795911603
-Updated: 1795897203
+Lease-Until: 1795912117
+Updated: 1795897717
 Task-Base: dbd7557d3680e6b79c2058a054a0085d3a476a82
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/54; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/54
