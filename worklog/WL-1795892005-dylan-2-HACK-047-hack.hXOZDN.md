@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `npm --prefix web test -- --run src/features/cierre src/features/voz && npm --prefix web run build && bash .uak/bin/design-lint`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/47; run .uak/bin/smoke
+- Next: Integrated in main: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
 
 ## History
 - 1795892005 | CLAIMED | dylan-2 | claim; next: test rojo de closing_notice_links_to_add_expense_and_voice | Harness: unknown | Model: unknown
@@ -14,3 +14,4 @@
 - 1795892636 | REVIEW | dylan-4 | review; reject; SHA aa37082a4c6af70f6f103bf8d84f816dddb67484; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
 - 1795893191 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/47; evidence: vitest cierre+voz exit 0 (+expense_date_uses_mexico_city_day_across_utc_midnight); build exit 0; design-lint PASS · red at c5e08a8: exit 1 (no assertion line recognized: the reviewer reads the log) · red at c5e08a8: exit 1 (no assertion line recognized: the reviewer reads the log) · red at c5e08a8: exit 1 (no assertion line recognized: the reviewer reads the log) · red at c5e08a8: exit 1 (no assertion line recognized: the reviewer reads the log); reviewer: - | Harness: unknown | Model: unknown
 - 1795893407 | REVIEW | dylan-4 | review; approve; SHA 3f1b1d6426daf25873fb0b55f0872ccd4e1313ba; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
+- 1795893549 | INTEGRATED | dylan-2 | merge; smoke and Verify PASS (smoke: full); commit d6a3c73cd3b09c58be89b4b73a1789d75c57aebd; reviewer dylan-4 | Harness: unknown | Model: unknown
