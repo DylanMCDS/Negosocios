@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/features/cierre/, web/src/features/voz/, web/src/lib/types.ts
 Depends: HACK-011, HACK-044
 Verify: `npm --prefix web test -- --run src/features/cierre src/features/voz && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795906682
-Updated: 1795892282
+Lease-Until: 1795907591
+Updated: 1795893191
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/47; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/47
