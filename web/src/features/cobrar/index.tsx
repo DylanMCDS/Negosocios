@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
 import { api, isLive, useTick } from "../../lib/api";
+import CouponScanner from "./CouponScanner";
 import { appendKey, formatCents, formatTyping, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
@@ -109,6 +110,8 @@ export default function Cobrar() {
   const [refCode, setRefCode] = useState("");
   const [referral, setReferral] = useState<Referral | null>(null);
   const [refError, setRefError] = useState<string | null>(null);
+  // A scanned coupon is redeemed against the charge's key before the QR exists; its total is what gets charged.
+  const [couponTotal, setCouponTotal] = useState<number | null>(null);
   // null while a saved business is being checked against the server; no saved business = the demo one.
   const [active, setActive] = useState<{ id: string; name: string | null } | null>(() =>
     getBusinessId() ? null : { id: DEMO_BUSINESS_ID, name: null },
@@ -171,6 +174,11 @@ export default function Cobrar() {
   };
 
   const charge = async () => {
+    if (couponTotal !== null) {
+      chargeCents.current = couponTotal;
+      void create();
+      return;
+    }
     idempotencyKey.current = crypto.randomUUID();
     chargeCents.current = amountCents;
     if (referral) {
@@ -204,6 +212,7 @@ export default function Cobrar() {
     setRefCode("");
     setReferral(null);
     setRefError(null);
+    setCouponTotal(null);
     setOrder(null);
     setPhase("idle");
   };
@@ -242,17 +251,17 @@ export default function Cobrar() {
   const keypad = (
     <div className="grid w-full max-w-[420px] grid-cols-3 gap-3" role="group" aria-label="Teclado numérico">
       {KEYS.map((k) => (
-        <Button key={k} variant="secondary" onClick={() => setDigits((d) => appendKey(d, k))}>
+        <Button key={k} variant="secondary" onClick={() => couponTotal === null && setDigits((d) => appendKey(d, k))}>
           {k}
         </Button>
       ))}
-      <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "."))} aria-label=".">
+      <Button variant="secondary" onClick={() => couponTotal === null && setDigits((d) => appendKey(d, "."))} aria-label=".">
         .
       </Button>
-      <Button variant="secondary" onClick={() => setDigits((d) => appendKey(d, "0"))}>
+      <Button variant="secondary" onClick={() => couponTotal === null && setDigits((d) => appendKey(d, "0"))}>
         0
       </Button>
-      <Button variant="secondary" onClick={() => setDigits((d) => d.slice(0, -1))} aria-label="Borrar">
+      <Button variant="secondary" onClick={() => couponTotal === null && setDigits((d) => d.slice(0, -1))} aria-label="Borrar">
         <Backspace size={24} aria-hidden="true" />
       </Button>
     </div>
@@ -283,7 +292,7 @@ export default function Cobrar() {
                 </div>
               )}
           <Surface className={showOrder ? "order-2 flex flex-col gap-4 lg:order-none lg:col-start-2 lg:row-start-1" : "flex flex-col gap-4"}>
-            <Stat label="Importe" value={order ? pesos(order.amount_cents) : formatTyping(digits)} unit="MXN" hero />
+            <Stat label="Importe" value={order ? pesos(order.amount_cents) : couponTotal !== null ? pesos(couponTotal) : formatTyping(digits)} unit="MXN" hero />
             {showOrder && (
               <>
                 <p className="text-ink-2">{order.concept}</p>
@@ -354,6 +363,12 @@ export default function Cobrar() {
                   <p className="text-[length:var(--text-s)] text-ink-2">Te lo da tu cliente; viene de un negocio aliado</p>
                   <Button variant="secondary" size="sm" onClick={() => void applyCode()} disabled={refCode.trim() === ""}>Aplicar</Button>
                   {refError && <p role="alert">{refError}</p>}
+                  <CouponScanner
+                    businessId={active?.id ?? DEMO_BUSINESS_ID}
+                    amountCents={amountCents}
+                    newKey={() => (idempotencyKey.current = crypto.randomUUID())}
+                    onApplied={(total) => { setReferral(null); setCouponTotal(total); }}
+                  />
                   {referral && (
                     <div className="flex flex-col gap-1">
                       <p className="text-ink-2">{`Aliado: ${referral.giver_name}`}</p>
