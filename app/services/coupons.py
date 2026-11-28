@@ -122,7 +122,11 @@ def redeem(conn, token, body, now):
         prior = conn.execute("""SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key=?
             AND redeemed_at IS NOT NULL""", (body.business_id, key)).fetchone()
         legacy = conn.execute(f"""SELECT 1 FROM referrals r JOIN alliances a ON a.id=r.alliance_id
-            WHERE a.giver=? AND r.order_id IN ({marks})""", (body.business_id, *names)).fetchone()
+            LEFT JOIN coupon_legacy_keys k ON k.referral_id=r.id
+            WHERE a.giver=? AND (
+                (k.referral_id IS NOT NULL AND k.order_key=?) OR
+                (k.referral_id IS NULL AND r.order_id IN ({marks})))""",
+            (body.business_id, key, *names)).fetchone()
         if prior or legacy:
             raise HTTPException(409, "Este cobro ya tiene un beneficio")
         amount = body.amount_cents

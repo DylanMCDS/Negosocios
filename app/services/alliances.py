@@ -42,6 +42,10 @@ def ensure_tables(conn: sqlite3.Connection) -> None:
             created_at TEXT NOT NULL,
             UNIQUE (alliance_id, order_id)
         );
+        CREATE TABLE IF NOT EXISTS coupon_legacy_keys (
+            referral_id TEXT PRIMARY KEY NOT NULL REFERENCES referrals(id),
+            order_key TEXT NOT NULL
+        );
     """)
 
 
@@ -128,39 +132,40 @@ def accept(conn, alliance_id: str) -> dict:
 
 
 def _identities(conn, giver: str, ref: str) -> tuple[str, set[str]]:
-    """One purchase can be named by its order id or by the Idempotency-Key it was created with."""
-    order = conn.execute(
+    """Return the stable purchase key; ID aliases only identify historical rows."""
+    rows = conn.execute(
         "SELECT id, idempotency_key FROM orders WHERE business_id = ? AND (id = ? OR idempotency_key = ?)",
-        (giver, ref, ref)).fetchone()
-    if order is None:
+        (giver, ref, ref)).fetchall()
+    if len(rows) > 1:
+        raise HTTPException(409, "La referencia del cobro es ambigua; usa una clave sin coincidencias")
+    if not rows:
         return ref, {ref}
-    return order["id"], {ref, order["id"], order["idempotency_key"]}
+    order = rows[0]
+    return order["idempotency_key"], {ref, order["id"], order["idempotency_key"]}
 
 
 def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
     """Reserva el beneficio una sola vez por orden; presupuesto y usos se descuentan en la misma transacción."""
     settle_demo_proposals(conn)
     conn.execute("BEGIN IMMEDIATE")
-    try:
+    with conn:
         row = _get(conn, alliance_id)
         if row["status"] != "active":
             raise HTTPException(409, "La alianza no está activa")
-        canonical, names = _identities(conn, row["giver"], order_id)
+        order_key, names = _identities(conn, row["giver"], order_id)
         marks = ",".join("?" * len(names))
         if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='coupons'").fetchone():
-            orders = conn.execute(
-                "SELECT idempotency_key FROM orders WHERE business_id=? AND (id=? OR idempotency_key=?)",
-                (row["giver"], order_id, order_id)).fetchall()
-            if len(orders) > 1:
-                raise HTTPException(409, "La referencia del cobro es ambigua; usa una clave sin coincidencias")
-            reservation_key = orders[0]["idempotency_key"] if orders else order_id
             reserved = conn.execute(
                 "SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key=? AND redeemed_at IS NOT NULL",
-                (row["giver"], reservation_key)).fetchone()
+                (row["giver"], order_key)).fetchone()
             if reserved:
                 raise HTTPException(409, "Este cobro ya tiene el beneficio de un cupón")
         prior = conn.execute(
-            f"SELECT * FROM referrals WHERE alliance_id = ? AND order_id IN ({marks})", (alliance_id, *names)).fetchone()
+            f"""SELECT r.* FROM referrals r LEFT JOIN coupon_legacy_keys k ON k.referral_id=r.id
+                WHERE r.alliance_id=? AND (
+                    (k.referral_id IS NOT NULL AND k.order_key=?) OR
+                    (k.referral_id IS NULL AND r.order_id IN ({marks})))""",
+            (alliance_id, order_key, *names)).fetchone()
         if prior is not None:
             return _result(row, True, prior["original_cents"], prior["discount_cents"], None)
         # Never leave the giver below its minimum contribution, in whole cents, for this amount.
@@ -175,17 +180,18 @@ def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
             reason = "El presupuesto de la alianza no alcanza para este descuento"
         if reason is not None:
             return _result(row, False, amount_cents, 0, reason)
+        referral_id = f"rf-{uuid.uuid4().hex}"
+        # Opaque storage avoids UNIQUE collisions between a future key and an unrelated database ID.
         conn.execute(
             "INSERT INTO referrals (id, alliance_id, order_id, original_cents, discount_cents, total_cents, created_at)"
             " VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (f"rf-{uuid.uuid4().hex[:10]}", alliance_id, canonical, amount_cents, discount, amount_cents - discount,
+            (referral_id, alliance_id, f"reservation:{referral_id}", amount_cents, discount, amount_cents - discount,
              datetime.now(UTC).isoformat()))
+        conn.execute("INSERT INTO coupon_legacy_keys(referral_id,order_key) VALUES (?,?)", (referral_id, order_key))
         conn.execute("UPDATE alliances SET uses = uses + 1, budget_used_cents = budget_used_cents + ? WHERE id = ?",
                      (discount, alliance_id))
         fresh = _get(conn, alliance_id)
         return _result(fresh, True, amount_cents, discount, None)
-    finally:
-        conn.commit()
 
 
 def _result(row, applied: bool, original: int, discount: int, reason: str | None) -> dict:
@@ -198,13 +204,20 @@ def _result(row, applied: bool, original: int, discount: int, reason: str | None
 
 def metrics(conn, alliance_id: str) -> dict:
     row = _get(conn, alliance_id)
-    refs = conn.execute("SELECT * FROM referrals WHERE alliance_id = ?", (alliance_id,)).fetchall()
+    refs = conn.execute(
+        "SELECT r.*,k.order_key FROM referrals r LEFT JOIN coupon_legacy_keys k ON k.referral_id=r.id WHERE r.alliance_id=?",
+        (alliance_id,)).fetchall()
     paid_total = paid_count = contribution = 0
     seen: set[str] = set()
     for ref in refs:
-        order = conn.execute(
-            "SELECT id, amount_cents FROM orders WHERE business_id = ? AND status = 'paid' AND (id = ? OR idempotency_key = ?)",
-            (row["giver"], ref["order_id"], ref["order_id"])).fetchone()
+        if ref["order_key"] is not None:
+            order = conn.execute(
+                "SELECT id,amount_cents FROM orders WHERE business_id=? AND status='paid' AND idempotency_key=?",
+                (row["giver"], ref["order_key"])).fetchone()
+        else:
+            order = conn.execute(
+                "SELECT id, amount_cents FROM orders WHERE business_id = ? AND status = 'paid' AND (id = ? OR idempotency_key = ?)",
+                (row["giver"], ref["order_id"], ref["order_id"])).fetchone()
         if order is None or order["id"] in seen:
             continue
         seen.add(order["id"])

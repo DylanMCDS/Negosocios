@@ -122,16 +122,26 @@ con el descuento: este endpoint no lo modifica ni lo cancela.
 ## Persistencia e interoperabilidad
 
 La tabla propia `coupons` conserva comprobante único, dirección, vencimiento y
-reserva inmutable; no modifica `db.py` ni las tablas base existentes.
+reserva inmutable; no modifica `db.py` ni altera el esquema de las tablas base.
 Actualiza los contadores de la alianza bajo el mismo bloqueo SQLite.
 Las reservas de cupones no se insertan en `referrals`, porque la atribución de
 esa tabla corresponde al `giver` del flujo legado, con dirección distinta.
 
 Antes de un canje se revisan otros cupones y las reservas de códigos legados
-para el negocio y los alias ID/clave de esa compra. El endpoint legado también
+para el negocio y la clave real de esa compra. La tabla propia
+`coupon_legacy_keys` registra la clave de cada reserva nueva de código legado,
+sin alterar las columnas de `referrals`. Los nuevos identificadores internos de
+referido son opacos: no pueden confundirse con un ID numérico de orden ni una
+clave futura. Sus reintentos y sus métricas usan la clave registrada.
+El referido, su vinculación y los contadores se confirman en la misma
+transacción; un error al escribir cualquiera de ellos revierte los demás.
+Para filas históricas sin esa vinculación se conserva la búsqueda anterior:
+una coincidencia ambigua se rechaza de forma conservadora al canjear un cupón;
+no se inventa una identidad que esos registros no contienen.
+El endpoint legado también
 comprueba, bajo su bloqueo SQLite, si la compra ya reservó un cupón y rechaza
 un segundo beneficio con 409. Cuando no existe la tabla de cupones, mantiene
-el flujo previo. La comprobación respeta el negocio: una clave igual en otro
+el flujo previo del descuento. La comprobación respeta el negocio: una clave igual en otro
 negocio no identifica la misma compra.
 
 ## Verificación

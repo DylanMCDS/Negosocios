@@ -356,3 +356,92 @@ def test_legacy_coupon_guard_rejects_ambiguous_id_key_without_spending(api):
     response = client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": "ambiguous", "amount_cents": 10000})
     assert response.status_code == 409
     assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (legacy["id"],)).fetchone()) == (0, 0)
+
+
+def test_future_legacy_key_does_not_block_coupon_on_different_order_id(api):
+    client, conn = api
+    token, _ = coupon(api)
+    legacy = legacy_at_cafe(client)
+    quote = client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": "1", "amount_cents": 10000})
+    assert quote.status_code == 200
+    order = create_reserved_order(conn, "next")
+    assert order.id == "1"
+    result = redeem(client, token, key=order.id)
+    assert result.status_code == 200
+    assert redeem(client, token, key="next").json() == result.json()
+    blocked = client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": order.id, "amount_cents": 10000})
+    assert blocked.status_code == 409
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (legacy["id"],)).fetchone()) == (1, 1000)
+
+
+def test_distinct_legacy_purchases_keep_independent_keys_and_paid_metrics(api):
+    from app.services.pey import FakePeyClient
+    client, conn = api
+    coupon(api)
+    legacy = legacy_at_cafe(client)
+    url = f'/api/alliances/{legacy["id"]}/quote'
+    assert client.post(url, json={"order_id": "1", "amount_cents": 10000}).status_code == 200
+    provider = FakePeyClient()
+    actual = create_reserved_order(conn, "next", provider)
+    assert actual.id == "1"
+    second = client.post(url, json={"order_id": actual.id, "amount_cents": 10000})
+    assert second.status_code == 200
+    assert second.json()["uses_remaining"] == 3
+    conn.execute("UPDATE orders SET status='paid' WHERE id=?", (actual.id,))
+    conn.commit()
+    metrics = client.get(f'/api/alliances/{legacy["id"]}/metrics').json()
+    assert metrics["referrals"] == 2
+    assert metrics["paid_purchases"] == 1
+    assert metrics["paid_sales_cents"] == 9000
+    before_collision = client.post(url, json={"order_id": actual.id, "amount_cents": 10000})
+    assert before_collision.status_code == 200
+    assert before_collision.json()["uses_remaining"] == 3
+    own_numeric = create_reserved_order(conn, "1", provider)
+    conn.execute("UPDATE orders SET status='paid' WHERE id=?", (own_numeric.id,))
+    conn.commit()
+    for reference in ("next", own_numeric.id):
+        replay = client.post(url, json={"order_id": reference, "amount_cents": 10000})
+        assert replay.status_code == 200
+        assert replay.json()["uses_remaining"] == 3
+        assert replay.json()["discount_cents"] == 1000
+    assert client.post(url, json={"order_id": "1", "amount_cents": 10000}).status_code == 409
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (legacy["id"],)).fetchone()) == (2, 2000)
+    metrics = client.get(f'/api/alliances/{legacy["id"]}/metrics').json()
+    assert metrics["paid_purchases"] == 2
+    assert metrics["paid_sales_cents"] == 18000
+    assert metrics["estimated_contribution_cents"] == 6000
+
+
+def test_historical_untyped_referral_still_blocks_coupon_and_counts_paid_order(api):
+    client, conn = api
+    token, _ = coupon(api)
+    legacy = legacy_at_cafe(client)
+    order = create_reserved_order(conn, "next")
+    conn.execute("""INSERT INTO referrals(id,alliance_id,order_id,original_cents,discount_cents,total_cents,created_at)
+        VALUES ('historical',?,?,10000,1000,9000,?)""", (legacy["id"], order.id, NOW.isoformat()))
+    conn.execute("UPDATE alliances SET uses=1,budget_used_cents=1000 WHERE id=?", (legacy["id"],))
+    conn.commit()
+    assert redeem(client, token, key="next").status_code == 409
+    assert client.get(f"/api/coupons/{token}").json()["status"] == "valid"
+    conn.execute("UPDATE orders SET status='paid' WHERE id=?", (order.id,))
+    conn.commit()
+    metrics = client.get(f'/api/alliances/{legacy["id"]}/metrics').json()
+    assert metrics["paid_purchases"] == 1
+    assert metrics["paid_sales_cents"] == 9000
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (legacy["id"],)).fetchone()) == (1, 1000)
+
+
+def test_legacy_binding_failure_rolls_back_referral_and_counters(api):
+    import sqlite3
+    import pytest
+    client, conn = api
+    coupon(api)
+    legacy = legacy_at_cafe(client)
+    conn.execute("""CREATE TRIGGER reject_legacy_binding BEFORE INSERT ON coupon_legacy_keys
+        BEGIN SELECT RAISE(ABORT, 'binding write failed'); END""")
+    conn.commit()
+    with pytest.raises(sqlite3.IntegrityError, match="binding write failed"):
+        client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": "failed-order", "amount_cents": 10000})
+    assert conn.execute("SELECT COUNT(*) FROM referrals WHERE alliance_id=?", (legacy["id"],)).fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM coupon_legacy_keys").fetchone()[0] == 0
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (legacy["id"],)).fetchone()) == (0, 0)
