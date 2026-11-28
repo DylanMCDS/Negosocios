@@ -9,18 +9,18 @@ Priority: P1
 Paths: web/src/features/explorar/
 Depends: HACK-050, HACK-038
 Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795910280
-Updated: 1795895880
+Lease-Until: 1795911164
+Updated: 1795896764
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/52; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/52
-Evidence: vitest explorar+perfil+mipagina exit 0; build exit 0; design-lint PASS; design-critic SHIP eb05422 · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]
+Evidence: vitest explorar+perfil+mipagina exit 0; build exit 0; design-lint PASS; design-critic SHIP 92cf549 · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ] · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]
 Participants: author dylan-2 (unknown); reviewer dylan-3 (unknown) reject; author dylan-2 (claude-sonnet-5-5)
-Events: 6
+Events: 7
 Checkpoints: 0
 Sessions: 3
 Last-Checkpoint: 0
-Task-Tip: eb054226ff99a4664fab0d85859c844df96e2720
+Task-Tip: 92cf549dbcfd56ce896ee98e2cf7b0b03eb44345
 Progress: 4 commit(s) since the claim · last: cfe7f2a HACK-051: tarjeta con altura al contenido y zoom abajo a la derecha (30 minutes ago) · 0 uncommitted tracked file(s) · at 1795895785
 Progress-Head: cfe7f2a/4294967295
 Progress-Changed: 1795895785
