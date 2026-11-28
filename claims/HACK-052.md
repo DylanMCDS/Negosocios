@@ -9,10 +9,10 @@ Priority: P1
 Paths: web/src/features/dividir/, web/src/features/cierre/, web/src/features/cobrar/, web/src/lib/api.ts
 Depends: HACK-042, HACK-047, HACK-049
 Verify: `npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795896432
-Updated: 1795893732
+Lease-Until: 1795897478
+Updated: 1795894778
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
-Next: primer test rojo
+Next: tras allow: fixture relativo, Verify, critic 390/1280, done
 PR: -
 Evidence: -
 Thread-Read: 296
