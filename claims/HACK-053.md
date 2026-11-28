@@ -6,7 +6,7 @@ Branch: feat/hack-053
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-053
 Worklog: worklog/WL-1795892018-dylan-3-HACK-053-hack.eqq2Og.md
 Priority: P1
-Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md
+Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md, app/services/alliances.py
 Depends: HACK-025, HACK-038
 Verify: `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
 Lease-Until: 1795895485

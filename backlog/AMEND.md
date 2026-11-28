@@ -82,3 +82,16 @@ Append-only; the last section of an ID replaces its section in the backlog. Why:
 - **Tests:** cobrar_amount_is_above_keypad, cobrar_action_is_fixed_in_thumb_zone, amount_inputs_use_decimal_keyboard, no_content_hidden_behind_bottom_nav
 - **Verify:** `npm --prefix web test -- --run && npm --prefix web run build && bash .uak/bin/design-lint && test -s docs/UX-AUDIT.md`
 - **Next step:** recorrer el flujo 1 a 390 px con Playwright y anotar cada toque.
+## HACK-053 · Cupones de alianza (backend): emitir, guardar, validar y canjear
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 90 min
+- **Rubric / Spec:** C2, C5 · prueba de Dylan 2026-11-28: wallet de cupones del cliente; el negocio escanea el cupón; el cupón se guarda al consumir en el negocio aliado y se aplica solo en el otro
+- **Depends on:** HACK-025, HACK-038
+- **Paths:** app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md, app/services/alliances.py
+- **Freeze-Allowed:** yes
+- **Acceptance:** Un **cupón** es por cliente (token aleatorio de un solo uso), pertenece a una alianza y se emite en el negocio que **da** el beneficio; sólo vale en el negocio aliado (la dirección de la alianza) y vence a los 7 días., `POST /api/coupons/claim` (negocio emisor + orden pagada de ese negocio, o el punto del negocio) emite un cupón **sólo** si hay una orden pagada en ese negocio que no haya reclamado ya uno; sin orden pagada, 409 con motivo en español., `GET /api/coupons/{token}` devuelve estado (vigente, usado, vencido), negocio emisor, negocio donde vale y descuento; sin datos sensibles., `POST /api/coupons/{token}/redeem` con la orden del negocio donde vale: aplica el descuento con las mismas reglas de la alianza (un beneficio por orden, tope de usos y de presupuesto, descuento en centavos enteros) y marca el cupón **usado** de forma atómica; un segundo canje devuelve 409., El cupón no sirve en otro negocio ni después de vencer; reintentar el mismo canje con la misma orden es idempotente., **Sin doble descuento:** una orden que ya consumió un cupón no acepta otro beneficio por el endpoint de código de alianza (`quote`), y al revés; el arreglo en `app/services/alliances.py` se limita a esa regla y no cambia el resultado de un cobro con código normal sin cupón., Tablas propias (`coupons`), sin tocar `db.py` ni los esquemas existentes; documentar el contrato en `docs/COUPONS.md`., Datos de ejemplo con `demo_data: true`.
+- **Tests:** claim_requires_paid_order_at_issuing_business, coupon_is_single_use, coupon_only_valid_at_partner_business, coupon_expires_after_seven_days, redeem_respects_budget_and_one_benefit_per_order, redeem_is_idempotent_for_same_order, coupon_view_never_exposes_sensitive_data
+- **Verify:** `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
+- **Next step:** aplicar el parche preparado en `app/services/alliances.py` y correr Verify.
