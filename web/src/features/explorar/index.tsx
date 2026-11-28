@@ -95,7 +95,7 @@ function PreviewCard({ business, reputation, trigger, onClose, partners, items, 
   return <div ref={panel} role="dialog" aria-label={`Vista previa de ${info.name}`} aria-busy={phase === "loading"}
     className="fixed inset-x-4 bottom-20 z-[1100] flex h-96 max-h-[55dvh] flex-col overflow-hidden rounded-lg bg-surface shadow-lift md:absolute md:inset-x-auto md:bottom-auto md:left-4 md:top-4 md:max-h-[calc(100%-32px)] md:w-96">
     <Button variant="ghost" size="sm" aria-label="Cerrar vista previa" className="absolute right-4 top-4 z-10 bg-surface" onClick={onClose}><X size={24} aria-hidden="true" /></Button>
-    <div className="min-h-0 flex-1 overflow-y-auto p-4">
+    <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-6">
       {network && partners.length > 0 ? (
         <div className="flex flex-col gap-3">
           <h2 className="pr-10 font-display text-[length:var(--text-l)] leading-tight">{`Red de ${info.name}`}</h2>
@@ -264,6 +264,13 @@ export default function Explorar() {
     lines.current = [];
     const from = (items ?? []).find((p) => p.business_id === selected);
     if (!ref || !from || !ref.L.polyline) return;
+    // On wide screens the card covers the left of the map: keep the whole network visible to its right.
+    const ids = [selected, ...partners.map((x) => x.partner_id)];
+    const points = (items ?? []).filter((p) => ids.includes(p.business_id)).map((p) => [p.lat, p.lng] as [number, number]);
+    if (points.length > 1) {
+      const wide = window.matchMedia?.("(min-width: 768px)").matches;
+      (ref.map as unknown as { fitBounds?: (b: unknown, o: unknown) => void }).fitBounds?.(points, { paddingTopLeft: [wide ? 420 : 40, 40], paddingBottomRight: [40, wide ? 40 : 300], maxZoom: 16 });
+    }
     lines.current = partners.flatMap((partner) => {
       const to = (items ?? []).find((p) => p.business_id === partner.partner_id);
       if (!to) return [];
