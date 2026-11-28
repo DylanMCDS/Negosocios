@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CheckCircle, Clock, Warning } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import { PromoSimulator } from "../../lib/discount";
 import type { Closing } from "../../lib/types";
-import { Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat } from "../../lib/ui";
+import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
 import { getBusinessId } from "../negocio/businessId";
+import ExpenseForm from "./ExpenseForm";
 import Recomendaciones from "./Recomendaciones";
 
 const DEMO_BUSINESS_ID = "rosa"; // negocio de la jornada de ejemplo cuando aún no hay alta en este navegador
@@ -18,10 +19,13 @@ const MISSING_TEXT: Record<string, string> = {
 export default function Cierre() {
   const [closing, setClosing] = useState<Closing | null>(null);
   const [failed, setFailed] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const businessId = getBusinessId() ?? DEMO_BUSINESS_ID;
 
-  useEffect(() => {
-    api<Closing>(`/closing/today?business_id=${encodeURIComponent(getBusinessId() ?? DEMO_BUSINESS_ID)}`).then(setClosing, () => setFailed(true));
-  }, []);
+  const load = useCallback(() => {
+    api<Closing>(`/closing/today?business_id=${encodeURIComponent(businessId)}`).then(setClosing, () => setFailed(true));
+  }, [businessId]);
+  useEffect(load, [load]);
 
   const demo = closing?.pending.some((o) => o.demo_data) ?? false;
   return (
@@ -47,8 +51,17 @@ export default function Cierre() {
                     <p key={m} className="font-semibold">{MISSING_TEXT[m] ?? `Falta: ${m}`}</p>
                   ))}
                   <p>La utilidad es estimada hasta que los captures.</p>
+                  {closing.missing.includes("expenses") && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button type="button" variant="secondary" onClick={() => setAdding(true)}>Agregar gasto</Button>
+                      <a href="#voz" className="inline-flex h-14 items-center rounded-full px-4 underline">Dictar gasto</a>
+                    </div>
+                  )}
                 </div>
               </div>
+            )}
+            {adding && (
+              <ExpenseForm businessId={businessId} onCancel={() => setAdding(false)} onSaved={() => { setAdding(false); load(); }} />
             )}
             <div className="grid grid-cols-2 gap-6 border-t border-line pt-6">
               <Stat label="Ventas cobradas" value={mxn(closing.confirmed_sales_cents)} unit="MXN" size="sm" />
@@ -75,7 +88,7 @@ export default function Cierre() {
                 Los pendientes no suman a tus ventas.
               </p>
             </section>
-            <Recomendaciones businessId={getBusinessId() ?? DEMO_BUSINESS_ID} />
+            <Recomendaciones businessId={businessId} />
           </>
         )}
       </PageLayout>
