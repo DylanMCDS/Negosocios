@@ -236,6 +236,7 @@ export default function Voz() {
           <p role="status" className="flex items-center gap-2">
             <CheckCircle size={24} aria-hidden="true" /> Gasto guardado.
             <a href="#cierre" className="underline">Ver en Cierre</a>
+            <Button variant="secondary" onClick={cancel}>Agregar otro gasto</Button>
           </p>
         )}
         {phase === "failed" && <p role="alert">No se pudo completar. Intenta de nuevo.</p>}
