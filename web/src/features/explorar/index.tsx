@@ -93,7 +93,7 @@ function PreviewCard({ business, reputation, trigger, onClose, partners, items, 
   const cover = page?.cover ?? "toldo";
   const Art = coverIcons[cover];
   return <div ref={panel} role="dialog" aria-label={`Vista previa de ${info.name}`} aria-busy={phase === "loading"}
-    className="fixed inset-x-4 bottom-20 z-[1100] flex h-96 max-h-[55dvh] flex-col overflow-hidden rounded-lg bg-surface shadow-lift md:absolute md:inset-x-auto md:bottom-auto md:left-4 md:top-4 md:max-h-[calc(100%-32px)] md:w-96">
+    className="fixed inset-x-4 bottom-20 z-[1100] flex h-auto max-h-[55dvh] flex-col overflow-hidden rounded-lg bg-surface shadow-lift md:absolute md:inset-x-auto md:bottom-auto md:left-4 md:top-4 md:max-h-[calc(100%-32px)] md:w-96">
     <Button variant="ghost" size="sm" aria-label="Cerrar vista previa" className="absolute right-4 top-4 z-10 bg-surface" onClick={onClose}><X size={24} aria-hidden="true" /></Button>
     <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-6">
       {network && partners.length > 0 ? (
@@ -211,6 +211,7 @@ export default function Explorar() {
         if (cancelled || !mapEl.current) return;
         const map = L.map(mapEl.current, { zoomControl: true }).setView([DEMO_CENTER.lat, DEMO_CENTER.lng], 15) as unknown as LeafletMap;
         map.attributionControl?.setPosition("topright");
+        (map as unknown as { zoomControl?: { setPosition?: (p: string) => void } }).zoomControl?.setPosition?.("bottomright");
         const tiles = L.tileLayer(TILES, { attribution: "© OpenStreetMap" });
         tiles.on("tileerror", () => setMapState((s) => (s === "ready" ? "no-tiles" : s)));
         tiles.addTo(map as never);
