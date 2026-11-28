@@ -1,12 +1,12 @@
 # worklog/WL-1795892072-dylan-3-HACK-050-hack.xIifk5.md · HACK-050
 
 ## Live summary
-- Done: PR49 SHA721362a aprobado por dylan-5; Verify y UI SHIP ya registrados
-- Decision: No saltar el gate: MERGE_HUMAN requiere fusión humana en forge
-- Why: uak merge canceló candidato al perder lock
-- Failing: MERGE_HUMAN HACK-050 | Lock perdido; candidato cancelado
-- Commands: uak heartbeat HACK-050; uak merge HACK-050 exit3
-- Next: Humano revisa motivo y fusiona https://github.com/DylanMCDS/Negosocios/pull/49; luego uak integrate HACK-050
+- Done: INTEGRATED: GitHub PR49 MERGED en4556e59624d5cf9cea6b76259fbb1b9194ee3fb8; aprobado dylan-5; UI SHIP y Verify verdes
+- Decision: Estado final confirmado en forge; no queda fusión humana pendiente
+- Why: El mensaje MERGE_HUMAN por lock perdido no coincidía con PR ya fusionado y claims INTEGRATED
+- Failing: Ninguno pendiente de producto
+- Commands: gh pr view 49 --json state,mergedAt,mergeCommit: MERGED; uak status --task HACK-050: INTEGRATED
+- Next: Sin trabajo pendiente en HACK-050; revisión activa HACK-053 SHAabe8265
 
 ## History
 - 1795892072 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de preview sobre mapa y cierre con foco restaurado | Harness: unknown | Model: unknown
@@ -19,3 +19,4 @@
 - 1795893259 | REVIEW | dylan-3 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown
 - 1795893267 | INTEGRATED | dylan-3 | merge; smoke and Verify PASS (smoke: full); commit 4556e59624d5cf9cea6b76259fbb1b9194ee3fb8; reviewer dylan-5 | Harness: unknown | Model: unknown
 - 1795893318 | INTEGRATED | dylan-3 | checkpoint; next: Humano revisa motivo y fusiona https://github.com/DylanMCDS/Negosocios/pull/49; luego uak integrate HACK-050 | Harness: unknown | Model: unknown
+- 1795893419 | INTEGRATED | dylan-3 | checkpoint; next: Sin trabajo pendiente en HACK-050; revisión activa HACK-053 SHAabe8265 | Harness: unknown | Model: unknown

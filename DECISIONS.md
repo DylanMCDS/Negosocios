@@ -97,3 +97,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795893009 | plan --amend | dylan/dylan | amended: HACK-053 Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md → app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md, app/services/alliances.py; | Why: scope or criteria fixed before review
 - 1795893318 | HACK-050 | No saltar el gate: MERGE_HUMAN requiere fusión humana en forge | Why: uak merge canceló candidato al perder lock
 - 1795893327 | HACK-053 | Paths ampliados por humano; guard acotado en quote sin cambiar códigos normales | Why: Un beneficio por compra en ambos endpoints con mismo bloqueo SQLite
+- 1795893419 | HACK-050 | Estado final confirmado en forge; no queda fusión humana pendiente | Why: El mensaje MERGE_HUMAN por lock perdido no coincidía con PR ya fusionado y claims INTEGRATED
