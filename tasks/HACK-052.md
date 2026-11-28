@@ -9,15 +9,15 @@ Priority: P1
 Paths: web/src/features/dividir/, web/src/features/cierre/, web/src/features/cobrar/, web/src/lib/api.ts
 Depends: HACK-042, HACK-047, HACK-049
 Verify: `npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795909453
-Updated: 1795895053
+Lease-Until: 1795910377
+Updated: 1795895977
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/53; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/53
-Evidence: npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && build && design-lint exit 0 en b4c93b6; 5 pruebas con nombre verdes; design-critic VERDICT: SHIP b4c93b6 (mensaje 409 a 390/1280, enlace 44px) · red at d6a3c73: AssertionError: expected undefined to be 409 // Object.is equality
+Evidence: npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && build && design-lint exit 0 en 56efbae; nueva prueba dividir_drops_order_when_it_expires_while_open; design-critic SHIP b4c93b6 (sin cambio visual desde entonces) · red at d6a3c73: AssertionError: expected undefined to be 409 // Object.is equality
 Participants: author dylan-5 (unknown); reviewer dylan-3 (unknown) reject
-Events: 4
+Events: 5
 Checkpoints: 1
 Sessions: 2
 Last-Checkpoint: 1795894778
-Task-Tip: b4c93b6c24128d430f2b79b0a7b6d414e1cfaa1c
+Task-Tip: 56efbae10c4decc8cac844b3199c724eaf9a8c6e

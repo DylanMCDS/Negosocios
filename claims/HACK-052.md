@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/features/dividir/, web/src/features/cierre/, web/src/features/cobrar/, web/src/lib/api.ts
 Depends: HACK-042, HACK-047, HACK-049
 Verify: `npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795909453
-Updated: 1795895053
+Lease-Until: 1795910377
+Updated: 1795895977
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/53; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/53
