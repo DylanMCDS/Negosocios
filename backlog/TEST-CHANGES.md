@@ -6,3 +6,4 @@ Append-only. Format: - ID | epoch | human | reason. Why: a test is a spec; chang
 - HACK-035 | 1795814108 | dylan | Barra movil 5+Mas (decision de Dylan): los tests del menu deben reflejar las nuevas entradas
 - HACK-046 | 1795820222 | dylan | Autorizado por Dylan (#222): actualizar explorar_opens_profile_not_payment / test de Explorar para que 'Ver negocio' abra #perfil/<id> en lugar de un cobro
 - HACK-045 | 1795820961 | dylan | Autorizado por Dylan: cambiar la aserción 'Elige tu cuenta' por 'Elige tu cobro' en la UI de HACK-045
+- HACK-052 | 1795894870 | dylan | dividir.test lists_pending_charges_to_split: expires_at del fixture relativo a la hora actual

@@ -103,3 +103,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795894184 | HACK-053 | Reenviado a rejecter via done --note; no cambio API ni esquema | Why: Evitar que una reserva futura se vincule a un ID de otra compra
 - 1795894438 | plan --amend | Dylan-Martinez/dylan-1 | amended: HACK-048 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/ → web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/, web/src/features/pagar/index.tsx; | Why: scope or criteria fixed before review
 - 1795894778 | HACK-052 | fallo de dividir.test lists_pending_charges por fixture con expires_at vencido; pido allow --tests (msg #299) | Why: filtro de vigentes oculta el fixture de ayer
+- 1795894870 | allow | dylan | test change: HACK-052 | Why: dividir.test lists_pending_charges_to_split: expires_at del fixture relativo a la hora actual

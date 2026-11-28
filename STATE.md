@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795894825
+Updated: 1795894870
 AVAILABLE: HACK-054 HACK-055 
 CLAIMED: HACK-052 
 BLOCKED: -
@@ -17,11 +17,11 @@ HACK-053 | REVIEW | dylan-4 | until 1795908584
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795893433 | HACK-053 | Cierre con uak done completado; sin fallos propios pendientes | Why: Paths ampliados por humano; control de doble descuento acotado a alliances.quote
 - 1795894006 | HACK-048 | editar features cierre/pagar mínimo | Why: criterios exigen pantallas reales
 - 1795894184 | HACK-053 | Reenviado a rejecter via done --note; no cambio API ni esquema | Why: Evitar que una reserva futura se vincule a un ID de otra compra
 - 1795894438 | plan --amend | Dylan-Martinez/dylan-1 | amended: HACK-048 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/ → web/src/App.tsx, web/sr
 - 1795894778 | HACK-052 | fallo de dividir.test lists_pending_charges por fixture con expires_at vencido; pido allow --tests (msg #299) | Why: filtro de vigentes oculta el fixture 
+- 1795894870 | allow | dylan | test change: HACK-052 | Why: dividir.test lists_pending_charges_to_split: expires_at del fixture relativo a la hora actual
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.
