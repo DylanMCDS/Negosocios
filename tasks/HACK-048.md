@@ -15,10 +15,10 @@ Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
 Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
 Evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0; ruta con View Transitions+fallback, reduced-motion, SkeletonList, FadeIn en Pagado, tokens únicos, capturas 390/1280, design-critic SHIP · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
-Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5)
-Events: 5
+Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject
+Events: 6
 Checkpoints: 1
-Sessions: 1
+Sessions: 2
 Last-Checkpoint: 1795892505
 Progress: 1 commit(s) since the claim · last: 35d5511 HACK-048: movimiento fluido (transición de ruta, esqueletos, fundidos, tokens únicos) (15 minutes ago) · 0 uncommitted tracked file(s) · at 1795893376
 Progress-Head: 35d5511/4294967295
