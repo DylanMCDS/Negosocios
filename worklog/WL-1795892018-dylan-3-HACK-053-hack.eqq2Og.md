@@ -1,12 +1,12 @@
 # worklog/WL-1795892018-dylan-3-HACK-053-hack.eqq2Og.md · HACK-053
 
 ## Live summary
-- Done: PR50 REVIEW abe8265; patch bilateral aplicado; Verify27 exit0, smoke PRODUCT_PASS, advisor GO; regresiones de stacking/concurrencia verdes
-- Decision: Paths ampliados por humano; guard acotado en quote sin cambiar códigos normales
-- Why: Un beneficio por compra en ambos endpoints con mismo bloqueo SQLite
-- Failing: Ninguno en HACK-053; re-review HACK-047 en curso
-- Commands: done HACK-053 REVIEW; q pytest coupons+alliances exit0; smoke --affected exit0; smoke PRODUCT_PASS; commit/push abe8265
-- Next: Esperar revisión HACK-053; cerrar re-review HACK-047 SHA3f1b1d6 y ack inbox
+- Done: PR50 REVIEW abe8265; Verify27 exit0; smoke PRODUCT_PASS; advisor GO; guard bilateral y concurrencia verdes. Re-review HACK047 APPROVE 3f1b1d6 con navegador y Verify33
+- Decision: Cierre con uak done completado; sin fallos propios pendientes
+- Why: Paths ampliados por humano; control de doble descuento acotado a alliances.quote
+- Failing: Ninguno
+- Commands: done HACK-053 REVIEW; Verify27 exit0; smoke --affected exit0; smoke PRODUCT_PASS; re-review HACK047 approve registrado
+- Next: Esperar veredicto HACK-053 en PR50; atender reject/approve según protocolo
 
 ## History
 - 1795892018 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem | Harness: unknown | Model: unknown
@@ -18,3 +18,4 @@
 - 1795893093 | CLAIMED | dylan-4 | Paths ampliados por humano: se aplica guard de doble descuento en alliances.py | Harness: unknown | Model: unknown
 - 1795893247 | REVIEW | dylan-4 | done; PR https://github.com/DylanMCDS/Negosocios/pull/50; evidence: abe8265: Verify uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py exit0 (27 pruebas); smoke --affected exit0; smoke PRODUCT_PASS exit0; advisor GO. Guard bilateral cupón/código bajo BEGIN IMMEDIATE, dos regresiones antes rojas ahora verdes, concurrencia un solo beneficio. Paths ampliados por Dylan; no cambios en db.py ni esquemas existentes. · red at c5e08a8: E   assert 409 == 201; reviewer: - | Harness: unknown | Model: unknown
 - 1795893327 | REVIEW | dylan-4 | checkpoint; next: Esperar revisión HACK-053; cerrar re-review HACK-047 SHA3f1b1d6 y ack inbox | Harness: unknown | Model: unknown
+- 1795893433 | REVIEW | dylan-4 | checkpoint; next: Esperar veredicto HACK-053 en PR50; atender reject/approve según protocolo | Harness: unknown | Model: unknown

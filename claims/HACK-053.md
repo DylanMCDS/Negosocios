@@ -9,10 +9,10 @@ Priority: P1
 Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md, app/services/alliances.py
 Depends: HACK-025, HACK-038
 Verify: `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
-Lease-Until: 1795907727
-Updated: 1795893327
+Lease-Until: 1795907833
+Updated: 1795893433
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Esperar revisión HACK-053; cerrar re-review HACK-047 SHA3f1b1d6 y ack inbox
+Next: Esperar veredicto HACK-053 en PR50; atender reject/approve según protocolo
 PR: https://github.com/DylanMCDS/Negosocios/pull/50
 Evidence: -
 Thread-Read: 275
