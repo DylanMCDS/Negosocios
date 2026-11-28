@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -94,4 +94,85 @@ it("explorar_opens_profile_not_payment", async () => {
   await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
   expect(screen.getByRole("link", { name: "Ver negocio" })).toHaveAttribute("href", "#perfil/rosa");
   expect(screen.queryByRole("link", { name: "Paga aquí con CoDi" })).not.toBeInTheDocument();
+});
+
+
+const publicPage = { ...all[0], cover: "maiz", reputation: { rating: 4.8, reviews_count: 9, endorsements: 3 }, promotions: [{ id: "promo-1", title: "Agua de la casa con Fonda Lupita", discount_pct: 10 }] };
+function servePreview(fail = false) {
+  const original = window.fetch;
+  vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+    if (url.startsWith("/api/profile/")) {
+      urls.push(url);
+      return new Response(JSON.stringify(fail ? { detail: "offline" } : publicPage), { status: fail ? 503 : 200 });
+    }
+    return original(url);
+  }));
+}
+
+it("selecting_business_shows_preview_card", async () => {
+  servePreview();
+  render(<Explorar />);
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+  expect(screen.queryByRole("dialog")).toBeInTheDocument();
+  const card = screen.getByRole("dialog", { name: /vista previa/i });
+  expect(card).toBeInTheDocument();
+  expect(await within(card).findByText("4.8 de 5 · 9 reseñas")).toBeInTheDocument();
+  expect(within(card).getByText("Agua de la casa con Fonda Lupita")).toBeInTheDocument();
+  expect(within(card).getByText("Abierto ahora")).toBeInTheDocument();
+  expect(within(card).getByText(/Tianguis de ejemplo/)).toBeInTheDocument();
+  expect(urls).toContain("/api/profile/rosa");
+});
+
+it("preview_card_opens_profile_not_payment", async () => {
+  servePreview(); render(<Explorar />);
+  await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+  const card = screen.getByRole("dialog");
+  expect(within(card).getByRole("link", { name: "Ver negocio" })).toHaveAttribute("href", "#perfil/rosa");
+  expect(within(card).queryByRole("link", { name: /pagar|cobrar/i })).not.toBeInTheDocument();
+});
+
+it("preview_card_closes_with_escape_and_returns_focus", async () => {
+  servePreview(); render(<Explorar />);
+  const trigger = await screen.findByRole("button", { name: /Tacos de Doña Rosa/ });
+  await userEvent.click(trigger);
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  await userEvent.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(trigger).toHaveFocus();
+});
+
+it("preview_card_falls_back_when_profile_fails", async () => {
+  servePreview(true); render(<Explorar />);
+  await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+  const card = screen.getByRole("dialog");
+  expect(await within(card).findByText("No pudimos cargar el perfil")).toBeInTheDocument();
+  expect(within(card).getByRole("heading", { name: "Tacos de Doña Rosa" })).toBeInTheDocument();
+  expect(within(card).getByRole("link", { name: "Ver negocio" })).toHaveAttribute("href", "#perfil/rosa");
+});
+
+it("preview_closes_with_button_and_outside_pointer", async () => {
+  servePreview(); render(<Explorar />);
+  const trigger = await screen.findByRole("button", { name: /Tacos de Doña Rosa/ });
+  await userEvent.click(trigger);
+  await userEvent.click(screen.getByRole("button", { name: "Cerrar vista previa" }));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(trigger).toHaveFocus();
+  await userEvent.click(trigger);
+  await userEvent.click(screen.getByRole("heading", { name: "Explorar" }));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(trigger).toHaveFocus();
+});
+
+it("preview_has_loading_state_until_public_profile_arrives", async () => {
+  const original = window.fetch;
+  let finish!: (response: Response) => void;
+  vi.stubGlobal("fetch", vi.fn((url: string) => url.startsWith("/api/profile/") ? new Promise<Response>((resolve) => { finish = resolve; }) : original(url)));
+  render(<Explorar />);
+  await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+  expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
+  expect(screen.getByRole("status", { name: "Cargando perfil" })).toBeInTheDocument();
+  await act(async () => { finish(new Response(JSON.stringify(publicPage), { status: 200 })); });
+  expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "false");
+  expect(screen.queryByRole("status", { name: "Cargando perfil" })).not.toBeInTheDocument();
 });
