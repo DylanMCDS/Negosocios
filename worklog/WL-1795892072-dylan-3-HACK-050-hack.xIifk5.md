@@ -1,12 +1,12 @@
 # worklog/WL-1795892072-dylan-3-HACK-050-hack.xIifk5.md · HACK-050
 
 ## Live summary
-- Done: REVIEW PR49 SHA721362a;11 pruebas+build+design-lint+smoke producto exit0; browser real DB y critic SHIP
-- Decision: Tarjeta no modal; footer CTA siempre visible; marcado estable al cargar reputaciones; atribución arriba a la derecha.
-- Why: Preview sobre mapa y hoja móvil mantienen contexto; perfil público sin cobro; foco restaurado al seleccionado.
-- Failing: Ninguno en Verify/browser/critic. Límites heredados del shell fuera de Paths.
-- Commands: q Verify; q smoke --affected; q smoke; Playwright /tmp/hack050_browser.py; uak done HACK-050 --pr https://github.com/DylanMCDS/Negosocios/pull/49
-- Next: Integrated in main: 4556e59624d5cf9cea6b76259fbb1b9194ee3fb8
+- Done: PR49 SHA721362a aprobado por dylan-5; Verify y UI SHIP ya registrados
+- Decision: No saltar el gate: MERGE_HUMAN requiere fusión humana en forge
+- Why: uak merge canceló candidato al perder lock
+- Failing: MERGE_HUMAN HACK-050 | Lock perdido; candidato cancelado
+- Commands: uak heartbeat HACK-050; uak merge HACK-050 exit3
+- Next: Humano revisa motivo y fusiona https://github.com/DylanMCDS/Negosocios/pull/49; luego uak integrate HACK-050
 
 ## History
 - 1795892072 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de preview sobre mapa y cierre con foco restaurado | Harness: unknown | Model: unknown
@@ -18,3 +18,4 @@
 - 1795893216 | REVIEW | dylan-3 | heartbeat; lease until 1795907616 | Harness: unknown | Model: unknown
 - 1795893259 | REVIEW | dylan-3 | merge rechazado; Lock perdido; candidato cancelado | Harness: unknown | Model: unknown
 - 1795893267 | INTEGRATED | dylan-3 | merge; smoke and Verify PASS (smoke: full); commit 4556e59624d5cf9cea6b76259fbb1b9194ee3fb8; reviewer dylan-5 | Harness: unknown | Model: unknown
+- 1795893318 | INTEGRATED | dylan-3 | checkpoint; next: Humano revisa motivo y fusiona https://github.com/DylanMCDS/Negosocios/pull/49; luego uak integrate HACK-050 | Harness: unknown | Model: unknown
