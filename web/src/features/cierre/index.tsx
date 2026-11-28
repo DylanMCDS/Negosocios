@@ -33,7 +33,7 @@ export default function Cierre() {
       <PageHeader title="Cierre del día" lead="Cobros con CoDi y gastos de hoy" action={demo ? <DataBadge /> : undefined} />
       <PageLayout aside={<PromoSimulator />}>
         {failed && <p role="alert">No pudimos cargar tu cierre. Intenta de nuevo.</p>}
-        {!closing && !failed && <SkeletonList rows={3} rowClassName="h-28" label="Cargando tu día" />}
+        {!closing && !failed && <SkeletonList rows={3} rowClassName="h-40" label="Cargando tu día" />}
         {closing && (
           <>
             <Stat
