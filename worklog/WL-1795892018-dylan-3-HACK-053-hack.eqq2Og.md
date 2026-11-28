@@ -6,7 +6,7 @@
 - Why: Distinguir claves futuras e IDs de compras distintas sin corromper reintentos ni métricas.
 - Failing: Ninguno en Verify de HACK-053; pendiente veredicto independiente.
 - Commands: uak done HACK-053 REVIEW; pytest coupons+alliances exit 0; pytest populate+reviews exit 0; smoke PRODUCT_PASS; review HACK-048 reject registrado.
-- Next: Esperar aprobación o rechazo de HACK-053; atender mensajes. HACK-046 ya INTEGRATED y no requiere revisión.
+- Next: Integrated in main: b97a4ba4ed0b92ff8e4dce2b770435d48f652512
 
 ## History
 - 1795892018 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem | Harness: unknown | Model: unknown
@@ -26,3 +26,4 @@
 - 1795894873 | REVIEW | dylan-4 | done; PR https://github.com/DylanMCDS/Negosocios/pull/50; evidence: a45ad23: Verify coupons+alliances exit0 (35 pruebas); población/reseñas exit0; smoke --affected exit0; smoke PRODUCT_PASS; advisor GO. Regresiones de ambos rechazos verificadas. · red at c5e08a8: E   assert 409 == 201; reviewer: - | Harness: unknown | Model: unknown
 - 1795894910 | REVIEW | dylan-4 | checkpoint; next: Esperar aprobación o rechazo de HACK-053; atender mensajes. HACK-046 ya INTEGRATED y no requiere revisión. | Harness: unknown | Model: unknown
 - 1795895961 | REVIEW | dylan-5 | review; approve; SHA a45ad23bd9c003c77960dcc6e90407a8c962fbc5; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795896024 | INTEGRATED | dylan-4 | merge; smoke and Verify PASS (smoke: full); commit b97a4ba4ed0b92ff8e4dce2b770435d48f652512; reviewer dylan-5 | Harness: unknown | Model: unknown

@@ -1,6 +1,6 @@
 # HACK-053
 ID: HACK-053
-State: REVIEW
+State: INTEGRATED
 Owner: dylan-4
 Branch: feat/hack-053
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-053
@@ -9,15 +9,19 @@ Priority: P1
 Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md, app/services/alliances.py
 Depends: HACK-025, HACK-038
 Verify: `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
-Lease-Until: 1795909310
-Updated: 1795894910
+Lease-Until: 0
+Updated: 1795896024
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Esperar aprobación o rechazo de HACK-053; atender mensajes. HACK-046 ya INTEGRATED y no requiere revisión.
+Next: Integrated in main: b97a4ba4ed0b92ff8e4dce2b770435d48f652512
 PR: https://github.com/DylanMCDS/Negosocios/pull/50
 Evidence: a45ad23: Verify coupons+alliances exit0 (35 pruebas); población/reseñas exit0; smoke --affected exit0; smoke PRODUCT_PASS; advisor GO. Regresiones de ambos rechazos verificadas. · red at c5e08a8: E   assert 409 == 201
-Participants: author dylan-3 (unknown); author dylan-4 (unknown); reviewer dylan-3 (unknown) reject; reviewer dylan-5 (claude-sonnet-5-5) approve
-Events: 17
+Participants: author dylan-3 (unknown); author dylan-4 (unknown); reviewer dylan-3 (unknown) reject; reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-4 (unknown)
+Events: 18
 Checkpoints: 7
 Sessions: 4
 Last-Checkpoint: 1795894910
 Task-Tip: a45ad23bd9c003c77960dcc6e90407a8c962fbc5
+Merge-Commit: b97a4ba4ed0b92ff8e4dce2b770435d48f652512
+Reviewer: dylan-5
+Integration-Proof: ancestry
+Smoke: full
