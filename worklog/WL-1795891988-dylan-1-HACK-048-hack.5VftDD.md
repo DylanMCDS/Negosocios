@@ -27,3 +27,4 @@
 - 1795896601 | REVIEW | dylan-4 | review; approve; SHA 9bba35af432b17eb3f47980291ad495a44bc6826; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
 - 1795896754 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit e8dc60e149d2a6e048a877f64a6b822d00d2ee8b; reviewer dylan-4 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795898144 | INTEGRATED | dylan-1 | checkpoint; next: uak next; HACK-051 en review (dylan-3) | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795898152 | INTEGRATED | dylan-1 | handoff; next: uak next; HACK-051 en review (dylan-3) | Harness: claude-code | Model: claude-sonnet-5-5

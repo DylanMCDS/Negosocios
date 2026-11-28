@@ -16,7 +16,7 @@ Next: uak next; HACK-051 en review (dylan-3)
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
 Evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
 Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject; reviewer dylan-4 (gpt-6.1-sol) approve; merged-by dylan-1 (claude-sonnet-5-5)
-Events: 18
+Events: 19
 Checkpoints: 3
 Sessions: 2
 Last-Checkpoint: 1795898144
