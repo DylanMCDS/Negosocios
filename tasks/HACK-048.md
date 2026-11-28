@@ -20,3 +20,7 @@ Events: 1
 Checkpoints: 0
 Sessions: 1
 Last-Checkpoint: 0
+Progress: 0 commit(s) since the claim · last: c5e08a8 Merge HACK-046 reviewed by dylan-1 (84 minutes ago) · 0 uncommitted tracked file(s) · at 1795892351
+Progress-Head: c5e08a8/4294967295
+Progress-Changed: 1795892351
+Away: 1795892351
