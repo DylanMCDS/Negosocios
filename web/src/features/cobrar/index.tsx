@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
+import { FadeIn } from "../../lib/motion";
 import { api, isLive, useTick } from "../../lib/api";
 import CouponScanner from "./CouponScanner";
 import { appendKey, formatCents, formatTyping, toCents } from "./amount";
@@ -333,14 +334,16 @@ export default function Cobrar() {
                 </Button>
               )}
               {phase === "paid" && (
-                <div role="status" className="fixed inset-0 z-20 flex flex-col items-center justify-center gap-8 bg-bg p-6 text-center">
-                  <CheckCircle size={96} weight="fill" aria-hidden="true" className="text-ok-ink" />
-                  <p className="font-display text-[length:var(--text-hero)] text-ok-ink">Pagado</p>
-                  <p className="font-display text-[length:var(--text-2xl)]">{pesos(order.amount_cents)}</p>
-                  <Button className="w-full max-w-sm" onClick={reset}>
-                    Cobrar otra orden
-                  </Button>
-                </div>
+                <FadeIn className="fixed inset-0 z-20 bg-bg">
+                  <div role="status" className="flex h-full flex-col items-center justify-center gap-8 p-6 text-center">
+                    <CheckCircle size={96} weight="fill" aria-hidden="true" className="text-ok-ink" />
+                    <p className="font-display text-[length:var(--text-hero)] text-ok-ink">Pagado</p>
+                    <p className="font-display text-[length:var(--text-2xl)]">{pesos(order.amount_cents)}</p>
+                    <Button className="w-full max-w-sm" onClick={reset}>
+                      Cobrar otra orden
+                    </Button>
+                  </div>
+                </FadeIn>
               )}
             </>
           ) : (
