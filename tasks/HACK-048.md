@@ -9,17 +9,17 @@ Priority: P1
 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/
 Depends: HACK-005
 Verify: `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795908010
-Updated: 1795893610
+Lease-Until: 1795908406
+Updated: 1795894006
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run .uak/bin/smoke
+Next: uak done con nota
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
 Evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0; ruta con View Transitions+fallback, reduced-motion, SkeletonList, FadeIn en Pagado, tokens únicos, capturas 390/1280, design-critic SHIP · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
 Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject
-Events: 6
-Checkpoints: 1
+Events: 7
+Checkpoints: 2
 Sessions: 2
-Last-Checkpoint: 1795892505
+Last-Checkpoint: 1795894006
 Progress: 1 commit(s) since the claim · last: 35d5511 HACK-048: movimiento fluido (transición de ruta, esqueletos, fundidos, tokens únicos) (15 minutes ago) · 0 uncommitted tracked file(s) · at 1795893376
 Progress-Head: 35d5511/4294967295
 Progress-Changed: 1795893376

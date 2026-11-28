@@ -9,10 +9,10 @@ Priority: P1
 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/
 Depends: HACK-005
 Verify: `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795908010
-Updated: 1795893610
+Lease-Until: 1795908406
+Updated: 1795894006
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run .uak/bin/smoke
+Next: uak done con nota
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
 Evidence: -
 Thread-Read: 270
