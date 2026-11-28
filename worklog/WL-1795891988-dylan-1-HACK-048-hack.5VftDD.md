@@ -12,3 +12,4 @@
 - 1795891988 | CLAIMED | dylan-1 | claim; next: test rojo de route_change_uses_transition_and_respects_reduced_motion | Harness: unknown | Model: unknown
 - 1795892381 | CLAIMED | dylan-1 | heartbeat; lease until 1795895081 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795892505 | CLAIMED | dylan-1 | checkpoint; next: capturas 390/1280 con y sin reduced motion en .uak-shots/HACK-048, design-critic, uak done | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795893376 | CLAIMED | dylan-1 | heartbeat; lease until 1795896076 | Harness: claude-code | Model: claude-sonnet-5-5
