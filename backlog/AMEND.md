@@ -108,3 +108,16 @@ Append-only; the last section of an ID replaces its section in the backlog. Why:
 - **Tests:** route_change_uses_transition_and_respects_reduced_motion, loading_states_render_skeleton_not_text, motion_tokens_are_single_source, pagado_screen_fades_in
 - **Verify:** `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
 - **Next step:** test rojo de `route_change_uses_transition_and_respects_reduced_motion`.
+## HACK-048 · App fluida: transiciones suaves entre pantallas, sin saltos ni pantallas en blanco
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C5, C2 · prueba de Dylan 2026-11-28: "que la app se sienta muy fluida sin transiciones bruscas"
+- **Depends on:** HACK-005
+- **Paths:** web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/, web/src/features/pagar/index.tsx
+- **Freeze-Allowed:** yes
+- **Acceptance:** Al cambiar de pantalla (menú, enlaces `#...`) hay una transición corta (150-220 ms, fundido con un pequeño desplazamiento) con la View Transitions API cuando existe y un fundido CSS como respaldo; nunca un corte seco., Con `prefers-reduced-motion` no hay movimiento: cambio inmediato o fundido sin desplazamiento., Sin saltos de diseño: el módulo de movimiento ofrece `SkeletonList` y `FadeIn` (esqueleto del mismo tamaño que el contenido final, sin CLS) y se usan en el shell y en el comprobante de Pagar. Adoptarlos en Cierre, Cobrar y Dividir se hace en HACK-056 (esos archivos son de HACK-052, enmienda humana de Dylan 2026-11-28)., Al cambiar de pantalla se vuelve arriba suavemente y se conserva la posición al volver atrás; la barra del menú no parpadea ni se re-monta., Botones y tarjetas tocables con respuesta táctil breve (pulsado/hover) sin animar propiedades que causen reflujo (sólo `opacity` y `transform`)., El comprobante de Pagar entra con un fundido (`FadeIn`), no aparece de golpe; los fundidos de "Pagado" (Cobrar) y "Cuenta completa" (Dividir) pasan a HACK-056., Un solo módulo de movimiento (`web/src/lib/motion/`) con duraciones y curvas en tokens, sin animaciones sueltas por pantalla., Recipe: shell · Hero: el cambio de pantalla del menú., Captura a 390 y 1280 (con y sin reduced motion); design-critic SHIP.
+- **Tests:** route_change_uses_transition_and_respects_reduced_motion, loading_states_render_skeleton_not_text, motion_tokens_are_single_source, pagado_screen_fades_in
+- **Verify:** `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** quitar de la rama lo que dependa de cierre/cobrar/dividir, correr Verify y `uak done` con la nota de la enmienda.

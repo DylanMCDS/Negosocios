@@ -105,3 +105,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795894778 | HACK-052 | fallo de dividir.test lists_pending_charges por fixture con expires_at vencido; pido allow --tests (msg #299) | Why: filtro de vigentes oculta el fixture de ayer
 - 1795894870 | allow | dylan | test change: HACK-052 | Why: dividir.test lists_pending_charges_to_split: expires_at del fixture relativo a la hora actual
 - 1795894910 | HACK-053 | Vinculación explícita de reservas legadas nuevas con clave original; lectura histórica conservadora. | Why: Distinguir claves futuras e IDs de compras distintas sin corromper reintentos ni métricas.
+- 1795896020 | plan --amend | dylan/dylan | amended: HACK-048 | Why: scope or criteria fixed before review

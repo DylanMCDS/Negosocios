@@ -1,6 +1,6 @@
 # HACK-048
 ID: HACK-048
-State: REVIEW
+State: CLAIMED
 Owner: dylan-1
 Branch: feat/hack-048
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-048
