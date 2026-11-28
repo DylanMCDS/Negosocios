@@ -12,7 +12,7 @@ Verify: `npm --prefix web test -- --run src/features/dividir src/features/cierre
 Lease-Until: 1795910377
 Updated: 1795895977
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/53; run .uak/bin/smoke
+Next: Humano: New file outside Paths: web/src/lib/api.test.ts. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation)
 PR: https://github.com/DylanMCDS/Negosocios/pull/53
 Evidence: -
 Thread-Read: 318
