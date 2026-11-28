@@ -406,3 +406,30 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** profile_roundtrip_saves_menu_and_description, profile_never_exposes_clabe, demo_businesses_have_profiles, explorar_opens_profile_not_payment, profile_page_shows_codi_badge_not_pay_button
 - **Verify:** `uv run pytest -q app/tests/test_profile.py && npm --prefix web test -- --run src/features/perfil src/features/mipagina src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
 - **Next step:** test rojo de `profile_roundtrip_saves_menu_and_description`.
+## HACK-047 · Gastos: agregar un gasto a mano desde Cierre y llegar a Voz desde el aviso "Faltan tus gastos"
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 45 min
+- **Rubric / Spec:** C4, C5 · prueba de Dylan 2026-11-28: "¿dónde se agregan los gastos por negocio? solo me da el aviso de que faltan tus gastos"
+- **Depends on:** HACK-011, HACK-044
+- **Paths:** web/src/features/cierre/, web/src/features/voz/, web/src/lib/types.ts
+- **Freeze-Allowed:** yes
+- **Acceptance:** El aviso "Faltan tus gastos" de Cierre trae dos botones: **Agregar gasto** y **Dictar gasto** (abre `#voz`). Hoy el aviso no lleva a ningún lado., **Agregar gasto** abre un formulario en la misma pantalla (sin salir de Cierre): importe, categoría de una lista corta (insumos, renta, luz y agua, gas, transporte, otro), descripción opcional y fecha (hoy por defecto). Guarda con `POST /api/expenses` (`source: "manual"`) en el negocio activo., Al guardar: el gasto aparece en Cierre sin recargar, el aviso desaparece si ya hay gastos, y la utilidad se recalcula. Errores en español, sin perder lo escrito., Validación: importe mayor a 0 con dos decimales, categoría obligatoria; el teclado numérico se abre en móvil (`inputMode="decimal"`)., En Voz, tras confirmar un gasto, el botón "Ver en Cierre" sigue funcionando y se ofrece "Agregar otro gasto" (sin cambiar la lógica de dictado)., Recipe: form · Hero: el importe del gasto., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** closing_notice_links_to_add_expense_and_voice, manual_expense_form_posts_manual_source_for_active_business, saved_expense_updates_closing_without_reload, expense_form_rejects_zero_amount
+- **Verify:** `npm --prefix web test -- --run src/features/cierre src/features/voz && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `closing_notice_links_to_add_expense_and_voice`.
+
+## HACK-048 · App fluida: transiciones suaves entre pantallas, sin saltos ni pantallas en blanco
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C5, C2 · prueba de Dylan 2026-11-28: "que la app se sienta muy fluida sin transiciones bruscas"
+- **Depends on:** HACK-005
+- **Paths:** web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Al cambiar de pantalla (menú, enlaces `#...`) hay una transición corta (150-220 ms, fundido con un pequeño desplazamiento) con la View Transitions API cuando existe y un fundido CSS como respaldo; nunca un corte seco., Con `prefers-reduced-motion` no hay movimiento: cambio inmediato o fundido sin desplazamiento., Sin saltos de diseño: los estados "Cargando…" usan un esqueleto del mismo tamaño que el contenido final; las listas y tarjetas no cambian de alto al llegar los datos (sin CLS visible)., Al cambiar de pantalla se vuelve arriba suavemente y se conserva la posición al volver atrás; la barra del menú no parpadea ni se re-monta., Botones y tarjetas tocables con respuesta táctil breve (pulsado/hover) sin animar propiedades que causen reflujo (sólo `opacity` y `transform`)., Las pantallas de estado largo (Pagado, Comprobante, Cuenta completa) entran con un fundido, no aparecen de golpe., Un solo módulo de movimiento (`web/src/lib/motion/`) con duraciones y curvas en tokens, sin animaciones sueltas por pantalla., Recipe: shell · Hero: el cambio de pantalla del menú., Captura a 390 y 1280 (con y sin reduced motion); design-critic SHIP.
+- **Tests:** route_change_uses_transition_and_respects_reduced_motion, loading_states_render_skeleton_not_text, motion_tokens_are_single_source, pagado_screen_fades_in
+- **Verify:** `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `route_change_uses_transition_and_respects_reduced_motion`.

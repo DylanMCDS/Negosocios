@@ -86,3 +86,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795822058 | HACK-045 | Integrado por protocolo sprint Auto-Merge yes tras aprobación bf6ad84 | Why: Verify, smoke y critic verdes; aprobación independiente confirmada
 - 1795822135 | HACK-046 | Perfil oculto pero enrutable; Mi página visible en Más. Horarios canónicos y datos públicos allowlist; editor por secciones y preview compartida. | Why: No crear cobros desde Explorar ni publicar datos sensibles; mantener componentes de kit.
 - 1795825236 | deadline lease/HACK-046/1795824835 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
+- 1795891638 | plan | dylan/dylan | tasks added: HACK-047 HACK-048 | Why: backlog without PR (Plan-Channel: claims)
