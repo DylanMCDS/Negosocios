@@ -9,8 +9,8 @@ Priority: P1
 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/
 Depends: HACK-005
 Verify: `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795894688
-Updated: 1795891988
+Lease-Until: 1795895081
+Updated: 1795892381
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
 Next: test rojo de route_change_uses_transition_and_respects_reduced_motion
 PR: -

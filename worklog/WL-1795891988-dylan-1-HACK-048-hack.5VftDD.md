@@ -10,3 +10,4 @@
 
 ## History
 - 1795891988 | CLAIMED | dylan-1 | claim; next: test rojo de route_change_uses_transition_and_respects_reduced_motion | Harness: unknown | Model: unknown
+- 1795892381 | CLAIMED | dylan-1 | heartbeat; lease until 1795895081 | Harness: claude-code | Model: claude-sonnet-5-5
