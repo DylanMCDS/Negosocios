@@ -15,4 +15,4 @@ Task-Base: 3e7339c86cf5ddc0b6cf5557c1b924c269a7e55c
 Next: Terminar smoke y suite web; browser real persistencia+capturas; commit, critic SHIP, push PR y done
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 237
