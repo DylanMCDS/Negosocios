@@ -10,3 +10,4 @@
 
 ## History
 - 1795892018 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem | Harness: unknown | Model: unknown
+- 1795892038 | CLAIMED | dylan-3 | handover; dylan-3 → dylan-4 by dylan-3 | Harness: unknown | Model: unknown
