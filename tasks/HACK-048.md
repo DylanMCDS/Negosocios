@@ -9,14 +9,14 @@ Priority: P1
 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/
 Depends: HACK-005
 Verify: `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795908406
-Updated: 1795894006
+Lease-Until: 1795908410
+Updated: 1795894010
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: uak done con nota
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run .uak/bin/smoke
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
-Evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0; ruta con View Transitions+fallback, reduced-motion, SkeletonList, FadeIn en Pagado, tokens únicos, capturas 390/1280, design-critic SHIP · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+Evidence: npm --prefix web test -- --run (131) + build + design-lint exit 0; skeleton en cierre/pagar, FadeIn en comprobante, scroll restore, App.test · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
 Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject
-Events: 7
+Events: 8
 Checkpoints: 2
 Sessions: 2
 Last-Checkpoint: 1795894006
@@ -24,4 +24,4 @@ Progress: 1 commit(s) since the claim · last: 35d5511 HACK-048: movimiento flui
 Progress-Head: 35d5511/4294967295
 Progress-Changed: 1795893376
 Away: 1795892351
-Task-Tip: 35d551168d7013fff39b567e1e2306441cca75ab
+Task-Tip: a3facb63f7b5aa8d6e6d8534b69aed5d5e91a031
