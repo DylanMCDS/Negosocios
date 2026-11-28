@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
-import { api } from "../../lib/api";
+import { api, isLive, useTick } from "../../lib/api";
 import { appendKey, formatCents, formatTyping, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
@@ -117,7 +117,9 @@ export default function Cobrar() {
     if (getBusinessId()) void resolveActiveBusiness().then(setActive);
   }, []);
   const amountCents = toCents(digits);
-  const [waiting, setWaiting] = useState<Order[]>([]);
+  const [waitingAll, setWaiting] = useState<Order[]>([]);
+  useTick();
+  const waiting = waitingAll.filter(isLive);
   useEffect(() => {
     const ids = readPending();
     if (ids.length === 0) return;
@@ -128,7 +130,7 @@ export default function Cobrar() {
       ),
     ).then((found) => {
       if (!live) return;
-      const open = found.filter((o): o is Order => o !== null && o.status === "pending");
+      const open = found.filter((o): o is Order => o !== null && isLive(o));
       writePending(open.map((o) => o.id));
       setWaiting(open);
     });
