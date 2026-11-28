@@ -100,3 +100,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795893419 | HACK-050 | Estado final confirmado en forge; no queda fusión humana pendiente | Why: El mensaje MERGE_HUMAN por lock perdido no coincidía con PR ya fusionado y claims INTEGRATED
 - 1795893433 | HACK-053 | Cierre con uak done completado; sin fallos propios pendientes | Why: Paths ampliados por humano; control de doble descuento acotado a alliances.quote
 - 1795894006 | HACK-048 | editar features cierre/pagar mínimo | Why: criterios exigen pantallas reales
+- 1795894184 | HACK-053 | Reenviado a rejecter via done --note; no cambio API ni esquema | Why: Evitar que una reserva futura se vincule a un ID de otra compra

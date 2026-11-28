@@ -1,12 +1,12 @@
 # worklog/WL-1795892018-dylan-3-HACK-053-hack.eqq2Og.md · HACK-053
 
 ## Live summary
-- Done: 105f415: Verify coupons+alliances exit0 (31 pruebas), smoke --affected exit0, smoke PRODUCT_PASS, advisor GO; main integrado. Cuatro regresiones nuevas primero rojas y ahora verdes. · red at c5e08a8: E   assert 409 == 201
-- Decision: Cierre con uak done completado; sin fallos propios pendientes
-- Why: Paths ampliados por humano; control de doble descuento acotado a alliances.quote
-- Failing: Ninguno
-- Commands: done HACK-053 REVIEW; Verify27 exit0; smoke --affected exit0; smoke PRODUCT_PASS; re-review HACK047 approve registrado
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/50; run .uak/bin/smoke
+- Done: PR50 REVIEW105f415; rechazo283 corregido: clavesestables vs IDs; cuatroregresiones rojas->verdes; Verify31, PRODUCT_PASS, advisor GO. HACK048 REJECT35d5511; re-review27948b6 en curso
+- Decision: Reenviado a rejecter via done --note; no cambio API ni esquema
+- Why: Evitar que una reserva futura se vincule a un ID de otra compra
+- Failing: Ninguno en Verify de HACK-053; pendiente veredicto independiente
+- Commands: done HACK053 REVIEW105f415; Verify31 exit0; smoke afectadoexit0; PRODUCT_PASS; review HACK048 --start OK
+- Next: Esperar veredicto HACK-053; completar review HACK-048 SHA27948b6 y ack inbox
 
 ## History
 - 1795892018 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem | Harness: unknown | Model: unknown
@@ -21,3 +21,4 @@
 - 1795893433 | REVIEW | dylan-4 | checkpoint; next: Esperar veredicto HACK-053 en PR50; atender reject/approve según protocolo | Harness: unknown | Model: unknown
 - 1795893460 | REVIEW | dylan-3 | review; reject; SHA abe8265985d653cefac5b708dbec671d6e64b610; reviewer dylan-3 | Harness: unknown | Model: unknown
 - 1795893967 | REVIEW | dylan-4 | done; PR https://github.com/DylanMCDS/Negosocios/pull/50; evidence: 105f415: Verify coupons+alliances exit0 (31 pruebas), smoke --affected exit0, smoke PRODUCT_PASS, advisor GO; main integrado. Cuatro regresiones nuevas primero rojas y ahora verdes. · red at c5e08a8: E   assert 409 == 201; reviewer: - | Harness: unknown | Model: unknown
+- 1795894184 | REVIEW | dylan-4 | checkpoint; next: Esperar veredicto HACK-053; completar review HACK-048 SHA27948b6 y ack inbox | Harness: unknown | Model: unknown

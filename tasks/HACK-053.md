@@ -9,15 +9,15 @@ Priority: P1
 Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md, app/services/alliances.py
 Depends: HACK-025, HACK-038
 Verify: `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
-Lease-Until: 1795908367
-Updated: 1795893967
+Lease-Until: 1795908584
+Updated: 1795894184
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/50; run .uak/bin/smoke
+Next: Esperar veredicto HACK-053; completar review HACK-048 SHA27948b6 y ack inbox
 PR: https://github.com/DylanMCDS/Negosocios/pull/50
 Evidence: 105f415: Verify coupons+alliances exit0 (31 pruebas), smoke --affected exit0, smoke PRODUCT_PASS, advisor GO; main integrado. Cuatro regresiones nuevas primero rojas y ahora verdes. · red at c5e08a8: E   assert 409 == 201
 Participants: author dylan-3 (unknown); author dylan-4 (unknown); reviewer dylan-3 (unknown) reject
-Events: 12
-Checkpoints: 5
+Events: 13
+Checkpoints: 6
 Sessions: 3
-Last-Checkpoint: 1795893433
+Last-Checkpoint: 1795894184
 Task-Tip: 105f415bd9275a183f41dfd4b3f15141fdf60693
