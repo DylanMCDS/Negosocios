@@ -1,0 +1,1755 @@
+[
+  {
+    "business_id": "pop-tortilleria-01",
+    "description": "Tortillería La Esperanza · Centro Oriente: kilo de tortilla, medio kilo, tostadas. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Kilo de tortilla",
+        "price_cents": 2600,
+        "featured": true
+      },
+      {
+        "name": "Medio kilo",
+        "price_cents": 1400,
+        "featured": false
+      },
+      {
+        "name": "Tostadas",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tortilleria-02",
+    "description": "Tortillería La Esperanza · San Juan: kilo de tortilla, medio kilo, tostadas. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Kilo de tortilla",
+        "price_cents": 2600,
+        "featured": true
+      },
+      {
+        "name": "Medio kilo",
+        "price_cents": 1400,
+        "featured": false
+      },
+      {
+        "name": "Tostadas",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tortilleria-03",
+    "description": "Tortillería La Esperanza · Regina: kilo de tortilla, medio kilo, tostadas. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Kilo de tortilla",
+        "price_cents": 2600,
+        "featured": true
+      },
+      {
+        "name": "Medio kilo",
+        "price_cents": 1400,
+        "featured": false
+      },
+      {
+        "name": "Tostadas",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-papeleria-01",
+    "description": "Papelería Pluma Azul · Reforma: copias (10), cuaderno, pluma, impresión. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Copias (10)",
+        "price_cents": 2000,
+        "featured": true
+      },
+      {
+        "name": "Cuaderno",
+        "price_cents": 3800,
+        "featured": false
+      },
+      {
+        "name": "Pluma",
+        "price_cents": 800,
+        "featured": false
+      },
+      {
+        "name": "Impresión",
+        "price_cents": 1000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-papeleria-02",
+    "description": "Papelería Pluma Azul · Centro Oriente: copias (10), cuaderno, pluma, impresión. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Copias (10)",
+        "price_cents": 2000,
+        "featured": true
+      },
+      {
+        "name": "Cuaderno",
+        "price_cents": 3800,
+        "featured": false
+      },
+      {
+        "name": "Pluma",
+        "price_cents": 800,
+        "featured": false
+      },
+      {
+        "name": "Impresión",
+        "price_cents": 1000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-abarrotes-01",
+    "description": "Abarrotes Don Pepe · San Juan: despensa chica, refresco 600 ml, pan de caja. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Despensa chica",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Refresco 600 ml",
+        "price_cents": 2000,
+        "featured": false
+      },
+      {
+        "name": "Pan de caja",
+        "price_cents": 4200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-abarrotes-02",
+    "description": "Abarrotes Don Pepe · Regina: despensa chica, refresco 600 ml, pan de caja. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Despensa chica",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Refresco 600 ml",
+        "price_cents": 2000,
+        "featured": false
+      },
+      {
+        "name": "Pan de caja",
+        "price_cents": 4200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-abarrotes-03",
+    "description": "Abarrotes Don Pepe · Reforma: despensa chica, refresco 600 ml, pan de caja. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Despensa chica",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Refresco 600 ml",
+        "price_cents": 2000,
+        "featured": false
+      },
+      {
+        "name": "Pan de caja",
+        "price_cents": 4200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tacos-01",
+    "description": "Tacos El Compadre: orden de tacos, quesadilla, refresco. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Orden de tacos",
+        "price_cents": 6000,
+        "featured": true
+      },
+      {
+        "name": "Quesadilla",
+        "price_cents": 4500,
+        "featured": false
+      },
+      {
+        "name": "Refresco",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-cerrajeria-01",
+    "description": "Cerrajería El Llavero: copia de llave, apertura, cambio de chapa. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Copia de llave",
+        "price_cents": 3500,
+        "featured": true
+      },
+      {
+        "name": "Apertura",
+        "price_cents": 35000,
+        "featured": false
+      },
+      {
+        "name": "Cambio de chapa",
+        "price_cents": 55000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-barberia-01",
+    "description": "Barbería El Navajas: corte clásico, barba, corte infantil. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Corte clásico",
+        "price_cents": 9000,
+        "featured": true
+      },
+      {
+        "name": "Barba",
+        "price_cents": 5000,
+        "featured": false
+      },
+      {
+        "name": "Corte infantil",
+        "price_cents": 7000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-reparacion-de-celulares-01",
+    "description": "Celulares Express: cambio de pantalla, cambio de batería, mica. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Cambio de pantalla",
+        "price_cents": 65000,
+        "featured": true
+      },
+      {
+        "name": "Cambio de batería",
+        "price_cents": 38000,
+        "featured": false
+      },
+      {
+        "name": "Mica",
+        "price_cents": 8000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-costurera-01",
+    "description": "Costura Doña Aurora: arreglo de bastilla, cierre nuevo, ajuste de camisa. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Arreglo de bastilla",
+        "price_cents": 6000,
+        "featured": true
+      },
+      {
+        "name": "Cierre nuevo",
+        "price_cents": 9000,
+        "featured": false
+      },
+      {
+        "name": "Ajuste de camisa",
+        "price_cents": 8000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tortilleria-04",
+    "description": "Tortillería La Esperanza: kilo de tortilla, medio kilo, tostadas. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Kilo de tortilla",
+        "price_cents": 2600,
+        "featured": true
+      },
+      {
+        "name": "Medio kilo",
+        "price_cents": 1400,
+        "featured": false
+      },
+      {
+        "name": "Tostadas",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tortilleria-05",
+    "description": "Tortillería El Maíz: kilo de tortilla, medio kilo, tostadas. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Kilo de tortilla",
+        "price_cents": 2600,
+        "featured": true
+      },
+      {
+        "name": "Medio kilo",
+        "price_cents": 1400,
+        "featured": false
+      },
+      {
+        "name": "Tostadas",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-papeleria-03",
+    "description": "Papelería La Tinta: copias (10), cuaderno, pluma, impresión. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Copias (10)",
+        "price_cents": 2000,
+        "featured": true
+      },
+      {
+        "name": "Cuaderno",
+        "price_cents": 3800,
+        "featured": false
+      },
+      {
+        "name": "Pluma",
+        "price_cents": 800,
+        "featured": false
+      },
+      {
+        "name": "Impresión",
+        "price_cents": 1000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-papeleria-04",
+    "description": "Papelería Pluma Azul: copias (10), cuaderno, pluma, impresión. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Copias (10)",
+        "price_cents": 2000,
+        "featured": true
+      },
+      {
+        "name": "Cuaderno",
+        "price_cents": 3800,
+        "featured": false
+      },
+      {
+        "name": "Pluma",
+        "price_cents": 800,
+        "featured": false
+      },
+      {
+        "name": "Impresión",
+        "price_cents": 1000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-fruteria-01",
+    "description": "Frutería Don Beto: kilo de manzana, kilo de plátano, fruta picada. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Kilo de manzana",
+        "price_cents": 4500,
+        "featured": true
+      },
+      {
+        "name": "Kilo de plátano",
+        "price_cents": 2800,
+        "featured": false
+      },
+      {
+        "name": "Fruta picada",
+        "price_cents": 3500,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-recauderia-01",
+    "description": "Recaudería Doña Mary: kilo de jitomate, manojo de cilantro, kilo de chile. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Kilo de jitomate",
+        "price_cents": 3200,
+        "featured": true
+      },
+      {
+        "name": "Manojo de cilantro",
+        "price_cents": 1000,
+        "featured": false
+      },
+      {
+        "name": "Kilo de chile",
+        "price_cents": 6000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-barberia-02",
+    "description": "Barbería Don Memo: corte clásico, barba, corte infantil. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Corte clásico",
+        "price_cents": 9000,
+        "featured": true
+      },
+      {
+        "name": "Barba",
+        "price_cents": 5000,
+        "featured": false
+      },
+      {
+        "name": "Corte infantil",
+        "price_cents": 7000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-fonda-01",
+    "description": "Fonda Doña Chela: comida corrida, caldo de pollo, agua fresca, postre. Negocio de ejemplo de la comunidad.",
+    "cover": "cafe",
+    "menu": [
+      {
+        "name": "Comida corrida",
+        "price_cents": 8500,
+        "featured": true
+      },
+      {
+        "name": "Caldo de pollo",
+        "price_cents": 6500,
+        "featured": false
+      },
+      {
+        "name": "Agua fresca",
+        "price_cents": 2500,
+        "featured": false
+      },
+      {
+        "name": "Postre",
+        "price_cents": 3500,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-abarrotes-04",
+    "description": "Abarrotes Don Pepe: despensa chica, refresco 600 ml, pan de caja. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Despensa chica",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Refresco 600 ml",
+        "price_cents": 2000,
+        "featured": false
+      },
+      {
+        "name": "Pan de caja",
+        "price_cents": 4200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-flores-01",
+    "description": "Flores La Primavera: ramo chico, ramo grande, maceta. Negocio de ejemplo de la comunidad.",
+    "cover": "flores",
+    "menu": [
+      {
+        "name": "Ramo chico",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Ramo grande",
+        "price_cents": 25000,
+        "featured": false
+      },
+      {
+        "name": "Maceta",
+        "price_cents": 18000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-cerrajeria-02",
+    "description": "Cerrajería La Segura: copia de llave, apertura, cambio de chapa. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Copia de llave",
+        "price_cents": 3500,
+        "featured": true
+      },
+      {
+        "name": "Apertura",
+        "price_cents": 35000,
+        "featured": false
+      },
+      {
+        "name": "Cambio de chapa",
+        "price_cents": 55000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tacos-02",
+    "description": "Tacos La Esquina: orden de tacos, quesadilla, refresco. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Orden de tacos",
+        "price_cents": 6000,
+        "featured": true
+      },
+      {
+        "name": "Quesadilla",
+        "price_cents": 4500,
+        "featured": false
+      },
+      {
+        "name": "Refresco",
+        "price_cents": 2200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tamales-01",
+    "description": "Tamales Doña Tere: tamal, atole, docena de tamales. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Tamal",
+        "price_cents": 2200,
+        "featured": true
+      },
+      {
+        "name": "Atole",
+        "price_cents": 2500,
+        "featured": false
+      },
+      {
+        "name": "Docena de tamales",
+        "price_cents": 24000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-flores-02",
+    "description": "Flores Doña Margarita: ramo chico, ramo grande, maceta. Negocio de ejemplo de la comunidad.",
+    "cover": "flores",
+    "menu": [
+      {
+        "name": "Ramo chico",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Ramo grande",
+        "price_cents": 25000,
+        "featured": false
+      },
+      {
+        "name": "Maceta",
+        "price_cents": 18000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-jugos-01",
+    "description": "Jugos La Naranja: jugo grande, licuado, torta. Negocio de ejemplo de la comunidad.",
+    "cover": "cafe",
+    "menu": [
+      {
+        "name": "Jugo grande",
+        "price_cents": 4500,
+        "featured": true
+      },
+      {
+        "name": "Licuado",
+        "price_cents": 5500,
+        "featured": false
+      },
+      {
+        "name": "Torta",
+        "price_cents": 5800,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-estetica-01",
+    "description": "Estética Lupita: corte y secado, tinte, manicure. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Corte y secado",
+        "price_cents": 15000,
+        "featured": true
+      },
+      {
+        "name": "Tinte",
+        "price_cents": 35000,
+        "featured": false
+      },
+      {
+        "name": "Manicure",
+        "price_cents": 12000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-costurera-02",
+    "description": "Arreglos La Aguja: arreglo de bastilla, cierre nuevo, ajuste de camisa. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Arreglo de bastilla",
+        "price_cents": 6000,
+        "featured": true
+      },
+      {
+        "name": "Cierre nuevo",
+        "price_cents": 9000,
+        "featured": false
+      },
+      {
+        "name": "Ajuste de camisa",
+        "price_cents": 8000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-fruteria-02",
+    "description": "Frutería La Cosecha: kilo de manzana, kilo de plátano, fruta picada. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Kilo de manzana",
+        "price_cents": 4500,
+        "featured": true
+      },
+      {
+        "name": "Kilo de plátano",
+        "price_cents": 2800,
+        "featured": false
+      },
+      {
+        "name": "Fruta picada",
+        "price_cents": 3500,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "tue": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "wed": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "thu": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "fri": {
+        "open": "10:00",
+        "close": "20:00"
+      },
+      "sat": {
+        "open": "10:00",
+        "close": "20:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-estetica-02",
+    "description": "Estética Brillo: corte y secado, tinte, manicure. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Corte y secado",
+        "price_cents": 15000,
+        "featured": true
+      },
+      {
+        "name": "Tinte",
+        "price_cents": 35000,
+        "featured": false
+      },
+      {
+        "name": "Manicure",
+        "price_cents": 12000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tue": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wed": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thu": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "fri": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sat": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-recauderia-02",
+    "description": "Recaudería La Milpa: kilo de jitomate, manojo de cilantro, kilo de chile. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Kilo de jitomate",
+        "price_cents": 3200,
+        "featured": true
+      },
+      {
+        "name": "Manojo de cilantro",
+        "price_cents": 1000,
+        "featured": false
+      },
+      {
+        "name": "Kilo de chile",
+        "price_cents": 6000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "tue": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "15:00"
+      },
+      "sun": {
+        "open": "08:00",
+        "close": "15:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-reparacion-de-celulares-02",
+    "description": "Reparación Digital Memo: cambio de pantalla, cambio de batería, mica. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Cambio de pantalla",
+        "price_cents": 65000,
+        "featured": true
+      },
+      {
+        "name": "Cambio de batería",
+        "price_cents": 38000,
+        "featured": false
+      },
+      {
+        "name": "Mica",
+        "price_cents": 8000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-abarrotes-05",
+    "description": "Abarrotes La Preferida: despensa chica, refresco 600 ml, pan de caja. Negocio de ejemplo de la comunidad.",
+    "cover": "toldo",
+    "menu": [
+      {
+        "name": "Despensa chica",
+        "price_cents": 12000,
+        "featured": true
+      },
+      {
+        "name": "Refresco 600 ml",
+        "price_cents": 2000,
+        "featured": false
+      },
+      {
+        "name": "Pan de caja",
+        "price_cents": 4200,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  },
+  {
+    "business_id": "pop-tamales-02",
+    "description": "Tamales El Güero: tamal, atole, docena de tamales. Negocio de ejemplo de la comunidad.",
+    "cover": "maiz",
+    "menu": [
+      {
+        "name": "Tamal",
+        "price_cents": 2200,
+        "featured": true
+      },
+      {
+        "name": "Atole",
+        "price_cents": 2500,
+        "featured": false
+      },
+      {
+        "name": "Docena de tamales",
+        "price_cents": 24000,
+        "featured": false
+      }
+    ],
+    "whatsapp": null,
+    "schedule": {
+      "mon": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "tue": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "wed": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "thu": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "fri": {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      "sat": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "demo_data": true
+  }
+]

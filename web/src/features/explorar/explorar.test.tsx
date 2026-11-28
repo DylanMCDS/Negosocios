@@ -83,7 +83,15 @@ describe("Explorar", () => {
     expect(await screen.findByText(/Verificado: Visita del equipo/)).toBeInTheDocument();
     expect(await screen.findByText("4.5 de 5 · 2 reseñas")).toBeInTheDocument();
     expect(screen.getByText("Recomendado por 3 aliados")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Paga aquí con CoDi" })).toHaveAttribute("href", "/?negocio=rosa#negocio");
+    expect(screen.getByRole("link", { name: "Ver negocio" })).toHaveAttribute("href", "#perfil/rosa");
     expect(screen.getByText(/Lunes/)).toBeInTheDocument(); // horario
   });
+});
+
+
+it("explorar_opens_profile_not_payment", async () => {
+  render(<Explorar />);
+  await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+  expect(screen.getByRole("link", { name: "Ver negocio" })).toHaveAttribute("href", "#perfil/rosa");
+  expect(screen.queryByRole("link", { name: "Paga aquí con CoDi" })).not.toBeInTheDocument();
 });
