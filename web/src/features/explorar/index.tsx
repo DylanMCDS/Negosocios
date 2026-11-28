@@ -63,11 +63,11 @@ function PartnerList({ partners, items, onPick }: { partners: Partner[]; items: 
 const coverIcons = { toldo: Storefront, maiz: Leaf, cafe: Coffee, flores: Flower };
 const coverColors = { toldo: "bg-tint", maiz: "bg-warn", cafe: "bg-tint", flores: "bg-ok" };
 
-function PreviewCard({ business, reputation, trigger, onClose, partners, items, onPick, onBack }: {
+function PreviewCard({ business, reputation, trigger, onClose, partners, items, onPick, onBack, startOpen }: {
   business: NetworkProfile; reputation: Reputation | null | undefined; trigger: HTMLElement | null; onClose: () => void;
-  partners: Partner[]; items: NetworkProfile[]; onPick: (id: string, target: HTMLElement) => void; onBack: (() => void) | null;
+  partners: Partner[]; items: NetworkProfile[]; onPick: (id: string, target: HTMLElement) => void; onBack: (() => void) | null; startOpen: boolean;
 }) {
-  const [network, setNetwork] = useState(false);
+  const [network, setNetwork] = useState(startOpen);
   const [page, setPage] = useState<Profile | null>(null);
   const [phase, setPhase] = useState<"loading" | "ready" | "failed">("loading");
   const panel = useRef<HTMLDivElement>(null);
@@ -145,6 +145,8 @@ export default function Explorar() {
   // Every business seen so far, whatever the active filter: allies are resolved here, not from the filtered list.
   const [directory, setDirectory] = useState<Record<string, NetworkProfile>>({});
   const askedAll = useRef(false);
+  // "#explorar/<id>" (from a public profile) opens that business with its network.
+  const [fromProfile] = useState(() => decodeURIComponent(window.location.hash.slice(1).split("/")[1] ?? "") || null);
   const [reputation, setReputation] = useState<Record<string, Reputation | null>>({});
   const [failed, setFailed] = useState(false);
   const [mapState, setMapState] = useState<"loading" | "ready" | "failed" | "no-tiles">("loading");
@@ -240,21 +242,27 @@ export default function Explorar() {
     [items, allied, reputation],
   );
 
+
+  useEffect(() => { if (fromProfile) setSelected(fromProfile); }, [fromProfile]);
+  const partners = selected ? alliances[selected] ?? [] : [];
+  const pool = useMemo(() => Object.values(directory), [directory]);
+  // The selected business and its allies keep their pins even when a filter hides them from the list.
+  const shown = useMemo(() => {
+    const extra = new Set(selected ? [selected, ...partners.map((x) => x.partner_id)] : []);
+    return [...visible, ...pool.filter((p) => extra.has(p.business_id) && !visible.some((v) => v.business_id === p.business_id))];
+  }, [visible, pool, selected, partners]);
   useEffect(() => {
     const ref = mapRef.current;
     if (!ref || mapState === "failed") return;
     markers.current.forEach((m) => m.remove());
-    markers.current = visible.map((p) => {
+    markers.current = shown.map((p) => {
       const icon = ref.L.divIcon({ html: pinHtml(p.category.charAt(0).toUpperCase(), false), className: "", iconSize: [40, 40] });
       const marker = ref.L.marker([p.lat, p.lng], { icon, title: p.name }).addTo(ref.map as never);
       marker.on("click", () => selectBusiness(p.business_id, marker.getElement() ?? mapEl.current));
       return marker;
     });
     ref.map.setView([center.lat, center.lng], 15);
-  }, [visible, mapState, center, selectBusiness]);
-
-  const partners = selected ? alliances[selected] ?? [] : [];
-  const pool = useMemo(() => Object.values(directory), [directory]);
+  }, [shown, mapState, center, selectBusiness]);
   // An ally hidden by the filter or the radius is looked up once without filters.
   useEffect(() => {
     if (askedAll.current || partners.every((x) => x.partner_id in directory)) return;
@@ -355,7 +363,7 @@ export default function Explorar() {
         <div className="relative isolate flex flex-col gap-3">
           <div ref={mapEl} tabIndex={-1} className="h-[60dvh] min-h-96 w-full overflow-hidden rounded-lg border border-line bg-tint md:h-[calc(100dvh-300px)] md:min-h-96" aria-label="Mapa de negocios cercanos" />
           {current && <PreviewCard key={current.business_id} business={current} reputation={reputation[current.business_id]} trigger={trigger.current} onClose={closePreview}
-            partners={partners} items={pool} onPick={pickPartner} onBack={trail.length ? goBack : null} />}
+            partners={partners} items={pool} onPick={pickPartner} onBack={trail.length ? goBack : null} startOpen={current.business_id === fromProfile} />}
           {mapState === "failed" && <p className="text-ink-2">El mapa no está disponible: usa la lista.</p>}
           {mapState === "no-tiles" && <p className="text-ink-2">No pudimos cargar el mapa: usa la lista.</p>}
         </div>

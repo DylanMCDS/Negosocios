@@ -8,7 +8,6 @@ const backgrounds = { toldo: "bg-tint", maiz: "bg-warn", cafe: "bg-tint", flores
 
 export default function ProfileView({ profile: p, preview = false }: { profile: Profile; preview?: boolean }) {
   const [shared, setShared] = useState("");
-  const [network, setNetwork] = useState(false);
   const Illustration = art[p.cover];
   const Heading = preview ? "h3" : "h1";
   const Section = preview ? "h4" : "h2";
@@ -64,10 +63,7 @@ export default function ProfileView({ profile: p, preview = false }: { profile: 
         </section>
         <section><Section className="mb-3 font-display text-[length:var(--text-l)]">Aliados</Section>
           {p.allies.length ? <ul className="divide-y divide-hairline">{p.allies.map((ally) => <li key={ally.business_id} className="py-3"><a className="inline-flex min-h-11 items-center font-display text-accent underline" href={profileHash(ally.business_id)}>{ally.name}</a></li>)}</ul> : <p className="text-ink-2">Todavía no tiene alianzas activas.</p>}
-          {p.allies.length > 0 && <Button variant="secondary" size="sm" className="mt-3" aria-expanded={network} onClick={() => setNetwork(!network)}>{network ? "Ocultar alianzas" : "Ver alianzas"}</Button>}
-          {network && <div className="mt-3 flex flex-col gap-2"><p className="font-display text-[length:var(--text-l)]">{`Red de ${p.name}`}</p>
-            <ul className="divide-y divide-hairline">{p.allies.map((ally) => <li key={ally.business_id}><a className="flex min-h-14 flex-col justify-center py-2" href={profileHash(ally.business_id)}><span className="font-semibold">{ally.name}</span><span className="font-display text-money">{ally.discount_pct} % de descuento</span></a></li>)}</ul>
-            {p.demo_data && <p className="text-[length:var(--text-s)] text-ink-2">Datos de ejemplo</p>}</div>}
+          {p.allies.length > 0 && <a className="mt-3 inline-flex h-11 items-center rounded-full bg-tint px-4 font-display text-accent" href={`#explorar/${encodeURIComponent(p.business_id)}`}>Ver alianzas</a>}
           {p.reputation.endorsements > 0 && <p className="mt-2 text-[length:var(--text-s)] text-ink-2">{p.reputation.endorsements} avales de alianzas activas.</p>}
         </section>
       </Surface>

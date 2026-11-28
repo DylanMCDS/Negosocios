@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import Perfil from "./index";
 
@@ -13,14 +12,12 @@ const show = (allies: unknown[]) => {
 
 it("profile_shows_alliance_network_with_discounts", async () => {
   show([{ business_id: "fonda", name: "Fonda Lupita", discount_pct: 10 }]);
-  await userEvent.click(await screen.findByRole("button", { name: "Ver alianzas" }));
-  expect(screen.getByText("Red de Tacos de Doña Rosa")).toBeInTheDocument();
-  expect(screen.getAllByText("10 % de descuento").length).toBeGreaterThan(0);
-  expect(screen.getAllByRole("link", { name: /Fonda Lupita/ })[0]).toHaveAttribute("href", "#perfil/fonda");
+  const link = await screen.findByRole("link", { name: "Ver alianzas" });
+  expect(link).toHaveAttribute("href", "#explorar/rosa");
 });
 
 it("profile_hides_alliance_button_without_allies", async () => {
   show([]);
   await screen.findByRole("heading", { name: base.name });
-  expect(screen.queryByRole("button", { name: "Ver alianzas" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Ver alianzas" })).not.toBeInTheDocument();
 });
