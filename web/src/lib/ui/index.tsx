@@ -22,7 +22,7 @@ export function Button({
     <button
       {...rest}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-full font-display transition-colors cursor-pointer disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 rounded-full font-display motion-press cursor-pointer disabled:cursor-not-allowed",
         look,
         dims,
         className,
@@ -215,6 +215,18 @@ export function AppShell({ nav, children }: { nav: ReactNode; children: ReactNod
     <div className="min-h-[100dvh] bg-bg text-ink">
       {nav}
       <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 md:px-8 md:pb-16">{children}</main>
+    </div>
+  );
+}
+
+/* Skeleton: a loading placeholder with the size of the final content (give it the same height), so nothing jumps when data arrives. */
+export function Skeleton({ className }: { className?: string }) {
+  return <div data-testid="skeleton" aria-hidden="true" className={cx("motion-pulse rounded-md bg-tint", className)} />;
+}
+export function SkeletonList({ rows = 3, label = "Cargando", rowClassName = "h-20" }: { rows?: number; label?: string; rowClassName?: string }) {
+  return (
+    <div role="status" aria-label={label} aria-busy="true" className="flex flex-col gap-3">
+      {Array.from({ length: rows }, (_, i) => <Skeleton key={i} className={rowClassName} />)}
     </div>
   );
 }
