@@ -16,7 +16,7 @@ Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
 Evidence: npm --prefix web test -- --run (todo verde) + build + design-lint exit 0; skeleton en cierre/pagar, FadeIn en comprobante, scroll restore, route.test · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
 Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject
-Events: 9
+Events: 10
 Checkpoints: 2
 Sessions: 2
 Last-Checkpoint: 1795894006
