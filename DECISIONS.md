@@ -87,3 +87,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795822135 | HACK-046 | Perfil oculto pero enrutable; Mi página visible en Más. Horarios canónicos y datos públicos allowlist; editor por secciones y preview compartida. | Why: No crear cobros desde Explorar ni publicar datos sensibles; mantener componentes de kit.
 - 1795825236 | deadline lease/HACK-046/1795824835 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795891638 | plan | dylan/dylan | tasks added: HACK-047 HACK-048 | Why: backlog without PR (Plan-Channel: claims)
+- 1795891840 | plan | dylan/dylan | tasks added: HACK-049 HACK-050 HACK-051 HACK-052 HACK-053 HACK-054 HACK-055 | Why: backlog without PR (Plan-Channel: claims)

@@ -433,3 +433,100 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** route_change_uses_transition_and_respects_reduced_motion, loading_states_render_skeleton_not_text, motion_tokens_are_single_source, pagado_screen_fades_in
 - **Verify:** `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
 - **Next step:** test rojo de `route_change_uses_transition_and_respects_reduced_motion`.
+## HACK-049 · Pagar: el negocio no queda atrapado en "Abrir página de pago"
+
+- **Type:** fix
+- **Priority:** P1
+- **Estimate:** 30 min
+- **Rubric / Spec:** C5, C4 · prueba de Dylan 2026-11-28: "le piqué a cobros pendientes → abrir página de pago y ya no me deja salir de ahí"
+- **Depends on:** HACK-041, HACK-010
+- **Paths:** web/src/features/cobrar/, web/src/features/pagar/
+- **Freeze-Allowed:** yes
+- **Acceptance:** En Cobrar, "Abrir página de pago" abre `#pagar/<id>` (dentro de la app, con el menú que sí funciona) y no `/pagar/<id>`. El enlace real para el cliente (QR del punto o sticker, `/pagar/<id>`) no cambia., La pantalla Pagar muestra un botón **Volver** (al `#cobrar` si se llegó desde la app) y no deja al negocio sin salida; el cliente que llega por el enlace directo no ve el botón., El menú funciona también si la URL es `/pagar/<id>`: al tocar una opción se navega (se cambia el origen a `/#<opción>`)., Recipe: detail · Hero: importe y negocio a pagar., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** open_payment_page_link_uses_hash_route, pagar_back_button_returns_to_cobrar, direct_pagar_link_hides_back_button, menu_works_from_pagar_path
+- **Verify:** `npm --prefix web test -- --run src/features/cobrar src/features/pagar && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `open_payment_page_link_uses_hash_route`.
+
+## HACK-050 · Explorar: tarjeta de vista previa al seleccionar un negocio
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 50 min
+- **Rubric / Spec:** C5, C2 · prueba de Dylan 2026-11-28: "cuando selecciones un negocio se sobreponga una tarjeta con la preview del mismo negocio"
+- **Depends on:** HACK-046
+- **Paths:** web/src/features/explorar/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Al seleccionar un negocio (en el mapa o en la lista) se superpone una **tarjeta de vista previa** sobre el mapa: portada, nombre, giro, zona aproximada, "Abierto ahora", reputación (estrellas) y 1 promoción de aliado si la hay., La tarjeta usa el perfil público (`GET /api/profile/<id>`) y tiene el botón **Ver negocio** (abre `#perfil/<id>`) y un botón para cerrar; no abre un cobro., En móvil es una hoja inferior que no tapa por completo el mapa; en escritorio, una tarjeta flotante. Se cierra con el botón, con Escape y tocando fuera; el foco vuelve al elemento seleccionado., Mientras carga el perfil, esqueleto del mismo tamaño; si falla, muestra lo que ya trae el listado y "No pudimos cargar el perfil"., Recipe: map · Hero: la tarjeta del negocio., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** selecting_business_shows_preview_card, preview_card_opens_profile_not_payment, preview_card_closes_with_escape_and_returns_focus, preview_card_falls_back_when_profile_fails
+- **Verify:** `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `selecting_business_shows_preview_card`.
+
+## HACK-051 · Explorar: ver la red de alianzas de cada negocio
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C2, C5 · prueba de Dylan 2026-11-28: "que se pudiera visualizar la red de alianzas de cada negocio (si es que tiene)"
+- **Depends on:** HACK-050, HACK-038
+- **Paths:** web/src/features/explorar/
+- **Freeze-Allowed:** yes
+- **Acceptance:** En la tarjeta de vista previa y en el perfil, un botón **Ver alianzas** (sólo si el negocio tiene alianzas activas, con `GET /api/alliances?business_id=`) muestra la red: el negocio al centro y sus aliados alrededor, con nombre, giro, zona y el descuento de cada alianza., Tocar un aliado lo selecciona en Explorar (mismo comportamiento que elegir en el mapa) y se puede seguir la red de ese negocio sin perder dónde se estaba (botón Volver)., En el mapa, las alianzas del negocio seleccionado se dibujan como líneas hacia sus aliados; en lista, como una lista "Aliados de este negocio"., Sin alianzas: no aparece el botón; nunca un estado vacío roto., Datos de ejemplo marcados como "Datos de ejemplo"; sin datos bancarios ni dirección exacta., Recipe: map · Hero: la red del negocio., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** alliances_button_only_when_business_has_alliances, alliance_network_lists_partners_with_discount, selecting_partner_selects_it_on_map, alliance_network_hidden_for_business_without_alliances
+- **Verify:** `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `alliances_button_only_when_business_has_alliances`.
+
+## HACK-052 · Cobros vencidos: no se listan como pendientes y Dividir explica el motivo real del error
+
+- **Type:** fix
+- **Priority:** P1
+- **Estimate:** 45 min
+- **Rubric / Spec:** C5, C4 · prueba de Dylan 2026-11-28: dividir un cobro de $84 en 3 partes dijo "No pudimos crear los cobros. Intenta de nuevo"; con un cobro nuevo funcionó (el anterior tenía más de 10 minutos y vencido)
+- **Depends on:** HACK-042, HACK-047, HACK-049
+- **Paths:** web/src/features/dividir/, web/src/features/cierre/, web/src/features/cobrar/, web/src/lib/api.ts
+- **Freeze-Allowed:** yes
+- **Acceptance:** Un cobro vence a los 10 minutos (`expires_at`, ya viene en la orden). Dividir y el recuadro "Tienes N cobros pendientes" de Cobrar sólo muestran cobros **vigentes**; Cierre los sigue listando con el chip **"Venció"** y no los suma a las ventas., Dividir lee el mensaje real del backend: si responde 409 "venció", dice **"Este cobro venció. Genera otro en Cobrar"** con enlace a `#cobrar`; "ya está dividida" lleva a ver las partes; 422 y 502 muestran su motivo en español. "Intenta de nuevo" sólo para errores de red., `api()` conserva el código y el mensaje del error para que las pantallas lo usen., Sin cambios en backend ni esquemas., Recipe: list · Hero: lista de cobros pendientes., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** dividir_hides_expired_orders, cobrar_waiting_list_excludes_expired, cierre_marks_expired_pending_with_chip, dividir_shows_expired_message_on_409, api_error_keeps_status_and_detail
+- **Verify:** `npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `dividir_shows_expired_message_on_409`.
+
+## HACK-053 · Cupones de alianza (backend): emitir, guardar, validar y canjear
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 90 min
+- **Rubric / Spec:** C2, C5 · prueba de Dylan 2026-11-28: wallet de cupones del cliente; el negocio escanea el cupón; el cupón se guarda al consumir en el negocio aliado y se aplica solo en el otro
+- **Depends on:** HACK-025, HACK-038
+- **Paths:** app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md
+- **Freeze-Allowed:** yes
+- **Acceptance:** Un **cupón** es por cliente (token aleatorio de un solo uso), pertenece a una alianza y se emite en el negocio que **da** el beneficio; sólo vale en el negocio aliado (la dirección de la alianza) y vence a los 7 días., `POST /api/coupons/claim` (negocio emisor + orden pagada de ese negocio, o el punto del negocio) emite un cupón **sólo** si hay una orden pagada en ese negocio que no haya reclamado ya uno; sin orden pagada, 409 con motivo en español., `GET /api/coupons/{token}` devuelve estado (vigente, usado, vencido), negocio emisor, negocio donde vale y descuento; sin datos sensibles., `POST /api/coupons/{token}/redeem` con la orden del negocio donde vale: aplica el descuento con las mismas reglas de la alianza (un beneficio por orden, tope de usos y de presupuesto, descuento en centavos enteros) y marca el cupón **usado** de forma atómica; un segundo canje devuelve 409., El cupón no sirve en otro negocio ni después de vencer; reintentar el mismo canje con la misma orden es idempotente., Tablas propias (`coupons`), sin tocar `db.py` ni los esquemas existentes; documentar el contrato en `docs/COUPONS.md`., Datos de ejemplo con `demo_data: true`.
+- **Tests:** claim_requires_paid_order_at_issuing_business, coupon_is_single_use, coupon_only_valid_at_partner_business, coupon_expires_after_seven_days, redeem_respects_budget_and_one_benefit_per_order, redeem_is_idempotent_for_same_order, coupon_view_never_exposes_sensitive_data
+- **Verify:** `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
+- **Next step:** test rojo de `coupon_is_single_use`.
+
+## HACK-054 · Cupones (negocio): "Escanear cupón" al cobrar
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C2, C5 · prueba de Dylan 2026-11-28: "el negocio escanea el cupón de alianza del cliente y se aplica el descuento"
+- **Depends on:** HACK-053, HACK-052
+- **Paths:** web/src/features/cobrar/
+- **Freeze-Allowed:** yes
+- **Acceptance:** En Cobrar, junto al campo del código de aliado, un botón **Escanear cupón**: abre la cámara y lee el QR del cupón del cliente (con `BarcodeDetector` si el navegador lo tiene; sin dependencias nuevas), y si no hay lector o permiso, se pide pegar o escribir el código del cupón., Al leer el cupón se muestra a quién da el descuento, cuánto y el nuevo total **antes** de confirmar; confirmar aplica el descuento con `POST /api/coupons/{token}/redeem`., Errores en español y sin perder el cobro: "Este cupón ya se usó", "Venció", "No vale en este negocio", "No hay presupuesto de la alianza"., Escribir el código de aliado a mano sigue funcionando igual., Recipe: form · Hero: el importe con el descuento aplicado., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** scan_coupon_button_next_to_alliance_code, scanned_coupon_shows_discount_before_confirm, coupon_errors_show_spanish_reason, manual_alliance_code_still_works, scan_falls_back_to_typed_code_without_camera
+- **Verify:** `npm --prefix web test -- --run src/features/cobrar && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `scanned_coupon_shows_discount_before_confirm`.
+
+## HACK-055 · Cupones (cliente): wallet, ganar el cupón en el negocio aliado y aplicarlo solo en el otro
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 90 min
+- **Rubric / Spec:** C2, C5, C4 · prueba de Dylan 2026-11-28: wallet de cupones; acercar el celular al sticker del negocio 2 guarda el cupón; en el negocio 1 se aplica solo
+- **Depends on:** HACK-053, HACK-049
+- **Paths:** web/src/features/cupones/, web/src/features/pagar/, web/src/features/puntos/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Pantalla **Mis cupones** (`#cupones`, grupo clientes): lista los cupones guardados en el navegador del cliente (sólo los tokens; el estado real se pide al servidor), con negocio donde vale, descuento y vencimiento, y un **QR grande** para que el negocio lo escanee. Estados: vigente, usado, vencido., **Ganar el cupón:** al acercar el celular al sticker del negocio que da el beneficio (punto de Puntos) y haber una orden pagada allí, el cupón se guarda solo y se avisa "Guardaste un cupón para [negocio aliado]"; si no hay pago verificado, se explica el motivo sin guardar nada., **Aplicarlo solo:** al abrir el punto de cobro (sticker de la caja o de la cuenta) del negocio donde vale, si el cliente trae un cupón vigente se aplica solo (o se elige entre varios) y se muestra el descuento antes de pagar., El wallet nunca guarda datos sensibles; si se borra el navegador sólo se pierde el acceso al token., Recipe: list · Hero: el cupón con su QR., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** wallet_lists_saved_coupons_with_status, wallet_shows_qr_for_valid_coupon, sticker_at_issuing_business_saves_coupon_when_paid, sticker_without_paid_order_explains_and_saves_nothing, point_at_partner_business_applies_valid_coupon_automatically
+- **Verify:** `npm --prefix web test -- --run src/features/cupones src/features/pagar src/features/puntos && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `wallet_lists_saved_coupons_with_status`.
