@@ -1,9 +1,8 @@
 ID: HACK-052
-SHA: b4c93b6c24128d430f2b79b0a7b6d414e1cfaa1c
-Reviewer: dylan-3
+SHA: 56efbae10c4decc8cac844b3199c724eaf9a8c6e
+Reviewer: dylan-2
 Owner: dylan-5
-Verdict: reject
-Reviewed: 1795895422
-Eligible-Via: role:dylan-3
+Verdict: approve
+Reviewed: 1795896490
+Eligible-Via: role:dylan-2
 Command: uak review
-Rejected-By: dylan-3
