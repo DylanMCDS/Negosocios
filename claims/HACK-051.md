@@ -1,6 +1,6 @@
 # HACK-051
 ID: HACK-051
-State: CLAIMED
+State: REVIEW
 Owner: dylan-2
 Branch: feat/hack-051
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-051
@@ -9,10 +9,10 @@ Priority: P1
 Paths: web/src/features/explorar/
 Depends: HACK-050, HACK-038
 Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795896322
-Updated: 1795893622
+Lease-Until: 1795908423
+Updated: 1795894023
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
-Next: leer criterios y escribir pruebas rojas
-PR: -
+Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/52; run .uak/bin/smoke
+PR: https://github.com/DylanMCDS/Negosocios/pull/52
 Evidence: -
 Thread-Read: 269
