@@ -1,6 +1,6 @@
 # HACK-048
 ID: HACK-048
-State: REVIEW
+State: INTEGRATED
 Owner: dylan-1
 Branch: feat/hack-048
 Worktree: /Users/dylanmartinezcastillo/Documents/Repositorios/Hackathon/Negosocios-wt/hack-048
@@ -9,14 +9,14 @@ Priority: P1
 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/, web/src/features/pagar/index.tsx
 Depends: HACK-005
 Verify: `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795910537
-Updated: 1795896137
+Lease-Until: 0
+Updated: 1795896754
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run .uak/bin/smoke
+Next: Integrated in main: e8dc60e149d2a6e048a877f64a6b822d00d2ee8b
 PR: https://github.com/DylanMCDS/Negosocios/pull/51
 Evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
-Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject; reviewer dylan-4 (gpt-6.1-sol) approve
-Events: 16
+Participants: author dylan-1 (unknown); author dylan-1 (claude-sonnet-5-5); reviewer dylan-4 (gpt-6.1-sol) reject; reviewer dylan-4 (gpt-6.1-sol) approve; merged-by dylan-1 (claude-sonnet-5-5)
+Events: 17
 Checkpoints: 2
 Sessions: 2
 Last-Checkpoint: 1795894006
@@ -25,3 +25,7 @@ Progress-Head: 7291e04/2262605012
 Progress-Changed: 1795895769
 Away: 1795892351
 Task-Tip: 9bba35af432b17eb3f47980291ad495a44bc6826
+Merge-Commit: e8dc60e149d2a6e048a877f64a6b822d00d2ee8b
+Reviewer: dylan-4
+Integration-Proof: ancestry
+Smoke: full

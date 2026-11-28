@@ -6,7 +6,7 @@
 - Why: criterios exigen pantallas reales
 - Failing: none
 - Commands: npm --prefix web test -- --run
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/51; run .uak/bin/smoke
+- Next: Integrated in main: e8dc60e149d2a6e048a877f64a6b822d00d2ee8b
 
 ## History
 - 1795891988 | CLAIMED | dylan-1 | claim; next: test rojo de route_change_uses_transition_and_respects_reduced_motion | Harness: unknown | Model: unknown
@@ -25,3 +25,4 @@
 - 1795895769 | REVIEW | dylan-1 | heartbeat; lease until 1795910169 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795896137 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/51; evidence: npm --prefix web test -- --run src/lib src/App && build && design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795896601 | REVIEW | dylan-4 | review; approve; SHA 9bba35af432b17eb3f47980291ad495a44bc6826; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
+- 1795896754 | INTEGRATED | dylan-1 | merge; smoke and Verify PASS (smoke: full); commit e8dc60e149d2a6e048a877f64a6b822d00d2ee8b; reviewer dylan-4 | Harness: claude-code | Model: claude-sonnet-5-5
