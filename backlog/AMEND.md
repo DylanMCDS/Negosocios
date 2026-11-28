@@ -95,3 +95,16 @@ Append-only; the last section of an ID replaces its section in the backlog. Why:
 - **Tests:** claim_requires_paid_order_at_issuing_business, coupon_is_single_use, coupon_only_valid_at_partner_business, coupon_expires_after_seven_days, redeem_respects_budget_and_one_benefit_per_order, redeem_is_idempotent_for_same_order, coupon_view_never_exposes_sensitive_data
 - **Verify:** `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
 - **Next step:** aplicar el parche preparado en `app/services/alliances.py` y correr Verify.
+## HACK-048 · App fluida: transiciones suaves entre pantallas, sin saltos ni pantallas en blanco
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 60 min
+- **Rubric / Spec:** C5, C2 · prueba de Dylan 2026-11-28: "que la app se sienta muy fluida sin transiciones bruscas"
+- **Depends on:** HACK-005
+- **Paths:** web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/, web/src/features/pagar/index.tsx
+- **Freeze-Allowed:** yes
+- **Acceptance:** Al cambiar de pantalla (menú, enlaces `#...`) hay una transición corta (150-220 ms, fundido con un pequeño desplazamiento) con la View Transitions API cuando existe y un fundido CSS como respaldo; nunca un corte seco., Con `prefers-reduced-motion` no hay movimiento: cambio inmediato o fundido sin desplazamiento., Sin saltos de diseño: los estados "Cargando…" usan un esqueleto del mismo tamaño que el contenido final; las listas y tarjetas no cambian de alto al llegar los datos (sin CLS visible)., Al cambiar de pantalla se vuelve arriba suavemente y se conserva la posición al volver atrás; la barra del menú no parpadea ni se re-monta., Botones y tarjetas tocables con respuesta táctil breve (pulsado/hover) sin animar propiedades que causen reflujo (sólo `opacity` y `transform`)., Las pantallas de estado largo (Pagado, Comprobante, Cuenta completa) entran con un fundido, no aparecen de golpe., Un solo módulo de movimiento (`web/src/lib/motion/`) con duraciones y curvas en tokens, sin animaciones sueltas por pantalla., Recipe: shell · Hero: el cambio de pantalla del menú., Captura a 390 y 1280 (con y sin reduced motion); design-critic SHIP.
+- **Tests:** route_change_uses_transition_and_respects_reduced_motion, loading_states_render_skeleton_not_text, motion_tokens_are_single_source, pagado_screen_fades_in
+- **Verify:** `npm --prefix web test -- --run src/lib src/App && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `route_change_uses_transition_and_respects_reduced_motion`.

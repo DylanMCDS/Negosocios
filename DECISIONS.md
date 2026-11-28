@@ -101,3 +101,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795893433 | HACK-053 | Cierre con uak done completado; sin fallos propios pendientes | Why: Paths ampliados por humano; control de doble descuento acotado a alliances.quote
 - 1795894006 | HACK-048 | editar features cierre/pagar mínimo | Why: criterios exigen pantallas reales
 - 1795894184 | HACK-053 | Reenviado a rejecter via done --note; no cambio API ni esquema | Why: Evitar que una reserva futura se vincule a un ID de otra compra
+- 1795894438 | plan --amend | Dylan-Martinez/dylan-1 | amended: HACK-048 Paths: web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/ → web/src/App.tsx, web/src/index.css, web/src/lib/ui/, web/src/lib/motion/, web/src/features/pagar/index.tsx; | Why: scope or criteria fixed before review
