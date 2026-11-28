@@ -303,7 +303,7 @@ export default function Cobrar() {
           {showOrder ? (
             <>
               {phase === "pending" && (
-                <a className="inline-flex min-h-11 items-center text-ink-2 underline" href={`/pagar/${order.id}`}>
+                <a className="inline-flex min-h-11 items-center text-ink-2 underline" href={`#pagar/${order.id}`}>
                   Abrir página de pago
                 </a>
               )}
