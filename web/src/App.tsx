@@ -1,4 +1,6 @@
-import { useEffect, useState, type ComponentType } from "react";
+import { flushSync } from "react-dom";
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from "react";
+import { applyMotionTokens, changeRoute, prefersReducedMotion } from "./lib/motion";
 import { AppShell, PageHeader, Surface } from "./lib/ui";
 import { buildMenu, MenuBar, type FeatureNav } from "./lib/ui/NavBar";
 import { activeBusinessName, BUSINESS_CHANGED, validateSavedBusiness } from "./lib/business";
@@ -27,6 +29,8 @@ function Soon({ title }: { title: string }) {
 const fallbacks: Record<string, ComponentType> = { cobrar: Cobrar, pagar: Pagar, cierre: Cierre };
 const views = menu.all;
 
+applyMotionTokens();
+
 // The view comes from the hash ("#cierre", "#pagar/<id>") or from a customer link ("/pagar/<id>").
 const read = () => {
   if (/^\/pagar(\/|$)/.test(window.location.pathname)) return "pagar";
@@ -51,11 +55,49 @@ function ActiveBusiness() {
 
 export default function App() {
   const [active, setActive] = useState(() => (views.some((v) => v.id === read()) ? read() : "cobrar"));
+  // Scroll: a new screen starts at the top (smoothly); going back restores where the person was.
+  const positions = useRef(new Map<string, number>());
+  const current = useRef(active);
+  const popped = useRef(false);
   useEffect(() => {
-    const sync = () => views.some((v) => v.id === read()) && setActive(read());
+    const sync = () => {
+      const next = read();
+      if (views.some((v) => v.id === next) && next !== current.current) {
+        positions.current.set(current.current, window.scrollY);
+        current.current = next;
+        changeRoute(() => flushSync(() => setActive(next)));
+      }
+    };
+    const pop = () => (popped.current = true);
+    window.addEventListener("popstate", pop);
     window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
+    return () => {
+      window.removeEventListener("popstate", pop);
+      window.removeEventListener("hashchange", sync);
+    };
   }, []);
+  const box = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const top = popped.current ? (positions.current.get(active) ?? 0) : 0;
+    popped.current = false;
+    window.scrollTo({ top, behavior: prefersReducedMotion() || top ? "auto" : "smooth" });
+    if (!top || !box.current || typeof ResizeObserver === "undefined") return;
+    // Going back: the data may arrive after the first paint and the page is still short; keep restoring while it grows, until it is tall enough or the person scrolls.
+    const stop = () => {
+      observer.disconnect();
+      clearTimeout(timer);
+      for (const e of ["wheel", "touchstart", "keydown"]) window.removeEventListener(e, stop);
+    };
+    const observer = new ResizeObserver(() => {
+      window.scrollTo({ top, behavior: "auto" });
+      // The page is tall enough now: the position is restored for good.
+      if (document.documentElement.scrollHeight >= top + window.innerHeight) stop();
+    });
+    observer.observe(box.current);
+    const timer = setTimeout(stop, 15000);
+    for (const e of ["wheel", "touchstart", "keydown"]) window.addEventListener(e, stop, { passive: true });
+    return stop;
+  }, [active]);
   const view = views.find((v) => v.id === active)!;
   const Screen = features[view.id] ?? fallbacks[view.id];
   return (
@@ -65,14 +107,15 @@ export default function App() {
           menu={menu}
           active={active}
           onSelect={(id) => {
-            window.location.hash = id;
-            setActive(id);
+            window.location.hash = id; // hashchange does the transition
           }}
         />
       }
     >
       {view.id !== "pagar" && view.id !== "negocio" && <ActiveBusiness />}
-      {Screen ? <Screen /> : <Soon title={view.label} />}
+      <div key={active} ref={box} className="motion-route">
+        {Screen ? <Screen /> : <Soon title={view.label} />}
+      </div>
     </AppShell>
   );
 }

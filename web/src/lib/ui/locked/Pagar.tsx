@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CheckCircle, ShieldCheck } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "..";
+import { FadeIn } from "../../motion";
 import { demoDay } from "./demoDay";
 
 export default function Pagar() {
@@ -23,10 +24,12 @@ export default function Pagar() {
         </Chip>
       </Surface>
       {done ? (
-        <Button variant="secondary" onClick={() => setDone(false)}>
-          <CheckCircle size={24} aria-hidden="true" />
-          Pagado 100 MXN
-        </Button>
+        <FadeIn>
+          <Button variant="secondary" onClick={() => setDone(false)}>
+            <CheckCircle size={24} aria-hidden="true" />
+            Pagado 100 MXN
+          </Button>
+        </FadeIn>
       ) : (
         <div className="flex flex-col gap-3">
           <Button onClick={() => setDone(true)}>Pagar 100 MXN</Button>
