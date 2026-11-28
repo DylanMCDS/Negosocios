@@ -530,3 +530,16 @@ Append-only; added to .uak/TASKS.md from main. Why: adding tasks never waits for
 - **Tests:** wallet_lists_saved_coupons_with_status, wallet_shows_qr_for_valid_coupon, sticker_at_issuing_business_saves_coupon_when_paid, sticker_without_paid_order_explains_and_saves_nothing, point_at_partner_business_applies_valid_coupon_automatically
 - **Verify:** `npm --prefix web test -- --run src/features/cupones src/features/pagar src/features/puntos && npm --prefix web run build && bash .uak/bin/design-lint`
 - **Next step:** test rojo de `wallet_lists_saved_coupons_with_status`.
+## HACK-056 · Adoptar el movimiento en Cierre, Cobrar y Dividir: esqueletos de carga y fundidos de "Pagado" y "Cuenta completa"
+
+- **Type:** feature
+- **Priority:** P1
+- **Estimate:** 40 min
+- **Rubric / Spec:** C5, C2 · prueba de Dylan 2026-11-28: "que la app se sienta muy fluida sin transiciones bruscas"; parte de HACK-048 recortada por la enmienda humana porque esos archivos eran de HACK-052
+- **Depends on:** HACK-048, HACK-052
+- **Paths:** web/src/features/cierre/, web/src/features/cobrar/, web/src/features/dividir/
+- **Freeze-Allowed:** yes
+- **Acceptance:** Usa `SkeletonList` y `FadeIn` de `web/src/lib/motion/` (HACK-048), sin crear animaciones nuevas por pantalla., Cierre: mientras carga `/closing/today` muestra un esqueleto del mismo tamaño que el contenido final y no el texto "Cargando tu día…"; no cambia de alto al llegar los datos., Cobrar: la pantalla completa "Pagado" entra con `FadeIn` y no aparece de golpe., Dividir: "Cuenta completa" entra con `FadeIn`; las cargas de la lista usan esqueleto., Con `prefers-reduced-motion` no hay desplazamiento (sólo cambio inmediato o fundido), Verificado a 390 y 1280 con y sin reduced motion., Recipe: shell · Hero: el cambio de estado a "Pagado"., Captura a 390 y 1280; design-critic SHIP.
+- **Tests:** cierre_loading_shows_skeleton_not_text, cobrar_pagado_overlay_uses_fade_in, dividir_cuenta_completa_uses_fade_in, reduced_motion_removes_translate_in_these_screens
+- **Verify:** `npm --prefix web test -- --run src/features/cierre src/features/cobrar src/features/dividir && npm --prefix web run build && bash .uak/bin/design-lint`
+- **Next step:** test rojo de `cierre_loading_shows_skeleton_not_text`.

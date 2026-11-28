@@ -106,3 +106,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795894870 | allow | dylan | test change: HACK-052 | Why: dividir.test lists_pending_charges_to_split: expires_at del fixture relativo a la hora actual
 - 1795894910 | HACK-053 | Vinculación explícita de reservas legadas nuevas con clave original; lectura histórica conservadora. | Why: Distinguir claves futuras e IDs de compras distintas sin corromper reintentos ni métricas.
 - 1795896020 | plan --amend | dylan/dylan | amended: HACK-048 | Why: scope or criteria fixed before review
+- 1795896030 | plan | dylan/dylan | tasks added: HACK-056 | Why: backlog without PR (Plan-Channel: claims)
