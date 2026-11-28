@@ -12,11 +12,11 @@ Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix we
 Lease-Until: 1795912150
 Updated: 1795897750
 Task-Base: d6a3c73cd3b09c58be89b4b73a1789d75c57aebd
-Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/52; run .uak/bin/smoke
+Next: Humano: Edits a file outside Paths: web/src/features/perfil/ProfileView.tsx (Paths of HACK-046). Revert that file on the branch (git checkout origin/main -- web/src/features/perfil/ProfileView.tsx), or the human merges the PR
 PR: https://github.com/DylanMCDS/Negosocios/pull/52
 Evidence: vitest explorar+perfil+mipagina exit 0 (+3 tests); build exit 0; design-lint PASS; design-critic SHIP 92cf549 (sin cambio visual desde entonces) · red at a31522a: AssertionError: expected "vi.fn()" to be called with arguments: [ +0, +0 ]
-Participants: author dylan-2 (unknown); reviewer dylan-3 (unknown) reject; author dylan-2 (claude-sonnet-5-5); reviewer dylan-5 (claude-sonnet-5-5) approve
-Events: 11
+Participants: author dylan-2 (unknown); reviewer dylan-3 (unknown) reject; author dylan-2 (claude-sonnet-5-5); reviewer dylan-5 (claude-sonnet-5-5) approve; merged-by dylan-2 (unknown)
+Events: 12
 Checkpoints: 0
 Sessions: 4
 Last-Checkpoint: 0

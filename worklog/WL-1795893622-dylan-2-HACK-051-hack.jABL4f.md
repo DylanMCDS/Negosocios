@@ -6,7 +6,7 @@
 - Why: Parallel work without touching the main checkout
 - Failing: No validation run yet
 - Commands: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/52; run .uak/bin/smoke
+- Next: Humano: Edits a file outside Paths: web/src/features/perfil/ProfileView.tsx (Paths of HACK-046). Revert that file on the branch (git checkout origin/main -- web/src/features/perfil/ProfileView.tsx), or the human merges the PR
 
 ## History
 - 1795893622 | CLAIMED | dylan-2 | claim; next: leer criterios y escribir pruebas rojas | Harness: unknown | Model: unknown
@@ -20,3 +20,4 @@
 - 1795897712 | REVIEW | dylan-2 | heartbeat; lease until 1795912112 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795897750 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/52; evidence: vitest explorar+perfil+mipagina exit 0 (+3 tests); build exit 0; design-lint PASS; design-critic SHIP 92cf549 (sin cambio visual desde entonces) · red at a31522a: AssertionError: expected "vi.fn()" to be called with arguments: [ +0, +0 ]; reviewer: - | Harness: unknown | Model: unknown
 - 1795898719 | REVIEW | dylan-5 | review; approve; SHA 1c1a51ba07efa40d802882da614d978dd60332d5; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795898850 | REVIEW | dylan-2 | merge rechazado; Edits a file outside Paths: web/src/features/perfil/ProfileView.tsx (Paths of HACK-046). Revert that file on the branch (git checkout origin/main -- web/src/features/perfil/ProfileView.tsx), or the human merges the PR | Harness: unknown | Model: unknown
