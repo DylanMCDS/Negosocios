@@ -7,6 +7,8 @@ import type { Profile } from "../perfil/model";
 // Demo tianguis (CDMX centro): where the map opens and the list is measured from until the person shares a location.
 const DEMO_CENTER = { lat: 19.432, lng: -99.133 };
 const RADIUS_KM = 5;
+// An ally can be farther than the list radius: it is looked up once over the whole planet (the server has no maximum).
+const EVERYWHERE_KM = 25000;
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 interface Hours { open: string; close: string }
@@ -243,7 +245,12 @@ export default function Explorar() {
   );
 
 
-  useEffect(() => { if (fromProfile) setSelected(fromProfile); }, [fromProfile]);
+  useEffect(() => {
+    if (!fromProfile) return;
+    // Coming from a profile the page keeps its old scroll: start at the top (desktop) or at the map (phone), so the pins are in view.
+    try { window.scrollTo?.(0, 0); } catch { /* not scrollable here */ }
+    selectBusiness(fromProfile, null);
+  }, [fromProfile, selectBusiness]);
   const partners = selected ? alliances[selected] ?? [] : [];
   const pool = useMemo(() => Object.values(directory), [directory]);
   // The selected business and its allies keep their pins even when a filter hides them from the list.
@@ -267,7 +274,7 @@ export default function Explorar() {
   useEffect(() => {
     if (askedAll.current || partners.every((x) => x.partner_id in directory)) return;
     askedAll.current = true;
-    api<NetworkProfile[]>(`/network?lat=${center.lat}&lng=${center.lng}&radius_km=${RADIUS_KM}`).then(
+    api<NetworkProfile[]>(`/network?lat=${center.lat}&lng=${center.lng}&radius_km=${EVERYWHERE_KM}`).then(
       (list) => setDirectory((d) => ({ ...Object.fromEntries(list.map((p) => [p.business_id, p])), ...d })),
       () => undefined,
     );

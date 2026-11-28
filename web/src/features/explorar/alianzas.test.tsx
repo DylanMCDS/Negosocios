@@ -122,7 +122,38 @@ describe("Red de alianzas", () => {
     render(<Explorar />);
     const dialog = await screen.findByRole("dialog", { name: /Vista previa de Tacos de Doña Rosa/ });
     expect(await within(dialog).findByText("Red de Tacos de Doña Rosa")).toBeInTheDocument();
+    const partner = await within(dialog).findByRole("button", { name: /Fonda Lupita/ });
+    expect(partner).toHaveTextContent("Fonda · Centro");
+    expect(partner).toHaveTextContent("10 % de descuento");
     window.location.hash = "";
+  });
+
+  it("entering_from_a_profile_brings_the_map_into_view", async () => {
+    window.location.hash = "#explorar/rosa";
+    const scroll = vi.fn();
+    vi.stubGlobal("scrollTo", scroll);
+    render(<Explorar />);
+    await screen.findByRole("dialog", { name: /Vista previa de Tacos de Doña Rosa/ });
+    expect(scroll).toHaveBeenCalledWith(0, 0);
+    window.location.hash = "";
+  });
+
+  it("ally_beyond_the_first_5_km_is_resolved_by_a_wide_lookup", async () => {
+    vi.mocked(fetch).mockImplementation(async (url: unknown) => {
+      const u = String(url);
+      const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+      if (u.startsWith("/api/alliances?business_id=rosa")) return json([alliance("active")]);
+      if (u.startsWith("/api/alliances")) return json([]);
+      if (u.includes("/reputation") || u.startsWith("/api/profile/")) return json({ detail: "no" }, 404);
+      return json(Number(new URL(u, "http://x").searchParams.get("radius_km")) > 5 ? network : [network[0]]);
+    });
+    render(<Explorar />);
+    await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+    await userEvent.click(await within(await screen.findByRole("dialog")).findByRole("button", { name: "Ver alianzas" }));
+    const partner = await within(screen.getByRole("dialog")).findByRole("button", { name: /Fonda Lupita/ });
+    await waitFor(() => expect(partner).toBeEnabled());
+    expect(partner).toHaveTextContent("Fonda · Centro");
+    await waitFor(() => expect(leaflet.pins).toContain("Fonda Lupita"));
   });
 
   it("alliance_lines_are_drawn_to_partners_on_the_map", async () => {
