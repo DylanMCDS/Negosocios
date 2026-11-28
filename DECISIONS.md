@@ -107,3 +107,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795894910 | HACK-053 | Vinculación explícita de reservas legadas nuevas con clave original; lectura histórica conservadora. | Why: Distinguir claves futuras e IDs de compras distintas sin corromper reintentos ni métricas.
 - 1795896020 | plan --amend | dylan/dylan | amended: HACK-048 | Why: scope or criteria fixed before review
 - 1795896030 | plan | dylan/dylan | tasks added: HACK-056 | Why: backlog without PR (Plan-Channel: claims)
+- 1795896925 | HACK-055 | Preparar sesión de implementación en este worktree; respetar contratos de animación y ApiError recibidos. | Why: El humano asignó HACK-055; el bloqueo de Paths quedó resuelto. PACE critical: checkpoint y handoff al terminar el claim.
