@@ -12,7 +12,7 @@ Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix we
 Lease-Until: 1795907616
 Updated: 1795893216
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Esperar dictamen independiente de PR49 en SHA721362a y corregir reject o merge tras approve según kit
+Next: Humano: Lock perdido; candidato cancelado
 PR: https://github.com/DylanMCDS/Negosocios/pull/49
 Evidence: -
 Thread-Read: 269

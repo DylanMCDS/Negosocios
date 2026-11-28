@@ -1,5 +1,5 @@
 ID: HACK-050
-State: MERGING
+State: HUMAN
 Owner: dylan-3
-Queued: 1795893228
-Reason: Waiting for queue
+Updated: 1795893259
+Reason: Lock perdido; candidato cancelado
