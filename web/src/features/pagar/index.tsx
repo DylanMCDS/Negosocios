@@ -218,22 +218,19 @@ function PagarScreen() {
   );
 }
 
-// Inside the app ("#pagar/<id>") the owner gets a way out; a customer on the direct link "/pagar/<id>" does not.
-// From the direct link the app menu only sets the hash, so a menu choice moves the origin into the app ("/#<view>").
+// From the direct link "/pagar/<id>" the app menu only sets the hash, and the shell would read the path again and stay here.
+// So a menu choice moves the origin into the app ("/#<view>"). Module level on purpose: the shell swaps this screen out first.
+const onDirectPath = () => /^\/pagar(\/|$)/.test(window.location.pathname);
+if (typeof window !== "undefined") {
+  window.addEventListener("hashchange", () => {
+    const view = window.location.hash.slice(1).split("/")[0];
+    if (onDirectPath() && view && view !== "pagar") window.history.replaceState(null, "", `/#${view}`);
+  });
+}
+
+// Inside the app ("#pagar/<id>") the owner gets a way out; a customer on the direct link does not see Volver.
 export default function Pagar() {
-  const [inApp, setInApp] = useState(() => !/^\/pagar(\/|$)/.test(window.location.pathname));
-  useEffect(() => {
-    const onHash = () => {
-      const view = window.location.hash.slice(1).split("/")[0];
-      if (/^\/pagar(\/|$)/.test(window.location.pathname) && view && view !== "pagar") {
-        window.history.replaceState(null, "", `/#${view}`);
-        window.dispatchEvent(new HashChangeEvent("hashchange"));
-        setInApp(true);
-      }
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
+  const inApp = !onDirectPath();
   return (
     <>
       {inApp && (

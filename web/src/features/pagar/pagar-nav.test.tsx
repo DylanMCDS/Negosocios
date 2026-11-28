@@ -41,6 +41,7 @@ describe("Pagar dentro y fuera de la app", () => {
     // The shell's menu only sets the hash; from the customer path that must move the origin into the app.
     window.location.hash = "cierre";
     window.dispatchEvent(new HashChangeEvent("hashchange"));
+    // The shell reads the path next: it must already be the app origin.
     expect(window.location.pathname).toBe("/");
     expect(window.location.hash).toBe("#cierre");
   });
