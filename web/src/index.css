@@ -77,3 +77,21 @@ h1, h2, h3, .font-display { font-family: var(--font-display); font-weight: 600; 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* Motion: durations and curves come from src/lib/motion (applyMotionTokens). Only opacity and transform move: no layout reflow. */
+@keyframes motion-in { from { opacity: 0; transform: translateY(calc(var(--motion-shift, 0px) * var(--motion-move, 1))); } to { opacity: 1; transform: none; } }
+@keyframes motion-pulse { 50% { opacity: 0.55; } }
+.motion-fade-in { animation: motion-in var(--motion-fade) var(--motion-ease) both; }
+.motion-pulse { animation: motion-pulse var(--motion-pulse) var(--motion-ease-in-out) infinite; }
+/* Fallback when the browser has no View Transitions: the entering screen fades in. */
+html:not([data-vt]) .motion-route { animation: motion-in var(--motion-route) var(--motion-ease) both; }
+.motion-press { transition: transform var(--motion-tap) var(--motion-ease), opacity var(--motion-tap) var(--motion-ease), background-color var(--motion-tap) var(--motion-ease); }
+.motion-press:active:not(:disabled) { transform: scale(0.97); opacity: 0.92; }
+::view-transition-old(root) { animation: motion-out var(--motion-route) var(--motion-ease) both; }
+::view-transition-new(root) { animation: motion-in var(--motion-route) var(--motion-ease) both; }
+@keyframes motion-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-move: 0; }
+  .motion-pulse { animation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
