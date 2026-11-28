@@ -84,6 +84,12 @@ exitosas usan `Cache-Control: no-store`. Token desconocido: 404.
 `order_id` puede ser la futura `Idempotency-Key` del cobro. Si el cobro ya existe,
 se aceptan su ID o su clave, pero debe seguir pendiente, sin vencer y tener
 exactamente el total descontado. Nunca se reescribe el importe de un QR emitido.
+Internamente la reserva siempre queda vinculada a la clave de idempotencia,
+no al ID de base de datos. Cuando existe una orden, su ID sólo sirve para resolver
+esa clave; nunca se compara como si fuera una clave reservada para otra compra.
+Si una referencia coincide con IDs y claves de órdenes distintas se rechaza
+con 409, sin consumir presupuesto. Los consumidores deben generar claves opacas
+únicas (por ejemplo UUID), para evitar colisiones con los IDs numéricos.
 
 ```json
 {"applied":true,"original_cents":10000,"discount_cents":1000,"total_cents":9000,"currency":"MXN","demo_data":true}

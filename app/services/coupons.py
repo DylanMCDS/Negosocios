@@ -104,11 +104,13 @@ def redeem(conn, token, body, now):
         if len(matches) > 1:
             raise HTTPException(409, "La referencia del cobro es ambigua; usa una clave sin coincidencias")
         order = matches[0] if matches else None
+        # Reservations always name an idempotency key, never a database ID.
+        key = order["idempotency_key"] if order else body.order_id
         names = {body.order_id}
         if order:
             names.update((order["id"], order["idempotency_key"]))
         if row["redeemed_at"]:
-            if row["redeem_order_key"] in names and row["original_cents"] == body.amount_cents:
+            if row["redeem_order_key"] == key and row["original_cents"] == body.amount_cents:
                 return _reservation(row)
             raise HTTPException(409, "Este cupón ya se usó")
         if datetime.fromisoformat(row["expires_at"]) <= now:
@@ -117,8 +119,8 @@ def redeem(conn, token, body, now):
         if alliance["status"] != "active":
             raise HTTPException(409, "La alianza no está activa")
         marks = ",".join("?" for _ in names)
-        prior = conn.execute(f"""SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key IN ({marks})
-            AND redeemed_at IS NOT NULL""", (body.business_id, *names)).fetchone()
+        prior = conn.execute("""SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key=?
+            AND redeemed_at IS NOT NULL""", (body.business_id, key)).fetchone()
         legacy = conn.execute(f"""SELECT 1 FROM referrals r JOIN alliances a ON a.id=r.alliance_id
             WHERE a.giver=? AND r.order_id IN ({marks})""", (body.business_id, *names)).fetchone()
         if prior or legacy:
@@ -136,7 +138,6 @@ def redeem(conn, token, body, now):
         if order and (order["status"] != "pending" or order["amount_cents"] != total or
                       (order["expires_at"] and datetime.fromisoformat(order["expires_at"]) <= now)):
             raise HTTPException(409, "Crea el cobro con el total del cupón antes de emitir su QR; no se cambia un cobro existente")
-        key = order["idempotency_key"] if order else body.order_id
         conn.execute("""UPDATE coupons SET redeemed_at=?,redeem_order_key=?,original_cents=?,discount_cents=?,total_cents=?
             WHERE token=?""", (now.isoformat(), key, amount, discount, total, token))
         conn.execute("UPDATE alliances SET uses=uses+1,budget_used_cents=budget_used_cents+? WHERE id=?",

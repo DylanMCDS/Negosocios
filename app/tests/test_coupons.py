@@ -274,3 +274,85 @@ def test_coupon_and_legacy_code_concurrent_reservations_allow_one_benefit(api):
     rows = conn.execute("SELECT SUM(uses),SUM(budget_used_cents) FROM alliances WHERE id IN (?,?)",
                         (coupon_alliance["id"], legacy["id"])).fetchone()
     assert tuple(rows) == (1, 1000)
+
+
+def create_reserved_order(conn, key, provider=None):
+    from app.services.orders import create_order, database
+    from app.services.pey import FakePeyClient
+    from app.schemas import OrderCreate
+    with database(str(conn.execute("PRAGMA database_list").fetchone()["file"])) as db:
+        order, _ = create_order(db, OrderCreate(business_id="cafe", amount_cents=9000, concept="Compra"), key, provider or FakePeyClient())
+    return order
+
+
+def legacy_at_cafe(client):
+    legacy = client.post("/api/alliances", json={
+        "business_a": "cafe", "business_b": "taqueria", "giver": "cafe",
+        "discount_pct": 10, "budget_cents": 10000, "max_uses": 5,
+        "price_cents": 10000, "variable_cost_cents": 6000, "min_contribution_cents": 3000,
+    }).json()
+    assert client.post(f'/api/alliances/{legacy["id"]}/accept').status_code == 200
+    return legacy
+
+
+def test_future_key_never_becomes_a_different_orders_id_on_retry(api):
+    from app.services.pey import FakePeyClient
+    provider = FakePeyClient()
+    client, conn = api
+    numeric_token, alliance = coupon(api)
+    paid(conn, "second-receipt")
+    rightful_token = claim(client, alliance, "second-receipt").json()["token"]
+    assert redeem(client, numeric_token, key="1").status_code == 200
+    rightful = redeem(client, rightful_token, key="next")
+    assert rightful.status_code == 200
+    order = create_reserved_order(conn, "next", provider)
+    assert order.id == "1"
+    before = tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (alliance["id"],)).fetchone())
+    assert redeem(client, numeric_token, key=order.id).status_code == 409
+    assert redeem(client, rightful_token, key=order.id).json() == rightful.json()
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (alliance["id"],)).fetchone()) == before
+    # The numeric reservation still belongs to its own future purchase.
+    own_order = create_reserved_order(conn, "1", provider)
+    assert own_order.id != order.id
+    assert redeem(client, numeric_token, key=own_order.id).status_code == 200
+    assert redeem(client, rightful_token, key=own_order.id).status_code == 409
+
+
+def test_unbound_numeric_coupon_key_does_not_block_existing_order_with_other_key(api):
+    client, conn = api
+    numeric_token, alliance = coupon(api)
+    paid(conn, "second-receipt")
+    other = claim(client, alliance, "second-receipt").json()["token"]
+    assert redeem(client, numeric_token, key="1").status_code == 200
+    order = create_reserved_order(conn, "next")
+    assert order.id == "1"
+    assert redeem(client, other, key=order.id).status_code == 200
+    assert redeem(client, numeric_token, key=order.id).status_code == 409
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (alliance["id"],)).fetchone()) == (2, 2000)
+
+
+def test_unbound_numeric_coupon_key_does_not_block_unrelated_legacy_order(api):
+    client, conn = api
+    token, _ = coupon(api)
+    assert redeem(client, token, key="1").status_code == 200
+    order = create_reserved_order(conn, "next")
+    assert order.id == "1"
+    legacy = legacy_at_cafe(client)
+    result = client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": order.id, "amount_cents": 10000})
+    assert result.status_code == 200
+    assert result.json()["applied"] is True
+    assert redeem(client, token, key=order.id).status_code == 409
+
+
+def test_legacy_coupon_guard_rejects_ambiguous_id_key_without_spending(api):
+    client, conn = api
+    token, _ = coupon(api)
+    assert redeem(client, token, key="somewhere").status_code == 200
+    for identifier, key in (("ambiguous", "first-key"), ("other-id", "ambiguous")):
+        conn.execute("""INSERT INTO orders(id,business_id,amount_cents,concept,status,idempotency_key,created_at)
+            VALUES (?,'cafe',9000,'Compra','pending',?,?)""", (identifier, key, NOW.isoformat()))
+    conn.commit()
+    legacy = legacy_at_cafe(client)
+    response = client.post(f'/api/alliances/{legacy["id"]}/quote', json={"order_id": "ambiguous", "amount_cents": 10000})
+    assert response.status_code == 409
+    assert tuple(conn.execute("SELECT uses,budget_used_cents FROM alliances WHERE id=?", (legacy["id"],)).fetchone()) == (0, 0)

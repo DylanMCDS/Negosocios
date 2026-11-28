@@ -148,9 +148,15 @@ def quote(conn, alliance_id: str, amount_cents: int, order_id: str) -> dict:
         canonical, names = _identities(conn, row["giver"], order_id)
         marks = ",".join("?" * len(names))
         if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='coupons'").fetchone():
+            orders = conn.execute(
+                "SELECT idempotency_key FROM orders WHERE business_id=? AND (id=? OR idempotency_key=?)",
+                (row["giver"], order_id, order_id)).fetchall()
+            if len(orders) > 1:
+                raise HTTPException(409, "La referencia del cobro es ambigua; usa una clave sin coincidencias")
+            reservation_key = orders[0]["idempotency_key"] if orders else order_id
             reserved = conn.execute(
-                f"SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key IN ({marks}) AND redeemed_at IS NOT NULL",
-                (row["giver"], *names)).fetchone()
+                "SELECT 1 FROM coupons WHERE recipient_id=? AND redeem_order_key=? AND redeemed_at IS NOT NULL",
+                (row["giver"], reservation_key)).fetchone()
             if reserved:
                 raise HTTPException(409, "Este cobro ya tiene el beneficio de un cupón")
         prior = conn.execute(
