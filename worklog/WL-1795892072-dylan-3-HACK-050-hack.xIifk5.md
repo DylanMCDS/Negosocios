@@ -15,3 +15,4 @@
 - 1795892892 | REVIEW | dylan-3 | checkpoint; next: Esperar dictamen independiente de PR49 en SHA721362a y corregir reject o merge tras approve según kit | Harness: unknown | Model: unknown
 - 1795892897 | REVIEW | dylan-3 | handoff; next: Esperar dictamen independiente de PR49 en SHA721362a y corregir reject o merge tras approve según kit | Harness: unknown | Model: unknown
 - 1795893164 | REVIEW | dylan-5 | review; approve; SHA 721362a5b35b0926ed8d76f59122e988577793bb; reviewer dylan-5 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795893216 | REVIEW | dylan-3 | heartbeat; lease until 1795907616 | Harness: unknown | Model: unknown
