@@ -24,6 +24,8 @@ class PointCreate(Contract):
     business_id: Annotated[str, Field(min_length=1)]
     kind: Literal["entrance", "cashier", "table"]
     label: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=60)]
+    icon: Literal["pin", "door", "cash", "table", "plant", "bag"] = "pin"
+    target: Literal["profile", "current", "assigned"] | None = None
 
 
 class PointOrder(Contract):
@@ -33,6 +35,7 @@ class PointOrder(Contract):
 @contextmanager
 def points_db(path):
     with database(path) as conn:
+        conn.execute("BEGIN IMMEDIATE")
         conn.execute("""CREATE TABLE IF NOT EXISTS points (
             id TEXT PRIMARY KEY, business_id TEXT NOT NULL REFERENCES businesses(id),
             kind TEXT NOT NULL CHECK(kind IN ('entrance','cashier','table')),
@@ -42,6 +45,12 @@ def points_db(path):
             point_id TEXT NOT NULL REFERENCES points(id),
             order_id TEXT NOT NULL REFERENCES orders(id), PRIMARY KEY(point_id,order_id)
         )""")
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(points)")}
+        if "icon" not in columns:
+            conn.execute("ALTER TABLE points ADD COLUMN icon TEXT NOT NULL DEFAULT 'pin'")
+        if "target" not in columns:
+            conn.execute("ALTER TABLE points ADD COLUMN target TEXT")
+        conn.commit()
         yield conn
 
 
@@ -80,6 +89,25 @@ def _point(conn, point_id, *, active=False):
     return row
 
 
+def _target(row):
+    return row["target"] or ("profile" if row["kind"] == "entrance" else "assigned")
+
+
+def _management(conn, row, now):
+    result = _public(conn, row, now)
+    assigned = conn.execute("""SELECT o.* FROM orders o
+        JOIN point_orders po ON po.order_id=o.id
+        WHERE po.point_id=? AND o.business_id=? ORDER BY o.created_at DESC,o.id DESC""",
+        (row["id"], row["business_id"])).fetchall()
+    if _target(row) == "current":
+        assigned = _pending(conn, row["business_id"], now)[:1]
+    result["assigned_orders"] = [
+        _brief(item) | {"status": "expired" if item["status"] == "pending" and not _eligible(item, now)
+                       else item["status"]} for item in assigned
+    ] if _target(row) != "profile" else []
+    return result
+
+
 def _public(conn, row, now):
     business = find_business(conn, row["business_id"])
     return dict(row) | {
@@ -96,8 +124,8 @@ def create_point(path, body, now):
         for _ in range(5):
             token = secrets.token_urlsafe(24)
             try:
-                conn.execute("INSERT INTO points(id,business_id,kind,label) VALUES (?,?,?,?)",
-                             (token, body.business_id, body.kind, body.label))
+                conn.execute("INSERT INTO points(id,business_id,kind,label,icon,target) VALUES (?,?,?,?,?,?)",
+                             (token, body.business_id, body.kind, body.label, body.icon, body.target))
                 return _public(conn, _point(conn, token), now)
             except sqlite3.IntegrityError:
                 if conn.execute("SELECT 1 FROM points WHERE id=?", (token,)).fetchone() is None:
@@ -109,7 +137,7 @@ def list_points(path, business_id, now):
     with points_db(path) as conn:
         business = find_business(conn, business_id)
         rows = conn.execute("SELECT * FROM points WHERE business_id=? ORDER BY rowid DESC", (business_id,)).fetchall()
-        return {"business": business.model_dump(mode="json"), "points": [_public(conn, row, now) for row in rows]}
+        return {"business": business.model_dump(mode="json"), "points": [_management(conn, row, now) for row in rows]}
 
 
 def pending_orders(path, business_id, now):
@@ -122,14 +150,14 @@ def link_order(path, point_id, order_id, now):
     with points_db(path) as conn, conn:
         conn.execute("BEGIN IMMEDIATE")
         point = _point(conn, point_id, active=True)
-        if point["kind"] == "entrance":
-            raise HTTPException(409, "La entrada abre el perfil. Usa una caja o mesa para cobrar.")
+        if _target(point) != "assigned":
+            raise HTTPException(409, "Este destino no usa cobros asignados. Elige un punto de cobro asignado.")
         order = conn.execute("SELECT * FROM orders WHERE id=? AND business_id=?",
                              (order_id, point["business_id"])).fetchone()
         if order is None:
-            raise HTTPException(404, "Cuenta no encontrada en este puesto")
+            raise HTTPException(404, "Cobro no encontrado en este puesto")
         if not _eligible(order, now):
-            raise HTTPException(409, "La cuenta ya no está pendiente o venció")
+            raise HTTPException(409, "El cobro ya no está pendiente o venció")
         conn.execute("INSERT INTO point_orders(point_id,order_id) VALUES (?,?) ON CONFLICT DO NOTHING",
                      (point_id, order_id))
         return _public(conn, point, now)
@@ -146,9 +174,14 @@ def resolve_point(path, point_id, now):
     with points_db(path) as conn:
         point = _point(conn, point_id, active=True)
         business = find_business(conn, point["business_id"])
-        orders = [] if point["kind"] == "entrance" else [_brief(row) for row in _pending(conn, business.id, now, point_id)]
-        mode = "profile" if point["kind"] == "entrance" else "payment" if len(orders) == 1 else "choose" if orders else "empty"
-        url = (f"/?{urlencode({'negocio': business.id})}#negocio" if mode == "profile" else
+        target = _target(point)
+        eligible = (_pending(conn, business.id, now)[:1] if target == "current" else
+                    _pending(conn, business.id, now, point_id) if target == "assigned" else [])
+        orders = [_brief(row) for row in eligible]
+        mode = "profile" if target == "profile" else "payment" if len(orders) == 1 else "choose" if orders else "empty"
+        profile_url = (f"/#perfil/{quote(business.id, safe='')}" if point["target"] else
+                       f"/?{urlencode({'negocio': business.id})}#negocio")
+        url = (profile_url if mode == "profile" else
                orders[0]["url"] if mode == "payment" else f"/#puntos/{quote(point_id, safe='')}")
         return {"point": _public(conn, point, now), "business": business.model_dump(mode="json"),
                 "orders": orders, "mode": mode, "url": url}

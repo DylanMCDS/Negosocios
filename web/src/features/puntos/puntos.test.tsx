@@ -17,7 +17,7 @@ describe("Puntos", () => {
       { id: "two", concept: "Mesa 2", amount_cents: 10000, url: "/pagar/two" },
     ] });
     render(<PublicPoint token="point-token" />);
-    expect(await screen.findByRole("heading", { name: "Elige tu cuenta" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Elige tu cobro" })).toBeInTheDocument();
     expect(screen.getByText("Tacos de Rosa")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Mesa 1/ })).toHaveAttribute("href", "/pagar/one");
     expect(screen.getByRole("link", { name: /Mesa 2/ })).toHaveAttribute("href", "/pagar/two");

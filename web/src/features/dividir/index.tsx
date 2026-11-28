@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { CheckCircle, Minus, Plus, QrCode } from "@phosphor-icons/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { CaretLeft, CaretRight, CheckCircle, Minus, Plus, QrCode } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import type { Business, Closing, Order } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, Stat, Surface } from "../../lib/ui";
@@ -128,7 +128,10 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
   const amounts = custom ? values.map(toCents) : equalParts(total, n);
   const sum = amounts.reduce((s, a) => s + (Number.isFinite(a) ? a : 0), 0);
   const diff = total - sum;
-  const valid = custom ? diff === 0 && amounts.every((a) => Number.isFinite(a) && a > 0) : Math.floor(total / n) >= 1;
+  // Every part is at least $0.01, so the number of parts can never exceed the amount in cents.
+  const maxParts = Math.max(1, Math.min(MAX_PARTS, total));
+  const partsOk = amounts.every((a) => Number.isFinite(a) && a >= 1) && (custom || n <= total);
+  const valid = custom ? diff === 0 && partsOk : partsOk;
 
   async function create() {
     setBusy(true);
@@ -155,7 +158,7 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
               <Minus size={20} aria-hidden="true" />
             </Button>
             <span className="min-w-8 text-center font-display text-[length:var(--text-l)]" aria-live="polite">{n}</span>
-            <Button size="sm" variant="ghost" aria-label="Más partes" disabled={n >= MAX_PARTS} onClick={() => resize(n + 1)}>
+            <Button size="sm" variant="ghost" aria-label="Más partes" disabled={n >= maxParts} onClick={() => resize(n + 1)}>
               <Plus size={20} aria-hidden="true" />
             </Button>
           </div>
@@ -185,6 +188,7 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
         {custom && diff !== 0 && (
           <p role="status" className="font-semibold">{diff > 0 ? `Faltan ${mxn(diff)}` : `Sobran ${mxn(-diff)}`}</p>
         )}
+        {!partsOk && <p role="status" className="font-semibold">Cada parte debe ser de al menos $0.01</p>}
         <Button onClick={create} disabled={!valid || busy}>Crear cobros</Button>
         {failed && <p role="alert">No pudimos crear los cobros. Intenta de nuevo.</p>}
       </Surface>
@@ -192,42 +196,178 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
   );
 }
 
+/** "Pedir por celular" for one part: the same CoDi push Cobrar uses, addressed to the part ("<orden>-<n>"). */
+function PartPush({ orderId, idx }: { orderId: string; idx: number }) {
+  const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [state, setState] = useState<{ kind: "idle" } | { kind: "sent"; last4: string } | { kind: "error" }>({ kind: "idle" });
+  const digits = phone.replace(/\D/g, "");
+  async function send() {
+    setState({ kind: "idle" });
+    try {
+      const res = await api<{ phone_last4: string }>(`/orders/${encodeURIComponent(`${orderId}-${idx}`)}/push`, { method: "POST", body: JSON.stringify({ phone: digits }) });
+      setState({ kind: "sent", last4: res.phone_last4 });
+    } catch {
+      setState({ kind: "error" });
+    }
+  }
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-surface px-5 font-display text-[length:var(--text-s)] text-accent hover:bg-hairline"
+      >
+        Pedir por celular
+      </button>
+    );
+  }
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <label className="flex flex-col gap-1 text-[length:var(--text-s)] text-ink-2">
+        Celular de tu cliente (10 dígitos)
+        <input className={field} type="tel" inputMode="tel" autoComplete="tel-national" maxLength={14} value={phone} onChange={(e) => setPhone(e.target.value)} />
+      </label>
+      <Button size="sm" disabled={digits.length !== 10} onClick={() => void send()}>Enviar</Button>
+      {state.kind === "sent" && <p aria-live="polite" className="rounded-md bg-ok p-3 text-ok-ink">{`Enviamos el cobro al celular terminado en ${state.last4}. Tu cliente lo aprueba en su app.`}</p>}
+      {state.kind === "error" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">No pudimos enviar el cobro al celular. Muestra el QR.</p>}
+    </div>
+  );
+}
+
+/** One big QR per screen. Paying a part turns its card green, says so, and moves on to the next pending part. */
+function PartsCarousel({ orderId, split }: { orderId: string; split: Split }) {
+  const n = split.parts.length;
+  const [current, setCurrent] = useState(() => Math.max(0, split.parts.findIndex((p) => p.status !== "paid")));
+  const [notice, setNotice] = useState<string | null>(null);
+  const paidKey = split.parts.filter((p) => p.status === "paid").map((p) => p.idx).join(",");
+  const seen = useRef(new Set(paidKey ? paidKey.split(",").map(Number) : []));
+  const touch = useRef<number | null>(null);
+
+  useEffect(() => {
+    const now = paidKey ? paidKey.split(",").map(Number) : [];
+    const fresh = now.filter((i) => !seen.current.has(i));
+    seen.current = new Set(now);
+    if (fresh.length === 0) return;
+    setNotice(`Parte ${fresh[0]} pagada`);
+    const after = split.parts.findIndex((p, i) => p.status !== "paid" && i >= fresh[0] - 1);
+    const any = split.parts.findIndex((p) => p.status !== "paid");
+    setCurrent(after >= 0 ? after : Math.max(any, 0));
+    const timer = setTimeout(() => setNotice(null), 3500);
+    return () => clearTimeout(timer);
+    // The poll hands over a new object every few seconds; only a change in who has paid matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paidKey]);
+
+  const go = (i: number) => setCurrent(Math.min(n - 1, Math.max(0, i)));
+  return (
+    <section className="flex flex-col gap-4">
+      {notice && <p role="status" className="rounded-md bg-ok p-3 font-display text-ok-ink">{notice}</p>}
+      <div
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Partes del cobro"
+        tabIndex={0}
+        className="overflow-hidden rounded-lg"
+        onKeyDown={(e) => { if (e.key === "ArrowLeft") go(current - 1); if (e.key === "ArrowRight") go(current + 1); }}
+        onTouchStart={(e) => { touch.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          if (touch.current === null) return;
+          const dx = e.changedTouches[0].clientX - touch.current;
+          touch.current = null;
+          if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+        }}
+      >
+        <div className="flex transition-transform duration-300 motion-reduce:transition-none" style={{ transform: `translateX(-${current * 100}%)` }}>
+          {split.parts.map((p) => {
+            const paid = p.status === "paid";
+            return (
+              <div key={p.idx} className="w-full shrink-0">
+                <div className={`flex flex-col items-center gap-3 rounded-lg p-5 ${paid ? "bg-ok text-ok-ink" : "bg-tint"}`}>
+                  <p className="font-display text-[length:var(--text-2xl)] leading-none">{mxn(p.amount_cents)}</p>
+                  {paid ? (
+                    <div className="flex flex-col items-center gap-2 py-8">
+                      <CheckCircle size={72} weight="fill" className="text-money" aria-hidden="true" />
+                      <p className="font-display text-[length:var(--text-xl)]">Pagado ✓</p>
+                    </div>
+                  ) : (
+                    p.qr_string && (
+                      <div className="w-full rounded-md bg-surface p-3">
+                        <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="mx-auto max-w-[240px] md:max-w-[340px]" />
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-2">
+        <Button size="sm" variant="secondary" aria-label="Parte anterior" className="hidden md:inline-flex" disabled={current === 0} onClick={() => go(current - 1)}><CaretLeft size={20} aria-hidden="true" /></Button>
+        <div className="flex flex-col items-center">
+        <p className="font-display text-[length:var(--text-body)]" aria-live="polite">{`Parte ${current + 1} de ${n}`}</p>
+        <div className="flex justify-center gap-1">
+        {split.parts.map((p, i) => (
+          <button
+            key={p.idx}
+            type="button"
+            aria-label={`Ir a la parte ${p.idx}${p.status === "paid" ? ", pagada" : ""}`}
+            aria-current={i === current ? "true" : undefined}
+            onClick={() => go(i)}
+            className="grid size-11 cursor-pointer place-items-center"
+          >
+            <span className={`block rounded-full ${i === current ? "size-4" : "size-3"} ${p.status === "paid" ? "bg-money" : i === current ? "bg-accent" : "bg-line"}`} />
+          </button>
+        ))}
+        </div>
+        </div>
+        <Button size="sm" variant="secondary" aria-label="Parte siguiente" className="hidden md:inline-flex" disabled={current === n - 1} onClick={() => go(current + 1)}><CaretRight size={20} aria-hidden="true" /></Button>
+      </div>
+      {split.parts[current].status !== "paid" && (
+        <div key={current} className="flex flex-col items-center gap-1">
+          <PartPush orderId={orderId} idx={split.parts[current].idx} />
+          <a className="inline-flex min-h-11 items-center px-3 underline underline-offset-4" href={`#dividir/${orderId}/${split.parts[current].idx}`}>
+            Abrir página de pago
+          </a>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function PartsView({ orderId, split, demo }: { orderId: string; split: Split; demo: boolean }) {
   const done = split.missing.length === 0;
-  // The next part to pay is the hero: one QR; the rest are compact rows.
-  const hero = split.parts.find((p) => p.status !== "paid" && p.qr_string);
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
-      <PageHeader
-        title={done ? "Cobro completo" : `Faltan ${split.missing.length} de ${split.parts.length}`}
-        lead={done ? "Todas las partes están pagadas." : "Cada parte se paga con su propio QR; el cobro se completa al pagar todas."}
-        action={demo ? <DataBadge /> : undefined}
-      />
-      <div className="grid gap-8 md:grid-cols-[320px_1fr] md:items-start">
-        {hero && hero.qr_string && (
-          <section className="flex flex-col items-center gap-3 rounded-lg bg-tint p-5">
-            <p className="text-[length:var(--text-s)] text-ink-2">{`Ahora: parte ${hero.idx}`}</p>
-            <p className="font-display text-[length:var(--text-xl)] leading-none">{mxn(hero.amount_cents)}</p>
-            <div className="w-full rounded-md bg-surface p-3">
-              <QrCubes value={hero.qr_string} label={`Código QR de la parte ${hero.idx}`} className="mx-auto max-w-[240px]" />
-            </div>
-            <a className="underline underline-offset-4" href={`#dividir/${orderId}/${hero.idx}`}>Abrir página de pago</a>
+    <div className="mx-auto flex max-w-4xl flex-col gap-6 py-2">
+      {done ? (
+        <PageHeader title="Cobro completo" lead="Todas las partes están pagadas." action={demo ? <DataBadge /> : undefined} />
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="min-w-0 font-display text-[length:var(--text-l)] leading-tight md:text-[length:var(--text-xl)]">{`Faltan ${split.missing.length} de ${split.parts.length}`}</h1>
+          {demo && <span className="shrink-0 whitespace-nowrap"><DataBadge /></span>}
+        </div>
+      )}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
+        {done ? (
+          <section className="flex flex-col items-center gap-3 rounded-lg bg-ok p-8 text-ok-ink">
+            <CheckCircle size={72} weight="fill" className="text-money" aria-hidden="true" />
+            <p className="font-display text-[length:var(--text-xl)]">Cuenta completa</p>
+            <p className="font-display text-[length:var(--text-2xl)] leading-none">{mxn(split.total_cents)}</p>
           </section>
+        ) : (
+          <PartsCarousel orderId={orderId} split={split} />
         )}
         <div className="flex flex-col gap-6">
           <Stat label="Pagado hasta ahora" value={mxn(split.paid_cents)} unit={`de ${mxn(split.total_cents)}`} size="sm" />
           <ul className="flex flex-col divide-y divide-hairline">
             {split.parts.map((p) => (
-              <li key={p.idx} className="flex min-h-16 items-center gap-4 py-3">
-                <div className="grid size-[88px] shrink-0 place-items-center">
-                  {p.status === "paid" ? (
-                    <CheckCircle size={40} weight="fill" className="text-money" aria-hidden="true" />
-                  ) : p.idx === hero?.idx || !p.qr_string ? (
-                    <QrCode size={40} className="text-accent" aria-hidden="true" />
-                  ) : (
-                    <QrCubes value={p.qr_string} label={`Código QR de la parte ${p.idx}`} className="max-w-[88px]" />
-                  )}
-                </div>
+              <li key={p.idx} className="flex min-h-14 items-center gap-4 py-3">
+                {p.status === "paid" ? (
+                  <CheckCircle size={32} weight="fill" className="shrink-0 text-money" aria-hidden="true" />
+                ) : (
+                  <QrCode size={32} className="shrink-0 text-accent" aria-hidden="true" />
+                )}
                 <p className="flex-1 font-semibold">{`Parte ${p.idx}`}</p>
                 <p className="font-display">{mxn(p.amount_cents)}</p>
                 {p.status === "paid" ? (
