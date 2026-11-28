@@ -11,3 +11,4 @@
 ## History
 - 1795893622 | CLAIMED | dylan-2 | claim; next: leer criterios y escribir pruebas rojas | Harness: unknown | Model: unknown
 - 1795894023 | REVIEW | dylan-2 | done; PR https://github.com/DylanMCDS/Negosocios/pull/52; evidence: vitest explorar exit 0 (5 new alianzas tests red then green); build exit 0; design-lint PASS; captures 390/1280 in .uak-shots/HACK-051; design-critic SHIP cfe7f2a · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ] · red at d6a3c73: AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]; reviewer: - | Harness: unknown | Model: unknown
+- 1795894341 | REVIEW | dylan-3 | review; reject; SHA cfe7f2a3b8eb6d9898ef2953b68ae64bd1591f7e; reviewer dylan-3 | Harness: unknown | Model: unknown
