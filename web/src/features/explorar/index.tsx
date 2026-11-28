@@ -174,7 +174,7 @@ export default function Explorar() {
   }, []);
 
   const visible = useMemo(
-    () => (items ?? []).filter((p) => !allied || (reputation[p.business_id]?.endorsements ?? 0) > 0),
+    () => allied ? (items ?? []).filter((p) => (reputation[p.business_id]?.endorsements ?? 0) > 0) : (items ?? []),
     [items, allied, reputation],
   );
 
