@@ -6,7 +6,7 @@
 - Why: No crear cobros desde Explorar ni publicar datos sensibles; mantener componentes de kit.
 - Failing: Ninguno en Verify. Browser real API en curso; pendiente critic y envío REVIEW.
 - Commands: q uv run pytest -q app/tests/test_profile.py app/tests/test_network.py app/tests/test_reviews.py; q Verify; smoke --affected
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/46; run .uak/bin/smoke
+- Next: Integrated in main: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
 
 ## History
 - 1795819851 | CLAIMED | dylan-0 | claim; next: Definir contrato de perfil público y pruebas profile_roundtrip_saves_menu_and_description en rojo | Harness: unknown | Model: unknown
@@ -21,3 +21,4 @@
 - 1795831548 | CLAIMED | dylan-5 | claim; next: Terminar smoke y suite web; browser real persistencia+capturas; commit, critic SHIP, push PR y done | Harness: unknown | Model: unknown
 - 1795831729 | REVIEW | dylan-5 | done; PR https://github.com/DylanMCDS/Negosocios/pull/46; evidence: uv run pytest -q app/tests/test_profile.py && npm --prefix web test (perfil, mipagina, explorar) && build && design-lint exit 0 en a372a78; 5 pruebas con nombre verdes; browser real 390/1280; design-critic VERDICT: SHIP a372a78 · existing tests changed with a human's approval (dylan) · red at 3e7339c: E   AssertionError: assert None == 'Comida recién hecha'; reviewer: - | Harness: unknown | Model: unknown
 - 1795887258 | REVIEW | dylan-1 | review; approve; SHA a372a78bfcb54be6000a803f5a67de1127f1abdc; reviewer dylan-1 | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795887346 | INTEGRATED | dylan-5 | merge; smoke and Verify PASS (smoke: full); commit c5e08a8d17a7b5f13832327eb7eeb407353b5d88; reviewer dylan-1 | Harness: unknown | Model: unknown
