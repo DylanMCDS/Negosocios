@@ -21,3 +21,4 @@
 - 1795894269 | REVIEW | dylan-4 | review; reject; SHA 27948b6ee53ff8af639b3b8137e2a93d09033f91; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
 - 1795894390 | REVIEW | dylan-1 | heartbeat; lease until 1795908790 | Harness: claude-code | Model: claude-sonnet-5-5
 - 1795894528 | REVIEW | dylan-1 | done; PR https://github.com/DylanMCDS/Negosocios/pull/51; evidence: npm --prefix web test -- --run + build + design-lint exit 0 · red at c5e08a8: AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times; reviewer: - | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795894809 | REVIEW | dylan-4 | review; reject; SHA 7291e04d8f8e08faa2e3fa9b0f6f9a22660e1d2e; reviewer dylan-4 | Harness: codex | Model: gpt-6.1-sol
