@@ -18,3 +18,4 @@
 - 1795821134 | CLAIMED | scheduler | deadline decision HACK-046-1795820044; option: Mantener modelo de edición del prototipo existente; contrato público allowlist sin datos bancarios. Horario canónico en network_profiles compartido con Explorar.; Why: La tarea exige PUT para puesto activo y no incluye un sistema de propiedad/autenticación; introducirlo ampliaría alcance. Se valida privacidad y coherencia de horarios.
 - 1795822135 | CLAIMED | dylan-0 | checkpoint; next: Terminar smoke y suite web; browser real persistencia+capturas; commit, critic SHIP, push PR y done | Harness: unknown | Model: unknown
 - 1795831532 | AVAILABLE | dylan-5 | release; claim released by dylan-5; reason: -; summary kept | Harness: claude-code | Model: claude-sonnet-5-5
+- 1795831548 | CLAIMED | dylan-5 | claim; next: Terminar smoke y suite web; browser real persistencia+capturas; commit, critic SHIP, push PR y done | Harness: unknown | Model: unknown
