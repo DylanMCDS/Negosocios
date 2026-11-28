@@ -91,3 +91,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795892361 | HACK-053 | Reserva pre-QR; issuer=giver, recipient=otro; coupons separado de referrals para preservar atribución | Why: No reescribir QR pey; no nested commits del quote legado
 - 1795892400 | HACK-050 | Preview no modal, anclada sobre mapa desktop y bottom sheet móvil. Markers no se recrean al seleccionar para conservar foco; footer separado permanece visible. | Why: Acceso al perfil sin cobro; skeleton mismo tamaño; fallback listado; cierre Escape/clic fuera/botón devuelve foco tras clic.
 - 1795892505 | HACK-048 | tokens TS -> CSS vars; VT API with CSS fallback | Why: single source
+- 1795892684 | HACK-053 | Parche6líneas fuera Paths preparado; ampliación exacta amend.md lista; solicitud humana asíncrona y msg267 a propietarios | Why: No cambiar alliances.py sin ampliar Paths; un beneficio/orden exige control bilateral

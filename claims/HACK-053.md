@@ -9,10 +9,10 @@ Priority: P1
 Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md
 Depends: HACK-025, HACK-038
 Verify: `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
-Lease-Until: 1795895061
-Updated: 1795892361
+Lease-Until: 1795895384
+Updated: 1795892684
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Revisar respuesta contrato; advisor done; smoke; commit push PR REVIEW
+Next: Humano plan --amend .uak-shots/HACK053/amend.md; aplicar legacy-guard.patch, Verify/smoke, advisor GO, actualizar PR50 y REVIEW
 PR: -
 Evidence: -
 Thread-Read: 259
