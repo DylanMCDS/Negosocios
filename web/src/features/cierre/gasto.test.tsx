@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Closing } from "../../lib/types";
 import Cierre from "./index";
+import { businessToday } from "./ExpenseForm";
 
 const empty: Closing = {
   currency: "MXN", confirmed_sales_cents: 20000, expenses_cents: 0, estimated_profit_cents: 20000,
@@ -64,5 +65,18 @@ describe("Gastos desde Cierre", () => {
     await userEvent.click(screen.getByRole("button", { name: "Guardar gasto" }));
     expect(await screen.findByText(/mayor a 0/)).toBeInTheDocument();
     expect(calls.some((c) => c.url === "/api/expenses")).toBe(false);
+  });
+});
+
+describe("Fecha del gasto", () => {
+  it("expense_date_uses_mexico_city_day_across_utc_midnight", async () => {
+    expect(businessToday(new Date("2026-11-29T01:00:00Z"))).toBe("2026-11-28");
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-29T01:00:00Z") });
+    try {
+      mockApi();
+      render(<Cierre />);
+      await userEvent.click(await screen.findByRole("button", { name: "Agregar gasto" }));
+      expect(screen.getByLabelText("Fecha")).toHaveValue("2026-11-28");
+    } finally { vi.useRealTimers(); }
   });
 });

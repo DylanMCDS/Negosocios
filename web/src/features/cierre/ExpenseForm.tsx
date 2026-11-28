@@ -5,7 +5,9 @@ import { Button, Surface } from "../../lib/ui";
 
 export const CATEGORIES = ["insumos", "renta", "luz y agua", "gas", "transporte", "otro"];
 
-const today = () => new Date().toISOString().slice(0, 10);
+// The business day follows Mexico City (the same zone the closing uses), not UTC: at 19:00 CDMX UTC is already tomorrow.
+export const businessToday = (now = new Date()) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "America/Mexico_City", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 const field = "h-14 w-full rounded-md border border-line bg-surface px-4 text-[length:var(--text-body)] text-ink";
 
 /* Manual expense, inside Cierre. Whole pesos or two decimals; the keyboard opens numeric on a phone. */
@@ -13,7 +15,7 @@ export default function ExpenseForm({ businessId, onSaved, onCancel }: { busines
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState(today());
+  const [date, setDate] = useState(businessToday());
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
