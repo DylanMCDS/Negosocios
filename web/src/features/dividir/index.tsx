@@ -192,19 +192,19 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
           <p role="status" className="font-semibold">{diff > 0 ? `Faltan ${mxn(diff)}` : `Sobran ${mxn(-diff)}`}</p>
         )}
         {!partsOk && <p role="status" className="font-semibold">Cada parte debe ser de al menos $0.01</p>}
-        <Button onClick={create} disabled={!valid || busy}>Crear cobros</Button>
-        {failed?.kind === "network" && <p role="alert">No pudimos crear los cobros. Revisa tu conexión e intenta de nuevo.</p>}
+        {failed?.kind === "network" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">No pudimos crear los cobros. Revisa tu conexión e intenta de nuevo.</p>}
         {failed?.kind === "expired" && (
-          <p role="alert">
-            Este cobro venció. Genera otro en <a className="underline" href="#cobrar">Cobrar</a>
+          <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">
+            Este cobro venció. Genera otro en <a className="inline-flex min-h-11 items-center underline" href="#cobrar">Cobrar</a>
           </p>
         )}
         {failed?.kind === "split" && (
-          <p role="alert">
-            Este cobro ya está dividido. <a className="underline" href={`#dividir/${orderId}`} onClick={() => window.location.reload()}>Ver las partes</a>
+          <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">
+            Este cobro ya está dividido. <a className="inline-flex min-h-11 items-center underline" href={`#dividir/${orderId}`} onClick={() => window.location.reload()}>Ver las partes</a>
           </p>
         )}
-        {failed?.kind === "reason" && <p role="alert">{failed.text}</p>}
+        {failed?.kind === "reason" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">{failed.text}</p>}
+        <Button onClick={create} disabled={!valid || busy}>Crear cobros</Button>
       </Surface>
     </div>
   );
