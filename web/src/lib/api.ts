@@ -1,8 +1,12 @@
 // The only door to the backend: every route lives under /api.
 /** A failed request keeps what the server said, so screens can show the real reason instead of a generic error. */
 export class ApiError extends Error {
-  constructor(readonly status: number, readonly detail: string | null, statusText = "") {
+  status: number;
+  detail: string | null;
+  constructor(status: number, detail: string | null, statusText = "") {
     super(`${status} ${statusText}`.trim());
+    this.status = status;
+    this.detail = detail;
   }
 }
 
