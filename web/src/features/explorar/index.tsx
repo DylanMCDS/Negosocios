@@ -267,7 +267,7 @@ export default function Explorar() {
     lines.current = partners.flatMap((partner) => {
       const to = (items ?? []).find((p) => p.business_id === partner.partner_id);
       if (!to) return [];
-      return [ref.L.polyline([[from.lat, from.lng], [to.lat, to.lng]], { color: "#6d28d9", weight: 3, dashArray: "6 6", className: "stroke-accent" }).addTo(ref.map as never)];
+      return [ref.L.polyline([[from.lat, from.lng], [to.lat, to.lng]], { color: "var(--accent)", weight: 3, dashArray: "6 6", className: "stroke-accent" }).addTo(ref.map as never)];
     });
   }, [selected, items, alliances, mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
