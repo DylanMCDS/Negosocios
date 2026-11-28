@@ -1,12 +1,12 @@
 # worklog/WL-1795892018-dylan-3-HACK-053-hack.eqq2Og.md · HACK-053
 
 ## Live summary
-- Done: PR50 REVIEW abe8265; Verify27 exit0; smoke PRODUCT_PASS; advisor GO; guard bilateral y concurrencia verdes. Re-review HACK047 APPROVE 3f1b1d6 con navegador y Verify33
+- Done: 105f415: Verify coupons+alliances exit0 (31 pruebas), smoke --affected exit0, smoke PRODUCT_PASS, advisor GO; main integrado. Cuatro regresiones nuevas primero rojas y ahora verdes. · red at c5e08a8: E   assert 409 == 201
 - Decision: Cierre con uak done completado; sin fallos propios pendientes
 - Why: Paths ampliados por humano; control de doble descuento acotado a alliances.quote
 - Failing: Ninguno
 - Commands: done HACK-053 REVIEW; Verify27 exit0; smoke --affected exit0; smoke PRODUCT_PASS; re-review HACK047 approve registrado
-- Next: Esperar veredicto HACK-053 en PR50; atender reject/approve según protocolo
+- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/50; run .uak/bin/smoke
 
 ## History
 - 1795892018 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem | Harness: unknown | Model: unknown
@@ -20,3 +20,4 @@
 - 1795893327 | REVIEW | dylan-4 | checkpoint; next: Esperar revisión HACK-053; cerrar re-review HACK-047 SHA3f1b1d6 y ack inbox | Harness: unknown | Model: unknown
 - 1795893433 | REVIEW | dylan-4 | checkpoint; next: Esperar veredicto HACK-053 en PR50; atender reject/approve según protocolo | Harness: unknown | Model: unknown
 - 1795893460 | REVIEW | dylan-3 | review; reject; SHA abe8265985d653cefac5b708dbec671d6e64b610; reviewer dylan-3 | Harness: unknown | Model: unknown
+- 1795893967 | REVIEW | dylan-4 | done; PR https://github.com/DylanMCDS/Negosocios/pull/50; evidence: 105f415: Verify coupons+alliances exit0 (31 pruebas), smoke --affected exit0, smoke PRODUCT_PASS, advisor GO; main integrado. Cuatro regresiones nuevas primero rojas y ahora verdes. · red at c5e08a8: E   assert 409 == 201; reviewer: - | Harness: unknown | Model: unknown
