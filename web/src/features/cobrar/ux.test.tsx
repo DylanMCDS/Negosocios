@@ -84,4 +84,9 @@ describe("Cobrar: cobros pendientes y Dividir", () => {
     render(<Cobrar />);
     expect(screen.getByText("Te lo da tu cliente; viene de un negocio aliado")).toBeInTheDocument();
   });
+
+  it("open_payment_page_link_uses_hash_route", async () => {
+    await charged();
+    expect(screen.getByRole("link", { name: /abrir página de pago/i })).toHaveAttribute("href", "#pagar/1234567");
+  });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
-import { CheckCircle, Clock, ShieldCheck } from "@phosphor-icons/react";
+import { ArrowLeft, CheckCircle, Clock, ShieldCheck } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
 import { api } from "../../lib/api";
 import type { Business, Order, Payment } from "../../lib/types";
@@ -46,7 +46,7 @@ interface Account {
 const isAccount = (d: unknown): d is Account =>
   typeof d === "object" && d !== null && typeof (d as Account).bank === "string" && typeof (d as Account).last4 === "string";
 
-export default function Pagar() {
+function PagarScreen() {
   const orderId = readOrderId();
   const [order, setOrder] = useState<Order | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
@@ -215,5 +215,36 @@ export default function Pagar() {
         )}
       </div>
     </div>
+  );
+}
+
+// Inside the app ("#pagar/<id>") the owner gets a way out; a customer on the direct link "/pagar/<id>" does not.
+// From the direct link the app menu only sets the hash, so a menu choice moves the origin into the app ("/#<view>").
+export default function Pagar() {
+  const [inApp, setInApp] = useState(() => !/^\/pagar(\/|$)/.test(window.location.pathname));
+  useEffect(() => {
+    const onHash = () => {
+      const view = window.location.hash.slice(1).split("/")[0];
+      if (/^\/pagar(\/|$)/.test(window.location.pathname) && view && view !== "pagar") {
+        window.history.replaceState(null, "", `/#${view}`);
+        window.dispatchEvent(new HashChangeEvent("hashchange"));
+        setInApp(true);
+      }
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  return (
+    <>
+      {inApp && (
+        <div className="mx-auto max-w-xl pt-2">
+          <Button variant="secondary" size="sm" onClick={() => { window.location.hash = "cobrar"; }}>
+            <ArrowLeft size={24} aria-hidden="true" />
+            Volver
+          </Button>
+        </div>
+      )}
+      <PagarScreen />
+    </>
   );
 }
