@@ -15,4 +15,4 @@ Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
 Next: Escribir tests rojos de preview sobre mapa y cierre con foco restaurado
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 263
