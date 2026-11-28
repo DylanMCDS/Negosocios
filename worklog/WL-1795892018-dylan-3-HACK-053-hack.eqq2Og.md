@@ -1,12 +1,12 @@
 # worklog/WL-1795892018-dylan-3-HACK-053-hack.eqq2Og.md · HACK-053
 
 ## Live summary
-- Done: a45ad23: Verify coupons+alliances exit0 (35 pruebas); población/reseñas exit0; smoke --affected exit0; smoke PRODUCT_PASS; advisor GO. Regresiones de ambos rechazos verificadas. · red at c5e08a8: E   assert 409 == 201
-- Decision: Reenviado a rejecter via done --note; no cambio API ni esquema
-- Why: Evitar que una reserva futura se vincule a un ID de otra compra
-- Failing: Ninguno en Verify de HACK-053; pendiente veredicto independiente
-- Commands: done HACK053 REVIEW105f415; Verify31 exit0; smoke afectadoexit0; PRODUCT_PASS; review HACK048 --start OK
-- Next: Another agent reviews https://github.com/DylanMCDS/Negosocios/pull/50; run .uak/bin/smoke
+- Done: PR #50 en REVIEW, SHA a45ad23. Rechazos #283 y #293 corregidos. Verify: 35 pruebas; población/reseñas y PRODUCT_PASS verdes. HACK-048 revisada en 7291e04: REJECT por integraciones pendientes; alcance y scroll ya correctos.
+- Decision: Vinculación explícita de reservas legadas nuevas con clave original; lectura histórica conservadora.
+- Why: Distinguir claves futuras e IDs de compras distintas sin corromper reintentos ni métricas.
+- Failing: Ninguno en Verify de HACK-053; pendiente veredicto independiente.
+- Commands: uak done HACK-053 REVIEW; pytest coupons+alliances exit 0; pytest populate+reviews exit 0; smoke PRODUCT_PASS; review HACK-048 reject registrado.
+- Next: Esperar aprobación o rechazo de HACK-053; atender mensajes. HACK-046 ya INTEGRATED y no requiere revisión.
 
 ## History
 - 1795892018 | CLAIMED | dylan-3 | claim; next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem | Harness: unknown | Model: unknown
@@ -24,3 +24,4 @@
 - 1795894184 | REVIEW | dylan-4 | checkpoint; next: Esperar veredicto HACK-053; completar review HACK-048 SHA27948b6 y ack inbox | Harness: unknown | Model: unknown
 - 1795894303 | REVIEW | dylan-3 | review; reject; SHA 105f415bd9275a183f41dfd4b3f15141fdf60693; reviewer dylan-3 | Harness: unknown | Model: unknown
 - 1795894873 | REVIEW | dylan-4 | done; PR https://github.com/DylanMCDS/Negosocios/pull/50; evidence: a45ad23: Verify coupons+alliances exit0 (35 pruebas); población/reseñas exit0; smoke --affected exit0; smoke PRODUCT_PASS; advisor GO. Regresiones de ambos rechazos verificadas. · red at c5e08a8: E   assert 409 == 201; reviewer: - | Harness: unknown | Model: unknown
+- 1795894910 | REVIEW | dylan-4 | checkpoint; next: Esperar aprobación o rechazo de HACK-053; atender mensajes. HACK-046 ya INTEGRATED y no requiere revisión. | Harness: unknown | Model: unknown
