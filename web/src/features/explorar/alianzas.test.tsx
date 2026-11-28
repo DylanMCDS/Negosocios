@@ -78,6 +78,26 @@ describe("Red de alianzas", () => {
     expect(await screen.findByRole("dialog", { name: /Vista previa de Tacos de Doña Rosa/ })).toBeInTheDocument();
   });
 
+  it("partner_outside_the_active_filter_is_still_resolved_and_followable", async () => {
+    vi.mocked(fetch).mockImplementation(async (url: unknown) => {
+      const u = String(url);
+      const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+      if (u.startsWith("/api/alliances?business_id=rosa")) return json([alliance("active")]);
+      if (u.startsWith("/api/alliances")) return json([]);
+      if (u.includes("/reputation") || u.startsWith("/api/profile/")) return json({ detail: "no" }, 404);
+      return json(new URL(u, "http://x").searchParams.get("category") ? [network[0]] : network);
+    });
+    render(<Explorar />);
+    await userEvent.click(await screen.findByRole("button", { name: "Tacos" }));
+    await userEvent.click(await screen.findByRole("button", { name: /Tacos de Doña Rosa/ }));
+    await userEvent.click(await within(await screen.findByRole("dialog")).findByRole("button", { name: "Ver alianzas" }));
+    const partner = await within(screen.getByRole("dialog")).findByRole("button", { name: /Fonda Lupita/ });
+    await waitFor(() => expect(partner).toBeEnabled());
+    expect(partner).toHaveTextContent("Fonda · Centro");
+    await userEvent.click(partner);
+    expect(await screen.findByRole("dialog", { name: /Vista previa de Fonda Lupita/ })).toBeInTheDocument();
+  });
+
   it("alliance_lines_are_drawn_to_partners_on_the_map", async () => {
     await open(/Tacos de Doña Rosa/);
     await waitFor(() => expect(leaflet.lines.length).toBeGreaterThan(0));

@@ -142,6 +142,9 @@ export default function Explorar() {
   const [trail, setTrail] = useState<string[]>([]);
   const [alliances, setAlliances] = useState<Record<string, Partner[]>>({});
   const lines = useRef<Array<{ remove: () => void }>>([]);
+  // Every business seen so far, whatever the active filter: allies are resolved here, not from the filtered list.
+  const [directory, setDirectory] = useState<Record<string, NetworkProfile>>({});
+  const askedAll = useRef(false);
   const [reputation, setReputation] = useState<Record<string, Reputation | null>>({});
   const [failed, setFailed] = useState(false);
   const [mapState, setMapState] = useState<"loading" | "ready" | "failed" | "no-tiles">("loading");
@@ -191,6 +194,10 @@ export default function Explorar() {
       );
     }
   }, [items, reputation]);
+
+  useEffect(() => {
+    if (items?.length) setDirectory((d) => ({ ...d, ...Object.fromEntries(items.map((p) => [p.business_id, p])) }));
+  }, [items]);
 
   // Active alliances of the selected business; none (or a failed lookup) means no button and no lines.
   useEffect(() => {
@@ -247,6 +254,16 @@ export default function Explorar() {
   }, [visible, mapState, center, selectBusiness]);
 
   const partners = selected ? alliances[selected] ?? [] : [];
+  const pool = useMemo(() => Object.values(directory), [directory]);
+  // An ally hidden by the filter or the radius is looked up once without filters.
+  useEffect(() => {
+    if (askedAll.current || partners.every((x) => x.partner_id in directory)) return;
+    askedAll.current = true;
+    api<NetworkProfile[]>(`/network?lat=${center.lat}&lng=${center.lng}&radius_km=${RADIUS_KM}`).then(
+      (list) => setDirectory((d) => ({ ...Object.fromEntries(list.map((p) => [p.business_id, p])), ...d })),
+      () => undefined,
+    );
+  }, [partners, directory, center]);
   const pickPartner = useCallback((id: string, target: HTMLElement) => {
     if (selected) setTrail((t) => [...t, selected]);
     selectBusiness(id, target);
@@ -263,21 +280,21 @@ export default function Explorar() {
     const ref = mapRef.current;
     lines.current.forEach((l) => l.remove());
     lines.current = [];
-    const from = (items ?? []).find((p) => p.business_id === selected);
+    const from = pool.find((p) => p.business_id === selected);
     if (!ref || !from || !ref.L.polyline) return;
     // On wide screens the card covers the left of the map: keep the whole network visible to its right.
     const ids = [selected, ...partners.map((x) => x.partner_id)];
-    const points = (items ?? []).filter((p) => ids.includes(p.business_id)).map((p) => [p.lat, p.lng] as [number, number]);
+    const points = pool.filter((p) => ids.includes(p.business_id)).map((p) => [p.lat, p.lng] as [number, number]);
     if (points.length > 1) {
       const wide = window.matchMedia?.("(min-width: 768px)").matches;
       (ref.map as unknown as { fitBounds?: (b: unknown, o: unknown) => void }).fitBounds?.(points, { paddingTopLeft: [wide ? 420 : 40, 40], paddingBottomRight: [40, wide ? 40 : 300], maxZoom: 16 });
     }
     lines.current = partners.flatMap((partner) => {
-      const to = (items ?? []).find((p) => p.business_id === partner.partner_id);
+      const to = pool.find((p) => p.business_id === partner.partner_id);
       if (!to) return [];
       return [ref.L.polyline([[from.lat, from.lng], [to.lat, to.lng]], { color: "var(--accent)", weight: 3, dashArray: "6 6", className: "stroke-accent" }).addTo(ref.map as never)];
     });
-  }, [selected, items, alliances, mapState]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selected, pool, alliances, mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const locate = () =>
     navigator.geolocation?.getCurrentPosition(
@@ -288,7 +305,7 @@ export default function Explorar() {
       () => setNote("Sin permiso de ubicación: te mostramos el tianguis de ejemplo."),
     ) ?? setNote("Tu navegador no comparte la ubicación: te mostramos el tianguis de ejemplo.");
 
-  const current = visible.find((p) => p.business_id === selected) ?? null;
+  const current = visible.find((p) => p.business_id === selected) ?? (selected ? directory[selected] ?? null : null);
   const pill = (on: boolean) =>
     `inline-flex h-11 cursor-pointer items-center rounded-full border px-4 font-display text-[length:var(--text-s)] ${on ? "border-ink bg-tint" : "border-line bg-surface"}`;
 
@@ -318,7 +335,7 @@ export default function Explorar() {
             {current && partners.length > 0 && (
               <section className="flex flex-col gap-2">
                 <h2 className="font-display text-[length:var(--text-l)]">Aliados de este negocio</h2>
-                <PartnerList partners={partners} items={items ?? []} onPick={pickPartner} />
+                <PartnerList partners={partners} items={pool} onPick={pickPartner} />
               </section>
             )}
             <ul className="flex flex-col divide-y divide-hairline">
@@ -338,7 +355,7 @@ export default function Explorar() {
         <div className="relative isolate flex flex-col gap-3">
           <div ref={mapEl} tabIndex={-1} className="h-[60dvh] min-h-96 w-full overflow-hidden rounded-lg border border-line bg-tint md:h-[calc(100dvh-300px)] md:min-h-96" aria-label="Mapa de negocios cercanos" />
           {current && <PreviewCard key={current.business_id} business={current} reputation={reputation[current.business_id]} trigger={trigger.current} onClose={closePreview}
-            partners={partners} items={items ?? []} onPick={pickPartner} onBack={trail.length ? goBack : null} />}
+            partners={partners} items={pool} onPick={pickPartner} onBack={trail.length ? goBack : null} />}
           {mapState === "failed" && <p className="text-ink-2">El mapa no está disponible: usa la lista.</p>}
           {mapState === "no-tiles" && <p className="text-ink-2">No pudimos cargar el mapa: usa la lista.</p>}
         </div>
