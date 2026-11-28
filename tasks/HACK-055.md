@@ -16,7 +16,7 @@ Next: Leer docs/COUPONS.md y web/DESIGN.md; verificar contrato NFC y canje pre-Q
 PR: -
 Evidence: -
 Participants: author dylan-4 (unknown)
-Events: 3
+Events: 4
 Checkpoints: 1
 Sessions: 1
 Last-Checkpoint: 1795896925
