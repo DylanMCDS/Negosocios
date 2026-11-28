@@ -92,16 +92,14 @@ export function PublicPoint({ token }: { token: string }) {
   if (!destination) return <><PageHeader title="Abriendo punto" lead="Estamos buscando el puesto y sus cobros." /><p role="status">Cargando…</p></>;
   const { business, orders, mode } = destination;
   return <>
-    <PageHeader title={mode === "choose" ? "Elige tu cobro" : mode === "profile" ? "Perfil del puesto" :
-      mode === "empty" ? "No hay cobros pendientes" : "Revisa tu cobro"} lead="Confirma el receptor y el importe antes de pagar." />
+    <PageHeader title={claim?.kind === "saved" ? `Guardaste un cupón para ${claim.coupon.redeem_at.name}` : mode === "choose" ? "Elige tu cobro" : mode === "profile" ? "Perfil del puesto" :
+      mode === "empty" ? "No hay cobros pendientes" : "Revisa tu cobro"}
+      lead={claim?.kind === "saved" ? `Te lo dio ${business.name}. Preséntalo en el negocio aliado.` : "Confirma el receptor y el importe antes de pagar."}
+      action={claim?.kind === "saved" ? <a className="inline-flex min-h-14 items-center rounded-full bg-accent px-6 font-display text-white" href="#cupones">Ver mis cupones</a> : undefined} />
     <Surface className="flex flex-col gap-6">
       <div><p className="text-ink-2">Pagas a</p><h2 className="text-[length:var(--text-l)]">{business.name}</h2></div>
       {(business.demo_data || orders.some((order) => order.demo_data)) && <div><DataBadge /></div>}
-      {claim?.kind === "saved" && <div role="status" className="flex flex-col gap-2 rounded-md bg-tint p-4">
-        <strong>Guardaste un cupón para {claim.coupon.redeem_at.name}</strong>
-        <a className="inline-flex min-h-11 items-center text-accent underline" href="#cupones">Ver mis cupones</a></div>}
-      {claim?.kind === "refused" && <div role="status" className="flex flex-col gap-1 rounded-md bg-tint p-4">
-        <strong>No guardamos ningún cupón.</strong><span>{claim.reason}</span></div>}
+      {claim?.kind === "refused" && <p role="status"><strong>No guardamos ningún cupón.</strong> {claim.reason}</p>}
       {applied && <div role="status" className="flex flex-col gap-3 rounded-md bg-tint p-4">
         <strong>Cupón aplicado: {applied.discount_pct}% de {applied.issuer.name}</strong>
         {orders.length === 1 && <span>Pagarías {pesos(discounted(orders[0].amount_cents, applied.discount_pct))} en lugar de {pesos(orders[0].amount_cents)}</span>}
@@ -110,7 +108,7 @@ export function PublicPoint({ token }: { token: string }) {
           {c.discount_pct}% de {c.issuer.name}</Button>)}</div>}
       </div>}
       {mode === "profile" && <a className="inline-flex min-h-14 items-center text-accent underline" href={destination.url}>Ver perfil</a>}
-      {mode === "empty" && <p>Pide al comerciante que cree y asigne tu cobro a este punto.</p>}
+      {mode === "empty" && claim?.kind !== "saved" && <p>Pide al comerciante que cree y asigne tu cobro a este punto.</p>}
       <ul className="divide-y divide-line">
         {orders.map((order) => <li key={order.id}><a href={order.url}
           className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-4 text-ink underline decoration-line underline-offset-4">

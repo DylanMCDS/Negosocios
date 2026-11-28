@@ -130,31 +130,34 @@ export default function Cupones() {
                 </span>
                 <span className="font-display text-[length:var(--text-l)]">{entry.coupon.discount_pct}% de descuento</span>
                 <span className="text-[length:var(--text-s)] text-ink-2">Vence el {when(entry.coupon.expires_at)}</span>
-                {entry.coupon.demo_data && <DataBadge />}
               </> : <><strong>Cupón por verificar</strong><span role="alert" className="text-ink-2">{entry.error}</span></>}
             </button>
           </li>)}
         </ul>
       </section>}>
         <Surface className="flex flex-col items-center gap-5 text-center" >
-          {coupon ? <FadeIn key={coupon.token} className="flex w-full flex-col items-center gap-5">
-            <div>
-              <p className="text-ink-2">Para tu próxima compra en</p>
-              <h2 className="text-[length:var(--text-xl)]">{coupon.redeem_at.name}</h2>
+          {coupon ? <FadeIn key={coupon.token} className="grid w-full items-center gap-6 md:grid-cols-2">
+            <div className="flex flex-col items-center gap-5">
+              <div>
+                <p className="text-ink-2">Para tu próxima compra en</p>
+                <h2 className="text-[length:var(--text-xl)]">{coupon.redeem_at.name}</h2>
+              </div>
+              <div>
+                <p className="font-display text-[length:var(--text-2xl)] leading-none md:text-[length:var(--text-hero)]">{coupon.discount_pct}%</p>
+                <p className="text-ink-2">de descuento</p>
+              </div>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Chip tone={coupon.status === "valid" ? "ok" : "neutral"}>{LABEL[coupon.status]}</Chip>
+                {coupon.demo_data && <DataBadge />}
+              </div>
+              <p className="text-[length:var(--text-s)] text-ink-2">Vence el {when(coupon.expires_at)}. Te lo dio {coupon.issuer.name}.</p>
             </div>
-            <div>
-              <p className="font-display text-[length:var(--text-2xl)] leading-none md:text-[length:var(--text-hero)]">{coupon.discount_pct}%</p>
-              <p className="text-ink-2">de descuento</p>
+            <div className="flex flex-col items-center gap-4">
+              {coupon.status === "valid" ? <>
+                <CouponQr coupon={coupon} />
+                <p>Presenta este QR para que el negocio aplique tu beneficio.</p>
+              </> : <p role="status">{coupon.status === "used" ? "Este cupón ya se usó." : "Este cupón venció."}</p>}
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Chip tone={coupon.status === "valid" ? "ok" : "neutral"}>{LABEL[coupon.status]}</Chip>
-              {coupon.demo_data && <DataBadge />}
-            </div>
-            {coupon.status === "valid" ? <>
-              <CouponQr coupon={coupon} />
-              <p>Presenta este QR para que el negocio aplique tu beneficio.</p>
-            </> : <p role="status">{coupon.status === "used" ? "Este cupón ya se usó." : "Este cupón venció."}</p>}
-            <p className="text-[length:var(--text-s)] text-ink-2">Vence el {when(coupon.expires_at)}. Te lo dio {coupon.issuer.name}.</p>
           </FadeIn> : <div className="flex flex-col gap-4"><QrCode size={64} aria-hidden="true" className="self-center text-ink-2" />
             <h2 className="text-[length:var(--text-l)]">Verifica tu cupón</h2>
             <p>Actualiza para consultar su estado antes de mostrarlo en el negocio.</p></div>}
