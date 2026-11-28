@@ -82,15 +82,19 @@ export default function App() {
     popped.current = false;
     window.scrollTo({ top, behavior: prefersReducedMotion() || top ? "auto" : "smooth" });
     if (!top || !box.current || typeof ResizeObserver === "undefined") return;
-    // Going back: the data may arrive after the first paint and the page is still short; keep restoring while it grows, until the person scrolls.
+    // Going back: the data may arrive after the first paint and the page is still short; keep restoring while it grows, until it is tall enough or the person scrolls.
     const stop = () => {
       observer.disconnect();
       clearTimeout(timer);
       for (const e of ["wheel", "touchstart", "keydown"]) window.removeEventListener(e, stop);
     };
-    const observer = new ResizeObserver(() => window.scrollTo({ top, behavior: "auto" }));
+    const observer = new ResizeObserver(() => {
+      window.scrollTo({ top, behavior: "auto" });
+      // The page is tall enough now: the position is restored for good.
+      if (document.documentElement.scrollHeight >= top + window.innerHeight) stop();
+    });
     observer.observe(box.current);
-    const timer = setTimeout(stop, 2000);
+    const timer = setTimeout(stop, 15000);
     for (const e of ["wheel", "touchstart", "keydown"]) window.addEventListener(e, stop, { passive: true });
     return stop;
   }, [active]);

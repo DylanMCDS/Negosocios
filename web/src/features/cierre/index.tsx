@@ -3,7 +3,7 @@ import { CheckCircle, Clock, Warning } from "@phosphor-icons/react";
 import { api } from "../../lib/api";
 import { PromoSimulator } from "../../lib/discount";
 import type { Closing } from "../../lib/types";
-import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, SkeletonList, Stat } from "../../lib/ui";
+import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
 import { getBusinessId } from "../negocio/businessId";
 import ExpenseForm from "./ExpenseForm";
@@ -33,7 +33,7 @@ export default function Cierre() {
       <PageHeader title="Cierre del día" lead="Cobros con CoDi y gastos de hoy" action={demo ? <DataBadge /> : undefined} />
       <PageLayout aside={<PromoSimulator />}>
         {failed && <p role="alert">No pudimos cargar tu cierre. Intenta de nuevo.</p>}
-        {!closing && !failed && <SkeletonList rows={3} label="Cargando tu día" rowClassName="h-28" />}
+        {!closing && !failed && <p className="text-ink-2">Cargando tu día…</p>}
         {closing && (
           <>
             <Stat
