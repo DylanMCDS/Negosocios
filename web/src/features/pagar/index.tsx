@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { CheckCircle, Clock, ShieldCheck } from "@phosphor-icons/react";
-import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
+import { Button, Chip, PageHeader, Stat, Surface, SkeletonList } from "../../lib/ui";
+import { FadeIn } from "../../lib/motion";
 import { api } from "../../lib/api";
 import type { Business, Order, Payment } from "../../lib/types";
 
@@ -124,6 +125,7 @@ export default function Pagar() {
     return (
       <div className="mx-auto flex max-w-xl flex-col gap-8 py-2" aria-busy="true">
         <PageHeader title="Cargando cobro" />
+        <SkeletonList rows={1} label="Cargando cobro" rowClassName="h-80" />
       </div>
     );
   }
@@ -153,7 +155,7 @@ export default function Pagar() {
 
   if (order.status === "paid") {
     return (
-      <div className="mx-auto flex max-w-xl flex-col gap-8 py-2">
+      <FadeIn className="mx-auto flex max-w-xl flex-col gap-8 py-2">
         <PageHeader title="Comprobante de pago" lead="CoDi confirmó tu pago." />
         <Surface className="flex flex-col gap-6">
           <div>
@@ -173,7 +175,7 @@ export default function Pagar() {
             Pagado
           </Chip>
         </Surface>
-      </div>
+      </FadeIn>
     );
   }
 

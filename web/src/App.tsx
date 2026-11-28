@@ -76,10 +76,23 @@ export default function App() {
       window.removeEventListener("hashchange", sync);
     };
   }, []);
+  const box = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const top = popped.current ? (positions.current.get(active) ?? 0) : 0;
     popped.current = false;
     window.scrollTo({ top, behavior: prefersReducedMotion() || top ? "auto" : "smooth" });
+    if (!top || !box.current || typeof ResizeObserver === "undefined") return;
+    // Going back: the data may arrive after the first paint and the page is still short; keep restoring while it grows, until the person scrolls.
+    const stop = () => {
+      observer.disconnect();
+      clearTimeout(timer);
+      for (const e of ["wheel", "touchstart", "keydown"]) window.removeEventListener(e, stop);
+    };
+    const observer = new ResizeObserver(() => window.scrollTo({ top, behavior: "auto" }));
+    observer.observe(box.current);
+    const timer = setTimeout(stop, 2000);
+    for (const e of ["wheel", "touchstart", "keydown"]) window.addEventListener(e, stop, { passive: true });
+    return stop;
   }, [active]);
   const view = views.find((v) => v.id === active)!;
   const Screen = features[view.id] ?? fallbacks[view.id];
@@ -96,7 +109,7 @@ export default function App() {
       }
     >
       {view.id !== "pagar" && view.id !== "negocio" && <ActiveBusiness />}
-      <div key={active} className="motion-route">
+      <div key={active} ref={box} className="motion-route">
         {Screen ? <Screen /> : <Soon title={view.label} />}
       </div>
     </AppShell>
