@@ -35,7 +35,7 @@ function reason(error: unknown) {
 }
 
 export default function CouponScanner({ businessId, amountCents, newKey, onApplied }: {
-  businessId: string; amountCents: number; newKey: () => string; onApplied: (totalCents: number) => void;
+  businessId: string; amountCents: number; newKey: () => string; onApplied: (totalCents: number, coupon: { issuer: string; pct: number }) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -111,7 +111,7 @@ export default function CouponScanner({ businessId, amountCents, newKey, onAppli
         body: JSON.stringify({ business_id: businessId, order_id: key, amount_cents: amountCents }),
       });
       setApplied(done.total_cents);
-      onApplied(done.total_cents);
+      onApplied(done.total_cents, { issuer: coupon.issuer.name, pct: coupon.discount_pct });
       setOpen(false);
     } catch (e) {
       setError(reason(e));
@@ -120,7 +120,7 @@ export default function CouponScanner({ businessId, amountCents, newKey, onAppli
     }
   }
 
-  if (applied !== null) return <p role="status" className="font-semibold">{`Cupón aplicado. Total ${formatCents(applied)}`}</p>;
+  if (applied !== null) return null; // the hero already shows the discounted total
   return (
     <div className="flex flex-col gap-3">
       <Button variant="secondary" size="sm" onClick={() => void start()} disabled={open}>
@@ -128,7 +128,7 @@ export default function CouponScanner({ businessId, amountCents, newKey, onAppli
         Escanear cupón
       </Button>
       {open && (
-        <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-3">
+        <div className="flex flex-col gap-3 border-t border-hairline pt-3">
           <video ref={video} playsInline muted className={stream.current ? "aspect-square w-full rounded-md bg-ink object-cover" : "hidden"} />
           {message && <p role="status" className="text-ink-2">{message}</p>}
           <label className="flex flex-col gap-2 text-ink-2">
@@ -140,10 +140,10 @@ export default function CouponScanner({ businessId, amountCents, newKey, onAppli
           {coupon && (
             <div className="flex flex-col gap-1">
               <p className="font-semibold">{`Cupón de ${coupon.issuer.name}`}</p>
-              <p>{`Descuento ${coupon.discount_pct} %`}</p>
-              <p>{`Total ${formatCents(estimate(amountCents, coupon.discount_pct))}`}</p>
+              <p className="text-ink-2">{`Descuento ${coupon.discount_pct} %`}</p>
+              <p className="font-display text-[length:var(--text-l)]">{`Total ${formatCents(estimate(amountCents, coupon.discount_pct))}`}</p>
               <p className="text-[length:var(--text-s)] text-ink-2">El descuento se aplica al confirmar.</p>
-              <Button onClick={() => void apply()} disabled={busy}>Aplicar cupón</Button>
+              <Button variant="secondary" onClick={() => void apply()} disabled={busy}>Aplicar cupón</Button>
             </div>
           )}
           <Button variant="ghost" size="sm" onClick={() => { stopCamera(); setOpen(false); }}>Cancelar</Button>

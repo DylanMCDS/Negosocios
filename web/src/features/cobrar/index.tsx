@@ -112,6 +112,7 @@ export default function Cobrar() {
   const [refError, setRefError] = useState<string | null>(null);
   // A scanned coupon is redeemed against the charge's key before the QR exists; its total is what gets charged.
   const [couponTotal, setCouponTotal] = useState<number | null>(null);
+  const [couponInfo, setCouponInfo] = useState<{ issuer: string; pct: number } | null>(null);
   // null while a saved business is being checked against the server; no saved business = the demo one.
   const [active, setActive] = useState<{ id: string; name: string | null } | null>(() =>
     getBusinessId() ? null : { id: DEMO_BUSINESS_ID, name: null },
@@ -213,6 +214,7 @@ export default function Cobrar() {
     setReferral(null);
     setRefError(null);
     setCouponTotal(null);
+    setCouponInfo(null);
     setOrder(null);
     setPhase("idle");
   };
@@ -293,6 +295,12 @@ export default function Cobrar() {
               )}
           <Surface className={showOrder ? "order-2 flex flex-col gap-4 lg:order-none lg:col-start-2 lg:row-start-1" : "flex flex-col gap-4"}>
             <Stat label="Importe" value={order ? pesos(order.amount_cents) : couponTotal !== null ? pesos(couponTotal) : formatTyping(digits)} unit="MXN" hero />
+            {!showOrder && couponInfo && (
+              <div className="flex flex-wrap items-center gap-2">
+                <s className="text-ink-2">{formatTyping(digits)}</s>
+                <Chip size="sm" tone="ok">{`Cupón ${couponInfo.issuer} −${couponInfo.pct} %`}</Chip>
+              </div>
+            )}
             {showOrder && (
               <>
                 <p className="text-ink-2">{order.concept}</p>
@@ -367,7 +375,7 @@ export default function Cobrar() {
                     businessId={active?.id ?? DEMO_BUSINESS_ID}
                     amountCents={amountCents}
                     newKey={() => (idempotencyKey.current = crypto.randomUUID())}
-                    onApplied={(total) => { setReferral(null); setCouponTotal(total); }}
+                    onApplied={(total, info) => { setReferral(null); setCouponTotal(total); setCouponInfo(info); }}
                   />
                   {referral && (
                     <div className="flex flex-col gap-1">
