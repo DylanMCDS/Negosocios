@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CaretLeft, CaretRight, CheckCircle, Minus, Plus, QrCode } from "@phosphor-icons/react";
 import { api, ApiError, isLive, useTick } from "../../lib/api";
 import type { Business, Closing, Order } from "../../lib/types";
-import { Button, Chip, DataBadge, PageHeader, Stat, Surface } from "../../lib/ui";
+import { Button, Chip, DataBadge, PageHeader, SkeletonList, Stat, Surface } from "../../lib/ui";
+import { FadeIn } from "../../lib/motion";
 import { mxn } from "../../lib/ui/locked/demoDay";
 import { getBusinessId } from "../negocio/businessId";
 import QrCubes from "./QrCubes";
@@ -98,7 +99,7 @@ function PendingList() {
     <div className={shell}>
       <PageHeader title="Dividir un cobro" lead="Cada quien paga su parte directo al negocio, con su propio QR." />
       <Surface className="flex flex-col gap-2">
-        {pending === null && <p className="text-ink-2">Cargando tus cobros…</p>}
+        {pending === null && <SkeletonList rows={2} rowClassName="h-14" label="Cargando tus cobros" />}
         {pending?.length === 0 && <p className="text-ink-2">No tienes cobros pendientes. Crea uno en Cobrar.</p>}
         <ul className="flex flex-col divide-y divide-hairline">
           {pending?.map((o, i) => (
@@ -366,11 +367,13 @@ function PartsView({ orderId, split, demo }: { orderId: string; split: Split; de
       )}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
         {done ? (
-          <section className="flex flex-col items-center gap-3 rounded-lg bg-ok p-8 text-ok-ink">
-            <CheckCircle size={72} weight="fill" className="text-money" aria-hidden="true" />
-            <p className="font-display text-[length:var(--text-xl)]">Cuenta completa</p>
-            <p className="font-display text-[length:var(--text-2xl)] leading-none">{mxn(split.total_cents)}</p>
-          </section>
+          <FadeIn>
+            <section className="flex flex-col items-center gap-3 rounded-lg bg-ok p-8 text-ok-ink">
+              <CheckCircle size={72} weight="fill" className="text-money" aria-hidden="true" />
+              <p className="font-display text-[length:var(--text-xl)]">Cuenta completa</p>
+              <p className="font-display text-[length:var(--text-2xl)] leading-none">{mxn(split.total_cents)}</p>
+            </section>
+          </FadeIn>
         ) : (
           <PartsCarousel orderId={orderId} split={split} />
         )}
