@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CaretLeft, CaretRight, CheckCircle, Minus, Plus, QrCode } from "@phosphor-icons/react";
-import { api, ApiError, isLive } from "../../lib/api";
+import { api, ApiError, isLive, useTick } from "../../lib/api";
 import type { Business, Closing, Order } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, Stat, Surface } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
@@ -85,10 +85,12 @@ function useOrder(orderId: string) {
 }
 
 function PendingList() {
-  const [pending, setPending] = useState<Order[] | null>(null);
+  const [all, setPending] = useState<Order[] | null>(null);
+  useTick();
+  const pending = all?.filter(isLive) ?? null;
   useEffect(() => {
     api<Closing>(`/closing/today?business_id=${encodeURIComponent(getBusinessId() ?? DEMO_BUSINESS_ID)}`).then(
-      (c) => setPending(c.pending.filter(isLive)),
+      (c) => setPending(c.pending),
       () => setPending([]),
     );
   }, []);

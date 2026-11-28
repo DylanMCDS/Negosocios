@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle, Clock, Warning } from "@phosphor-icons/react";
-import { api, isLive } from "../../lib/api";
+import { api, isLive, useTick } from "../../lib/api";
 import { PromoSimulator } from "../../lib/discount";
 import type { Closing } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat } from "../../lib/ui";
@@ -17,7 +17,7 @@ const MISSING_TEXT: Record<string, string> = {
 };
 
 export default function Cierre() {
-  const [closing, setClosing] = useState<Closing | null>(null);
+  useTick();  const [closing, setClosing] = useState<Closing | null>(null);
   const [failed, setFailed] = useState(false);
   const [adding, setAdding] = useState(false);
   const businessId = getBusinessId() ?? DEMO_BUSINESS_ID;

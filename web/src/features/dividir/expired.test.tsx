@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Dividir from "./index";
 
@@ -46,5 +46,16 @@ describe("Dividir con cobros vencidos", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Este cobro venció. Genera otro en Cobrar");
     expect(screen.getByRole("link", { name: /cobrar/i })).toHaveAttribute("href", "#cobrar");
     expect(screen.queryByText(/intenta de nuevo/i)).toBeNull();
+  });
+
+  it("dividir_drops_order_when_it_expires_while_open", async () => {
+    vi.stubGlobal("fetch", vi.fn((url: string) =>
+      url.startsWith("/api/closing/today")
+        ? json({ currency: "MXN", confirmed_sales_cents: 0, expenses_cents: 0, estimated_profit_cents: 0, pending: [order("3333333", "Cena por vencer", new Date(Date.now() + 1500).toISOString())], pending_cents: 8400, missing: [] })
+        : json({}, 404),
+    ));
+    render(<Dividir />);
+    expect(await screen.findByText("Cena por vencer")).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText("Cena por vencer")).toBeNull(), { timeout: 4000 });
   });
 });

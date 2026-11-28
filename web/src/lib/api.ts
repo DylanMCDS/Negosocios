@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 // The only door to the backend: every route lives under /api.
 /** A failed request keeps what the server said, so screens can show the real reason instead of a generic error. */
 export class ApiError extends Error {
@@ -31,3 +33,13 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 /** An order can still be paid: pending and not past `expires_at` (10 minutes after it was created). */
 export const isLive = (order: { status: string; expires_at: string | null }): boolean =>
   order.status === "pending" && (order.expires_at === null || new Date(order.expires_at).getTime() > Date.now());
+
+/** Re-renders every `ms` so a screen that hides expired orders drops one the moment it expires, with the screen open. */
+export function useTick(ms = 1000): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), ms);
+    return () => clearInterval(timer);
+  }, [ms]);
+  return now;
+}
