@@ -18,6 +18,7 @@ it("editor_saves_menu_and_description_with_live_preview", async () => {
   render(<MiPagina />);
   const description = await screen.findByLabelText("Descripción corta");
   fireEvent.change(description, { target: { value: "Comida hecha cada mañana" } });
+  await userEvent.click(screen.getByRole("button", { name: "Menú" }));
   expect(screen.getByText("Comida hecha cada mañana")).toBeInTheDocument();
   fireEvent.change(screen.getByLabelText("Precio 1 (MXN)"), { target: { value: "65.50" } });
   await userEvent.click(screen.getByRole("button", { name: "Guardar página" }));

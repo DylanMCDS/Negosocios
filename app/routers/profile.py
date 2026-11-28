@@ -20,6 +20,6 @@ def get_profile(business_id: str, settings: Annotated[Settings, Depends(get_sett
 
 
 @router.put("/api/profile/{business_id}")
-def put_profile(business_id: str, body: dict, settings: Annotated[Settings, Depends(get_settings)],
+def put_profile(business_id: str, body: profile.ProfileUpdate, settings: Annotated[Settings, Depends(get_settings)],
                 now: Annotated[datetime, Depends(get_now)]):
     return profile.save_profile(settings.database_path, business_id, body, now)

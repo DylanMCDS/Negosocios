@@ -166,7 +166,7 @@ export default function Explorar() {
                 <p>{rep && rep.rating !== null ? `${rep.rating.toFixed(1)} de 5 · ${rep.reviews_count} reseñas` : "Aún sin reseñas"}</p>
                 {rep && rep.endorsements > 0 && <p>{`Recomendado por ${rep.endorsements} ${rep.endorsements === 1 ? "aliado" : "aliados"}`}</p>}
                 <ul>{DAYS.filter(([k]) => current.schedule[k]).map(([k, label]) => <li key={k}>{`${label} ${current.schedule[k].open} a ${current.schedule[k].close}`}</li>)}</ul>
-                <a className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4" href={`/?negocio=${encodeURIComponent(current.business_id)}#negocio`}>Paga aquí con CoDi</a>
+                <a className="font-display text-[length:var(--text-l)] underline decoration-accent underline-offset-4" href={`#perfil/${encodeURIComponent(current.business_id)}`}>Ver negocio</a>
                 {current.demo_data && <p className="text-[length:var(--text-s)] text-ink-2">Datos de ejemplo</p>}
               </Surface>
             )}

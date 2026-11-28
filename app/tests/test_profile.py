@@ -171,3 +171,32 @@ def test_profile_public_reviews_and_active_alliance_allowlist(api):
     assert set(page["promotions"][0]) == {"id", "title", "discount_pct"}
     assert page["promotions"][0]["id"] == alliance["id"]
     assert "private-order" not in json.dumps(page) and "budget_cents" not in json.dumps(page)
+
+
+@pytest.mark.parametrize("exhaustion", ["uses=max_uses", "budget_used_cents=budget_cents", "budget_used_cents=4500"])
+def test_profile_hides_offers_without_remaining_uses_or_budget(api, exhaustion):
+    client, conn = api
+    alliance = client.post("/api/alliances", json={
+        "business_a": "ally", "business_b": "shop", "giver": "shop", "discount_pct": 10,
+        "price_cents": 10000, "variable_cost_cents": 6000, "min_contribution_cents": 3000,
+        "budget_cents": 5000, "max_uses": 5}).json()
+    assert client.post(f"/api/alliances/{alliance['id']}/accept").status_code == 200
+    assert len(client.get("/api/profile/shop").json()["promotions"]) == 1
+    conn.execute(f"UPDATE alliances SET {exhaustion} WHERE id = ?", (alliance["id"],))
+    conn.commit()
+    page = client.get("/api/profile/shop").json()
+    assert page["promotions"] == page["allies"] == []
+
+
+def test_profile_and_directory_schedule_rollback_together(api):
+    client, conn = api
+    assert client.put("/api/network/shop", json={"lat": 19.4, "lng": -99.13, "schedule": SCHEDULE}).status_code == 200
+    assert client.put("/api/profile/shop", json=editable()).status_code == 200
+    conn.execute("""CREATE TRIGGER reject_directory_update BEFORE UPDATE OF schedule ON network_profiles
+        BEGIN SELECT RAISE(ABORT, 'schedule storage failed'); END""")
+    conn.commit()
+    with pytest.raises(Exception, match="schedule storage failed"):
+        client.put("/api/profile/shop", json=editable(description="No guardar", schedule={}))
+    page = client.get("/api/profile/shop").json()
+    assert page["description"] == "Comida recién hecha"
+    assert page["schedule"] == client.get("/api/network/shop").json()["schedule"] == SCHEDULE
