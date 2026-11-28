@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { ArrowClockwise, Backspace, CheckCircle, QrCode } from "@phosphor-icons/react";
 import { Button, Chip, PageHeader, Stat, Surface } from "../../lib/ui";
-import { api } from "../../lib/api";
+import { api, isLive } from "../../lib/api";
 import { appendKey, formatCents, formatTyping, toCents } from "./amount";
 import { DEMO_BUSINESS_ID, getBusinessId, resolveActiveBusiness } from "../../lib/business";
 import type { Order } from "../../lib/types";
@@ -128,7 +128,7 @@ export default function Cobrar() {
       ),
     ).then((found) => {
       if (!live) return;
-      const open = found.filter((o): o is Order => o !== null && o.status === "pending");
+      const open = found.filter((o): o is Order => o !== null && isLive(o));
       writePending(open.map((o) => o.id));
       setWaiting(open);
     });

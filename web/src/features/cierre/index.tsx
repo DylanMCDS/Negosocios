@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle, Clock, Warning } from "@phosphor-icons/react";
-import { api } from "../../lib/api";
+import { api, isLive } from "../../lib/api";
 import { PromoSimulator } from "../../lib/discount";
 import type { Closing } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Stat } from "../../lib/ui";
@@ -78,7 +78,7 @@ export default function Cierre() {
                       <Clock size={28} aria-hidden="true" />
                       <p className="flex-1 font-semibold">{o.concept}</p>
                       <p className="font-display">{mxn(o.amount_cents)}</p>
-                      <Chip size="sm" tone="warn">Pendiente</Chip>
+                      {isLive(o) ? <Chip size="sm" tone="warn">Pendiente</Chip> : <Chip size="sm">Venció</Chip>}
                     </li>
                   ))}
                 </ul>
