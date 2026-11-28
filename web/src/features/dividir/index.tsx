@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CaretLeft, CaretRight, CheckCircle, Minus, Plus, QrCode } from "@phosphor-icons/react";
-import { api } from "../../lib/api";
+import { api, ApiError, isLive, useTick } from "../../lib/api";
 import type { Business, Closing, Order } from "../../lib/types";
 import { Button, Chip, DataBadge, PageHeader, Stat, Surface } from "../../lib/ui";
 import { mxn } from "../../lib/ui/locked/demoDay";
@@ -85,7 +85,9 @@ function useOrder(orderId: string) {
 }
 
 function PendingList() {
-  const [pending, setPending] = useState<Order[] | null>(null);
+  const [all, setPending] = useState<Order[] | null>(null);
+  useTick();
+  const pending = all?.filter(isLive) ?? null;
   useEffect(() => {
     api<Closing>(`/closing/today?business_id=${encodeURIComponent(getBusinessId() ?? DEMO_BUSINESS_ID)}`).then(
       (c) => setPending(c.pending),
@@ -119,7 +121,7 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
   const [custom, setCustom] = useState(false);
   const [values, setValues] = useState<string[]>(["", ""]);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<{ kind: "network" } | { kind: "expired" } | { kind: "split" } | { kind: "reason"; text: string } | null>(null);
 
   const resize = (next: number) => {
     setN(next);
@@ -135,13 +137,16 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
 
   async function create() {
     setBusy(true);
-    setFailed(false);
+    setFailed(null);
     try {
       const body = custom ? { amounts_cents: amounts } : { parts: n };
       const d = await api<unknown>(`/orders/${encodeURIComponent(orderId)}/split`, { method: "POST", body: JSON.stringify(body) });
       if (isSplit(d)) onDone(d);
-    } catch {
-      setFailed(true);
+    } catch (error) {
+      if (!(error instanceof ApiError)) setFailed({ kind: "network" });
+      else if (error.status === 409 && /venci/i.test(error.detail ?? "")) setFailed({ kind: "expired" });
+      else if (error.status === 409 && /dividida/i.test(error.detail ?? "")) setFailed({ kind: "split" });
+      else setFailed({ kind: "reason", text: `No pudimos crear los cobros. ${error.detail ?? ""}`.trim() });
     } finally {
       setBusy(false);
     }
@@ -189,8 +194,19 @@ function SplitForm({ orderId, total, concept, onDone }: { orderId: string; total
           <p role="status" className="font-semibold">{diff > 0 ? `Faltan ${mxn(diff)}` : `Sobran ${mxn(-diff)}`}</p>
         )}
         {!partsOk && <p role="status" className="font-semibold">Cada parte debe ser de al menos $0.01</p>}
+        {failed?.kind === "network" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">No pudimos crear los cobros. Revisa tu conexión e intenta de nuevo.</p>}
+        {failed?.kind === "expired" && (
+          <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">
+            Este cobro venció. Genera otro en <a className="inline-flex min-h-11 items-center underline" href="#cobrar">Cobrar</a>
+          </p>
+        )}
+        {failed?.kind === "split" && (
+          <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">
+            Este cobro ya está dividido. <a className="inline-flex min-h-11 items-center underline" href={`#dividir/${orderId}`} onClick={() => window.location.reload()}>Ver las partes</a>
+          </p>
+        )}
+        {failed?.kind === "reason" && <p role="alert" className="rounded-md bg-bad p-3 text-bad-ink">{failed.text}</p>}
         <Button onClick={create} disabled={!valid || busy}>Crear cobros</Button>
-        {failed && <p role="alert">No pudimos crear los cobros. Intenta de nuevo.</p>}
       </Surface>
     </div>
   );

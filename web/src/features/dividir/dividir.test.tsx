@@ -6,7 +6,7 @@ import Dividir from "./index";
 const order = (over: Record<string, unknown> = {}) => ({
   id: "1234567", business_id: "rosa", amount_cents: 10001, concept: "Cena de tacos", currency: "MXN",
   status: "pending", idempotency_key: "k", codi_qr_id: "qr-0", qr_string: "000201FULL", created_at: "2026-11-27T18:00:00Z",
-  expires_at: "2026-11-27T18:10:00Z", paid_at: null, reconciliation_required: false, reconciliation_reason: null,
+  expires_at: new Date(Date.now() + 3600_000).toISOString(), paid_at: null, reconciliation_required: false, reconciliation_reason: null,
   demo_data: false, ...over,
 });
 const business = { id: "rosa", name: "Tacos de Doña Rosa", category: "Tacos", zone: "Tianguis", temporary_location: null, location_expires_at: null, demo_data: false };
