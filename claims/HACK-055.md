@@ -15,4 +15,4 @@ Task-Base: dbd7557d3680e6b79c2058a054a0085d3a476a82
 Next: Leer docs/COUPONS.md y web/DESIGN.md; verificar contrato NFC y canje pre-QR; escribir tests wallet_lists_saved_coupons_with_status y wallet_shows_qr_for_valid_coupon; uak red HACK-055.
 PR: -
 Evidence: -
-Thread-Read: 0
+Thread-Read: 319
