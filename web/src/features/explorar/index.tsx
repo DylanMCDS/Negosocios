@@ -242,7 +242,7 @@ export default function Explorar() {
         }
       >
         <div className="relative isolate flex flex-col gap-3">
-          <div ref={mapEl} tabIndex={-1} className="h-96 w-full overflow-hidden rounded-lg border border-line bg-tint md:h-[calc(100dvh-300px)] md:min-h-96" aria-label="Mapa de negocios cercanos" />
+          <div ref={mapEl} tabIndex={-1} className="h-[60dvh] min-h-96 w-full overflow-hidden rounded-lg border border-line bg-tint md:h-[calc(100dvh-300px)] md:min-h-96" aria-label="Mapa de negocios cercanos" />
           {current && <PreviewCard key={current.business_id} business={current} reputation={reputation[current.business_id]} trigger={trigger.current} onClose={closePreview} />}
           {mapState === "failed" && <p className="text-ink-2">El mapa no está disponible: usa la lista.</p>}
           {mapState === "no-tiles" && <p className="text-ink-2">No pudimos cargar el mapa: usa la lista.</p>}
