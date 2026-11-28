@@ -6,7 +6,7 @@
 - Why: filtro de vigentes oculta el fixture de ayer
 - Failing: dividir.test lists_pending_charges_to_split
 - Commands: npm --prefix web test -- --run src/features/dividir src/features/cierre src/features/cobrar src/lib
-- Next: Humano: New file outside Paths: web/src/lib/api.test.ts. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation)
+- Next: Integrated in main: dbd7557d3680e6b79c2058a054a0085d3a476a82 (recorded by dylan)
 
 ## History
 - 1795893732 | CLAIMED | dylan-5 | claim; next: primer test rojo | Harness: unknown | Model: unknown
@@ -17,3 +17,4 @@
 - 1795896490 | REVIEW | dylan-2 | review; approve; SHA 56efbae10c4decc8cac844b3199c724eaf9a8c6e; reviewer dylan-2 | Harness: unknown | Model: unknown
 - 1795896545 | REVIEW | dylan-5 | merge rechazado; New file outside Paths: web/src/lib/api.test.ts. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation) | Harness: unknown | Model: unknown
 - 1795896620 | REVIEW | dylan-5 | merge rechazado; New file outside Paths: web/src/lib/api.test.ts. Move it into the task's Paths, or a human adds its dir to Additive-Paths in PROJECT.md (new files there need no reservation) | Harness: unknown | Model: unknown
+- 1795896850 | INTEGRATED | dylan | integrate; recorded by dylan; PR https://github.com/DylanMCDS/Negosocios/pull/53; merged dbd7557d3680e6b79c2058a054a0085d3a476a82; proof ancestry | Harness: claude-code | Model: claude-sonnet-5-5
