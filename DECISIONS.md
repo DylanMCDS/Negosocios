@@ -89,3 +89,4 @@ Why: a reversible option after 15 min keeps work moving.
 - 1795891638 | plan | dylan/dylan | tasks added: HACK-047 HACK-048 | Why: backlog without PR (Plan-Channel: claims)
 - 1795891840 | plan | dylan/dylan | tasks added: HACK-049 HACK-050 HACK-051 HACK-052 HACK-053 HACK-054 HACK-055 | Why: backlog without PR (Plan-Channel: claims)
 - 1795892361 | HACK-053 | Reserva pre-QR; issuer=giver, recipient=otro; coupons separado de referrals para preservar atribución | Why: No reescribir QR pey; no nested commits del quote legado
+- 1795892400 | HACK-050 | Preview no modal, anclada sobre mapa desktop y bottom sheet móvil. Markers no se recrean al seleccionar para conservar foco; footer separado permanece visible. | Why: Acceso al perfil sin cobro; skeleton mismo tamaño; fallback listado; cierre Escape/clic fuera/botón devuelve foco tras clic.

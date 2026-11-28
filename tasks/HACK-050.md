@@ -9,14 +9,14 @@ Priority: P1
 Paths: web/src/features/explorar/
 Depends: HACK-046
 Verify: `npm --prefix web test -- --run src/features/explorar && npm --prefix web run build && bash .uak/bin/design-lint`
-Lease-Until: 1795894772
-Updated: 1795892072
+Lease-Until: 1795895100
+Updated: 1795892400
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Escribir tests rojos de preview sobre mapa y cierre con foco restaurado
+Next: Browser real1280x720+390x844 y prueba foco marker/list; critic SHIP; push PR y done REVIEW
 PR: -
 Evidence: -
 Participants: author dylan-3 (unknown)
-Events: 1
-Checkpoints: 0
+Events: 2
+Checkpoints: 1
 Sessions: 1
-Last-Checkpoint: 0
+Last-Checkpoint: 1795892400
