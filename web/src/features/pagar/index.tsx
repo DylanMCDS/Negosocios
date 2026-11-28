@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle, Clock, ShieldCheck } from "@phosphor-icons/reac
 import { Button, Chip, PageHeader, Stat, Surface, SkeletonList } from "../../lib/ui";
 import { FadeIn } from "../../lib/motion";
 import { api } from "../../lib/api";
+import { useSavedCoupons, discounted } from "../cupones";
 import type { Business, Order, Payment } from "../../lib/types";
 
 const POLL_MS = 2000;
@@ -83,6 +84,7 @@ function PagarScreen() {
 
   // Receiving account (simulated in this demo): only bank and last 4 are ever exposed.
   const businessId = business?.id;
+  const { applied: coupon } = useSavedCoupons(businessId);
   useEffect(() => {
     if (!businessId) return;
     let alive = true;
@@ -196,6 +198,8 @@ function PagarScreen() {
           </div>
           <Stat label="Importe" value={pesos(order.amount_cents)} unit="MXN" hero />
           <p>{order.concept}</p>
+          {coupon && <p role="status" className="rounded-md bg-tint p-4">
+            Cupón aplicado: {coupon.discount_pct}% de {coupon.issuer.name}. Pagarías {pesos(discounted(order.amount_cents, coupon.discount_pct))} en lugar de {pesos(order.amount_cents)}.</p>}
           <Chip tone="ok">
             <ShieldCheck size={20} className="mr-2" aria-hidden="true" />
             Sin comisión con CoDi

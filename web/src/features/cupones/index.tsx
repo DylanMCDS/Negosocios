@@ -54,6 +54,27 @@ function CouponQr({ coupon }: { coupon: Coupon }) {
   </svg>;
 }
 
+// Point at the business where a saved coupon is valid: pick it up on its own and preview the discounted total.
+export function useSavedCoupons(businessId: string | undefined) {
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [chosen, setChosen] = useState("");
+  useEffect(() => {
+    const tokens = savedCouponTokens();
+    if (!businessId || !tokens.length) return;
+    let alive = true;
+    void Promise.all(tokens.map((t) => api<Coupon>(`/coupons/${encodeURIComponent(t)}`).catch(() => null))).then((list) => {
+      if (!alive) return;
+      const usable = list.filter((c): c is Coupon => !!c && c.status === "valid" && c.redeem_at.id === businessId)
+        .sort((a, b) => b.discount_pct - a.discount_pct);
+      setCoupons(usable);
+      setChosen(usable[0]?.token ?? "");
+    });
+    return () => { alive = false; };
+  }, [businessId]);
+  return { coupons, applied: coupons.find((c) => c.token === chosen), choose: setChosen };
+}
+export const discounted = (cents: number, pct: number) => cents - Math.floor((cents * pct) / 100);
+
 export default function Cupones() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [selectedToken, setSelectedToken] = useState("");

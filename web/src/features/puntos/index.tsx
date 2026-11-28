@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { MapPin, Printer, QrCode, Door, CashRegister, Table, Plant, Bag } from "@phosphor-icons/react";
 import QRCode from "qrcode";
-import { api } from "../../lib/api";
+import { api, ApiError } from "../../lib/api";
+import { saveCouponToken, useSavedCoupons, discounted, type Coupon } from "../cupones";
 import { resolveActiveBusiness } from "../../lib/business";
 import { Button, Chip, DataBadge, PageHeader, PageLayout, SectionHeader, Surface } from "../../lib/ui";
 import "./print.css";
@@ -42,10 +43,40 @@ function PointQr({ value, label }: { value: string; label: string }) {
   </svg>;
 }
 
+type Claim = { kind: "saved"; coupon: Coupon } | { kind: "refused"; reason: string };
+const REFUSED = "No pudimos guardar tu cupón ahora.";
+
+// Sticker at the business that gives the benefit: claim it after a verified paid order; nothing is saved otherwise.
+function useCouponClaim(token: string, destination: Destination | null) {
+  const [claim, setClaim] = useState<Claim | null>(null);
+  const businessId = destination?.business.id;
+  useEffect(() => {
+    if (!businessId) return;
+    let alive = true;
+    void (async () => {
+      try {
+        const list = await api<Array<{ id: string; status: string; role: string }>>(`/alliances?business_id=${encodeURIComponent(businessId)}`);
+        const given = Array.isArray(list) ? list.find((a) => a.role === "giver" && a.status === "active") : undefined;
+        if (!given) return;
+        const coupon = await api<Coupon>("/coupons/claim", { method: "POST", body: JSON.stringify({ alliance_id: given.id, point_id: token }) });
+        if (!alive) return;
+        setClaim(saveCouponToken(coupon.token) ? { kind: "saved", coupon } : { kind: "refused", reason: REFUSED });
+      } catch (reason) {
+        if (alive && reason instanceof ApiError) setClaim({ kind: "refused", reason: reason.detail || REFUSED });
+      }
+    })();
+    return () => { alive = false; };
+  }, [token, businessId]);
+  return claim;
+}
+
+
 export function PublicPoint({ token }: { token: string }) {
   const [destination, setDestination] = useState<Destination | null>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const claim = useCouponClaim(token, destination);
+  const { coupons, applied, choose } = useSavedCoupons(destination?.business.id);
   useEffect(() => {
     let alive = true;
     setDestination(null); setError("");
@@ -66,6 +97,18 @@ export function PublicPoint({ token }: { token: string }) {
     <Surface className="flex flex-col gap-6">
       <div><p className="text-ink-2">Pagas a</p><h2 className="text-[length:var(--text-l)]">{business.name}</h2></div>
       {(business.demo_data || orders.some((order) => order.demo_data)) && <div><DataBadge /></div>}
+      {claim?.kind === "saved" && <div role="status" className="flex flex-col gap-2 rounded-md bg-tint p-4">
+        <strong>Guardaste un cupón para {claim.coupon.redeem_at.name}</strong>
+        <a className="inline-flex min-h-11 items-center text-accent underline" href="#cupones">Ver mis cupones</a></div>}
+      {claim?.kind === "refused" && <div role="status" className="flex flex-col gap-1 rounded-md bg-tint p-4">
+        <strong>No guardamos ningún cupón.</strong><span>{claim.reason}</span></div>}
+      {applied && <div role="status" className="flex flex-col gap-3 rounded-md bg-tint p-4">
+        <strong>Cupón aplicado: {applied.discount_pct}% de {applied.issuer.name}</strong>
+        {orders.length === 1 && <span>Pagarías {pesos(discounted(orders[0].amount_cents, applied.discount_pct))} en lugar de {pesos(orders[0].amount_cents)}</span>}
+        {coupons.length > 1 && <div className="flex flex-wrap gap-2">{coupons.map((c) => <Button key={c.token} size="sm"
+          variant={c.token === applied.token ? "primary" : "secondary"} aria-pressed={c.token === applied.token} onClick={() => choose(c.token)}>
+          {c.discount_pct}% de {c.issuer.name}</Button>)}</div>}
+      </div>}
       {mode === "profile" && <a className="inline-flex min-h-14 items-center text-accent underline" href={destination.url}>Ver perfil</a>}
       {mode === "empty" && <p>Pide al comerciante que cree y asigne tu cobro a este punto.</p>}
       <ul className="divide-y divide-line">
