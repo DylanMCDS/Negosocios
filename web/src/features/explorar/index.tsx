@@ -7,6 +7,8 @@ import type { Profile } from "../perfil/model";
 // Demo tianguis (CDMX centro): where the map opens and the list is measured from until the person shares a location.
 const DEMO_CENTER = { lat: 19.432, lng: -99.133 };
 const RADIUS_KM = 5;
+// An ally can be farther than the list radius: it is looked up once over the whole planet (the server has no maximum).
+const EVERYWHERE_KM = 25000;
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 interface Hours { open: string; close: string }
@@ -24,6 +26,8 @@ interface NetworkProfile {
   open_now: boolean;
   demo_data: boolean;
 }
+interface Partner { partner_id: string; partner_name: string; discount_pct: number; demo: boolean }
+interface AllianceRow extends Partner { status: string }
 interface Reputation { rating: number | null; reviews_count: number; endorsements: number }
 
 const DAYS: Array<[string, string]> = [["mon", "Lunes"], ["tue", "Martes"], ["wed", "Miércoles"], ["thu", "Jueves"], ["fri", "Viernes"], ["sat", "Sábado"], ["sun", "Domingo"]];
@@ -35,10 +39,37 @@ const pinHtml = (label: string, on: boolean) =>
 type LeafletMap = { attributionControl?: { setPosition: (position: "topright") => unknown }; remove: () => void; setView: (c: [number, number], z: number) => LeafletMap };
 type LeafletApi = typeof import("leaflet");
 
+/* Allies of one business: name, trade, zone and the discount of each alliance. Tapping one selects it. */
+function PartnerList({ partners, items, onPick }: { partners: Partner[]; items: NetworkProfile[]; onPick: (id: string, target: HTMLElement) => void }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <ul className="flex flex-col divide-y divide-hairline">
+        {partners.map((p) => {
+          const found = items.find((i) => i.business_id === p.partner_id);
+          return (
+            <li key={p.partner_id}>
+              <button type="button" disabled={!found} onClick={(e) => onPick(p.partner_id, e.currentTarget)} className="flex min-h-14 w-full cursor-pointer flex-col justify-center py-2 text-left disabled:cursor-default">
+                <span className="font-semibold">{p.partner_name}</span>
+                {found && <span className="text-[length:var(--text-s)] text-ink-2">{found.category} · {found.zone}</span>}
+                <span className="font-display text-money">{p.discount_pct} % de descuento</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {partners.some((p) => p.demo) && <p className="text-[length:var(--text-s)] text-ink-2">Datos de ejemplo</p>}
+    </div>
+  );
+}
+
 const coverIcons = { toldo: Storefront, maiz: Leaf, cafe: Coffee, flores: Flower };
 const coverColors = { toldo: "bg-tint", maiz: "bg-warn", cafe: "bg-tint", flores: "bg-ok" };
 
-function PreviewCard({ business, reputation, trigger, onClose }: { business: NetworkProfile; reputation: Reputation | null | undefined; trigger: HTMLElement | null; onClose: () => void }) {
+function PreviewCard({ business, reputation, trigger, onClose, partners, items, onPick, onBack, startOpen }: {
+  business: NetworkProfile; reputation: Reputation | null | undefined; trigger: HTMLElement | null; onClose: () => void;
+  partners: Partner[]; items: NetworkProfile[]; onPick: (id: string, target: HTMLElement) => void; onBack: (() => void) | null; startOpen: boolean;
+}) {
+  const [network, setNetwork] = useState(startOpen);
   const [page, setPage] = useState<Profile | null>(null);
   const [phase, setPhase] = useState<"loading" | "ready" | "failed">("loading");
   const panel = useRef<HTMLDivElement>(null);
@@ -64,9 +95,15 @@ function PreviewCard({ business, reputation, trigger, onClose }: { business: Net
   const cover = page?.cover ?? "toldo";
   const Art = coverIcons[cover];
   return <div ref={panel} role="dialog" aria-label={`Vista previa de ${info.name}`} aria-busy={phase === "loading"}
-    className="fixed inset-x-4 bottom-20 z-[1100] flex h-96 max-h-[55dvh] flex-col overflow-hidden rounded-lg bg-surface shadow-lift md:absolute md:inset-x-auto md:bottom-auto md:left-4 md:top-4 md:max-h-[calc(100%-32px)] md:w-96">
+    className="fixed inset-x-4 bottom-20 z-[1100] flex h-auto max-h-[55dvh] flex-col overflow-hidden rounded-lg bg-surface shadow-lift md:absolute md:inset-x-auto md:bottom-auto md:left-4 md:top-4 md:max-h-[calc(100%-32px)] md:w-96">
     <Button variant="ghost" size="sm" aria-label="Cerrar vista previa" className="absolute right-4 top-4 z-10 bg-surface" onClick={onClose}><X size={24} aria-hidden="true" /></Button>
-    <div className="min-h-0 flex-1 overflow-y-auto p-4">
+    <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-6">
+      {network && partners.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          <h2 className="pr-10 font-display text-[length:var(--text-l)] leading-tight">{`Red de ${info.name}`}</h2>
+          <PartnerList partners={partners} items={items} onPick={onPick} />
+        </div>
+      ) : <>
       <div className={`mb-3 flex h-14 items-center rounded-md px-4 ${coverColors[cover]}`}><Art size={48} className="text-accent" aria-hidden="true" /></div>
       <h2 className="pr-2 font-display text-[length:var(--text-l)] leading-tight">{info.name}</h2>
       <p className="mt-1 text-[length:var(--text-s)] text-ink-2">{info.category} · {info.zone}</p>
@@ -83,9 +120,14 @@ function PreviewCard({ business, reputation, trigger, onClose }: { business: Net
           <ul>{DAYS.filter(([k]) => info.schedule[k]).map(([k, label]) => <li key={k}>{`${label} ${info.schedule[k]!.open} a ${info.schedule[k]!.close}`}</li>)}</ul>
         </details>
       </div>
+      </>}
     </div>
     <div className="shrink-0 border-t border-hairline bg-surface px-4 pb-3">
-        <a className="inline-flex min-h-11 items-center font-display text-[length:var(--text-l)] text-accent underline underline-offset-4" href={`#perfil/${encodeURIComponent(business.business_id)}`}>Ver negocio</a>
+        <div className="flex flex-wrap items-center gap-x-4">
+          <a className="inline-flex min-h-11 items-center font-display text-[length:var(--text-l)] text-accent underline underline-offset-4" href={`#perfil/${encodeURIComponent(business.business_id)}`}>Ver negocio</a>
+          {partners.length > 0 && <Button variant="secondary" size="sm" onClick={() => setNetwork(!network)}>{network ? "Ocultar alianzas" : "Ver alianzas"}</Button>}
+          {onBack && <Button variant="ghost" size="sm" onClick={onBack}>Volver</Button>}
+        </div>
         {info.demo_data && <p className="text-[length:var(--text-s)] text-ink-2">Datos de ejemplo</p>}
     </div>
   </div>;
@@ -99,6 +141,14 @@ export default function Explorar() {
   const [openNow, setOpenNow] = useState(false);
   const [allied, setAllied] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [trail, setTrail] = useState<string[]>([]);
+  const [alliances, setAlliances] = useState<Record<string, Partner[]>>({});
+  const lines = useRef<Array<{ remove: () => void }>>([]);
+  // Every business seen so far, whatever the active filter: allies are resolved here, not from the filtered list.
+  const [directory, setDirectory] = useState<Record<string, NetworkProfile>>({});
+  const askedAll = useRef(false);
+  // "#explorar/<id>" (from a public profile) opens that business with its network.
+  const [fromProfile] = useState(() => decodeURIComponent(window.location.hash.slice(1).split("/")[1] ?? "") || null);
   const [reputation, setReputation] = useState<Record<string, Reputation | null>>({});
   const [failed, setFailed] = useState(false);
   const [mapState, setMapState] = useState<"loading" | "ready" | "failed" | "no-tiles">("loading");
@@ -109,6 +159,7 @@ export default function Explorar() {
   const trigger = useRef<HTMLElement | null>(null);
   const closePreview = useCallback(() => {
     setSelected(null);
+    setTrail([]);
     const target = trigger.current?.isConnected ? trigger.current : mapEl.current;
     target?.focus({ preventScroll: true });
   }, []);
@@ -149,6 +200,19 @@ export default function Explorar() {
   }, [items, reputation]);
 
   useEffect(() => {
+    if (items?.length) setDirectory((d) => ({ ...d, ...Object.fromEntries(items.map((p) => [p.business_id, p])) }));
+  }, [items]);
+
+  // Active alliances of the selected business; none (or a failed lookup) means no button and no lines.
+  useEffect(() => {
+    if (!selected || selected in alliances) return;
+    api<AllianceRow[]>(`/alliances?business_id=${encodeURIComponent(selected)}`).then(
+      (rows) => setAlliances((a) => ({ ...a, [selected]: rows.filter((r) => r.status === "active") })),
+      () => setAlliances((a) => ({ ...a, [selected]: [] })),
+    );
+  }, [selected, alliances]);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
@@ -158,6 +222,7 @@ export default function Explorar() {
         if (cancelled || !mapEl.current) return;
         const map = L.map(mapEl.current, { zoomControl: true }).setView([DEMO_CENTER.lat, DEMO_CENTER.lng], 15) as unknown as LeafletMap;
         map.attributionControl?.setPosition("topright");
+        (map as unknown as { zoomControl?: { setPosition?: (p: string) => void } }).zoomControl?.setPosition?.("bottomright");
         const tiles = L.tileLayer(TILES, { attribution: "© OpenStreetMap" });
         tiles.on("tileerror", () => setMapState((s) => (s === "ready" ? "no-tiles" : s)));
         tiles.addTo(map as never);
@@ -179,18 +244,72 @@ export default function Explorar() {
     [items, allied, reputation],
   );
 
+
+  useEffect(() => {
+    if (!fromProfile) return;
+    // Coming from a profile the page keeps its old scroll: start at the top (desktop) or at the map (phone), so the pins are in view.
+    try { window.scrollTo?.(0, 0); } catch { /* not scrollable here */ }
+    selectBusiness(fromProfile, null);
+  }, [fromProfile, selectBusiness]);
+  const partners = selected ? alliances[selected] ?? [] : [];
+  const pool = useMemo(() => Object.values(directory), [directory]);
+  // The selected business and its allies keep their pins even when a filter hides them from the list.
+  const shown = useMemo(() => {
+    const extra = new Set(selected ? [selected, ...partners.map((x) => x.partner_id)] : []);
+    return [...visible, ...pool.filter((p) => extra.has(p.business_id) && !visible.some((v) => v.business_id === p.business_id))];
+  }, [visible, pool, selected, partners]);
   useEffect(() => {
     const ref = mapRef.current;
     if (!ref || mapState === "failed") return;
     markers.current.forEach((m) => m.remove());
-    markers.current = visible.map((p) => {
+    markers.current = shown.map((p) => {
       const icon = ref.L.divIcon({ html: pinHtml(p.category.charAt(0).toUpperCase(), false), className: "", iconSize: [40, 40] });
       const marker = ref.L.marker([p.lat, p.lng], { icon, title: p.name }).addTo(ref.map as never);
       marker.on("click", () => selectBusiness(p.business_id, marker.getElement() ?? mapEl.current));
       return marker;
     });
     ref.map.setView([center.lat, center.lng], 15);
-  }, [visible, mapState, center, selectBusiness]);
+  }, [shown, mapState, center, selectBusiness]);
+  // An ally hidden by the filter or the radius is looked up once without filters.
+  useEffect(() => {
+    if (askedAll.current || partners.every((x) => x.partner_id in directory)) return;
+    askedAll.current = true;
+    api<NetworkProfile[]>(`/network?lat=${center.lat}&lng=${center.lng}&radius_km=${EVERYWHERE_KM}`).then(
+      (list) => setDirectory((d) => ({ ...Object.fromEntries(list.map((p) => [p.business_id, p])), ...d })),
+      () => undefined,
+    );
+  }, [partners, directory, center]);
+  const pickPartner = useCallback((id: string, target: HTMLElement) => {
+    if (selected) setTrail((t) => [...t, selected]);
+    selectBusiness(id, target);
+  }, [selected, selectBusiness]);
+  const goBack = useCallback(() => {
+    const previous = trail[trail.length - 1];
+    if (!previous) return;
+    setTrail((t) => t.slice(0, -1));
+    setSelected(previous);
+  }, [trail]);
+
+  // The network of the selected business, drawn as lines to its allies.
+  useEffect(() => {
+    const ref = mapRef.current;
+    lines.current.forEach((l) => l.remove());
+    lines.current = [];
+    const from = pool.find((p) => p.business_id === selected);
+    if (!ref || !from || !ref.L.polyline) return;
+    // On wide screens the card covers the left of the map: keep the whole network visible to its right.
+    const ids = [selected, ...partners.map((x) => x.partner_id)];
+    const points = pool.filter((p) => ids.includes(p.business_id)).map((p) => [p.lat, p.lng] as [number, number]);
+    if (points.length > 1) {
+      const wide = window.matchMedia?.("(min-width: 768px)").matches;
+      (ref.map as unknown as { fitBounds?: (b: unknown, o: unknown) => void }).fitBounds?.(points, { paddingTopLeft: [wide ? 420 : 40, 40], paddingBottomRight: [40, wide ? 40 : 300], maxZoom: 16 });
+    }
+    lines.current = partners.flatMap((partner) => {
+      const to = pool.find((p) => p.business_id === partner.partner_id);
+      if (!to) return [];
+      return [ref.L.polyline([[from.lat, from.lng], [to.lat, to.lng]], { color: "var(--accent)", weight: 3, dashArray: "6 6", className: "stroke-accent" }).addTo(ref.map as never)];
+    });
+  }, [selected, pool, alliances, mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const locate = () =>
     navigator.geolocation?.getCurrentPosition(
@@ -201,7 +320,7 @@ export default function Explorar() {
       () => setNote("Sin permiso de ubicación: te mostramos el tianguis de ejemplo."),
     ) ?? setNote("Tu navegador no comparte la ubicación: te mostramos el tianguis de ejemplo.");
 
-  const current = visible.find((p) => p.business_id === selected) ?? null;
+  const current = visible.find((p) => p.business_id === selected) ?? (selected ? directory[selected] ?? null : null);
   const pill = (on: boolean) =>
     `inline-flex h-11 cursor-pointer items-center rounded-full border px-4 font-display text-[length:var(--text-s)] ${on ? "border-ink bg-tint" : "border-line bg-surface"}`;
 
@@ -228,6 +347,12 @@ export default function Explorar() {
             </Surface>
             {failed && <p role="alert">No pudimos cargar los negocios. Intenta de nuevo.</p>}
             {items && visible.length === 0 && !failed && <p className="text-ink-2">No hay negocios con esos filtros.</p>}
+            {current && partners.length > 0 && (
+              <section className="flex flex-col gap-2">
+                <h2 className="font-display text-[length:var(--text-l)]">Aliados de este negocio</h2>
+                <PartnerList partners={partners} items={pool} onPick={pickPartner} />
+              </section>
+            )}
             <ul className="flex flex-col divide-y divide-hairline">
               {visible.map((p) => (
                 <li key={p.business_id}>
@@ -244,7 +369,8 @@ export default function Explorar() {
       >
         <div className="relative isolate flex flex-col gap-3">
           <div ref={mapEl} tabIndex={-1} className="h-[60dvh] min-h-96 w-full overflow-hidden rounded-lg border border-line bg-tint md:h-[calc(100dvh-300px)] md:min-h-96" aria-label="Mapa de negocios cercanos" />
-          {current && <PreviewCard key={current.business_id} business={current} reputation={reputation[current.business_id]} trigger={trigger.current} onClose={closePreview} />}
+          {current && <PreviewCard key={current.business_id} business={current} reputation={reputation[current.business_id]} trigger={trigger.current} onClose={closePreview}
+            partners={partners} items={pool} onPick={pickPartner} onBack={trail.length ? goBack : null} startOpen={current.business_id === fromProfile} />}
           {mapState === "failed" && <p className="text-ink-2">El mapa no está disponible: usa la lista.</p>}
           {mapState === "no-tiles" && <p className="text-ink-2">No pudimos cargar el mapa: usa la lista.</p>}
         </div>

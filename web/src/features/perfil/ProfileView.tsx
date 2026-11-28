@@ -63,6 +63,7 @@ export default function ProfileView({ profile: p, preview = false }: { profile: 
         </section>
         <section><Section className="mb-3 font-display text-[length:var(--text-l)]">Aliados</Section>
           {p.allies.length ? <ul className="divide-y divide-hairline">{p.allies.map((ally) => <li key={ally.business_id} className="py-3"><a className="inline-flex min-h-11 items-center font-display text-accent underline" href={profileHash(ally.business_id)}>{ally.name}</a></li>)}</ul> : <p className="text-ink-2">Todavía no tiene alianzas activas.</p>}
+          {p.allies.length > 0 && <a className="mt-3 inline-flex h-11 items-center rounded-full bg-tint px-4 font-display text-accent" href={`#explorar/${encodeURIComponent(p.business_id)}`}>Ver alianzas</a>}
           {p.reputation.endorsements > 0 && <p className="mt-2 text-[length:var(--text-s)] text-ink-2">{p.reputation.endorsements} avales de alianzas activas.</p>}
         </section>
       </Surface>
