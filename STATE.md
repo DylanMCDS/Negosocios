@@ -1,7 +1,7 @@
 # STATE
 
 Phase: execution
-Updated: 1795892353
+Updated: 1795892361
 AVAILABLE: HACK-051 HACK-052 HACK-054 HACK-055 
 CLAIMED: HACK-048 HACK-049 HACK-050 HACK-053 
 BLOCKED: -
@@ -14,15 +14,15 @@ HACK-047 | REVIEW | dylan-2 | until 1795906682
 HACK-048 | CLAIMED | dylan-1 | until 1795894688
 HACK-049 | CLAIMED | dylan-5 | until 1795894732
 HACK-050 | CLAIMED | dylan-3 | until 1795894772
-HACK-053 | CLAIMED | dylan-4 | until 1795894738
+HACK-053 | CLAIMED | dylan-4 | until 1795895061
 
 Blockers: BLOCKED tasks; use status --task ID --summary.
 Current decisions (last 5):
-- 1795822058 | HACK-045 | Integrado por protocolo sprint Auto-Merge yes tras aprobación bf6ad84 | Why: Verify, smoke y critic verdes; aprobación independiente confirmada
 - 1795822135 | HACK-046 | Perfil oculto pero enrutable; Mi página visible en Más. Horarios canónicos y datos públicos allowlist; editor por secciones y preview compartida. | Wh
 - 1795825236 | deadline lease/HACK-046/1795824835 | REQUIRES_RECOVERY | Claim kept; read the summary and use release --expired --read-summary. No work is deleted.
 - 1795891638 | plan | dylan/dylan | tasks added: HACK-047 HACK-048 | Why: backlog without PR (Plan-Channel: claims)
 - 1795891840 | plan | dylan/dylan | tasks added: HACK-049 HACK-050 HACK-051 HACK-052 HACK-053 HACK-054 HACK-055 | Why: backlog without PR (Plan-Channel: claims)
+- 1795892361 | HACK-053 | Reserva pre-QR; issuer=giver, recipient=otro; coupons separado de referrals para preservar atribución | Why: No reescribir QR pey; no nested commits del 
 
 Global next step: available P0; else review PRs, tests, demo, rehearsal.
 Why: bounded snapshot to resume without rereading history.

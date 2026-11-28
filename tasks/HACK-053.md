@@ -9,14 +9,14 @@ Priority: P1
 Paths: app/services/coupons.py, app/routers/coupons.py, app/tests/test_coupons.py, docs/COUPONS.md
 Depends: HACK-025, HACK-038
 Verify: `uv run pytest -q app/tests/test_coupons.py app/tests/test_alliances.py`
-Lease-Until: 1795894738
-Updated: 1795892038
+Lease-Until: 1795895061
+Updated: 1795892361
 Task-Base: c5e08a8d17a7b5f13832327eb7eeb407353b5d88
-Next: Escribir tests rojos de cupones de un solo uso y contrato claim/redeem
+Next: Revisar respuesta contrato; advisor done; smoke; commit push PR REVIEW
 PR: -
 Evidence: -
-Participants: author dylan-3 (unknown)
-Events: 2
-Checkpoints: 0
-Sessions: 1
-Last-Checkpoint: 0
+Participants: author dylan-3 (unknown); author dylan-4 (unknown)
+Events: 3
+Checkpoints: 1
+Sessions: 2
+Last-Checkpoint: 1795892361
